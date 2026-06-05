@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
+@theme {
+  /* ── Fonts ── */
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* ── Brand colors ── */
+  --color-brand:         #1B4332;
+  --color-brand-light:   #2D6A4F;
+  --color-brand-xlight:  #D8F3DC;
+
+  --color-accent:        #F59E0B;
+  --color-accent-light:  #FEF3C7;
+
+  --color-danger:        #DC2626;
+  --color-danger-light:  #FEE2E2;
+
+  --color-info:          #2563EB;
+  --color-info-light:    #DBEAFE;
+
+  --color-success:       #16A34A;
+  --color-success-light: #DCFCE7;
+
+  --color-warning:       #D97706;
+  --color-warning-light: #FEF3C7;
+
+  /* ── Neutral scale ── */
+  --color-sl-50:  #F8FAFC;
+  --color-sl-100: #F1F5F9;
+  --color-sl-200: #E2E8F0;
+  --color-sl-300: #CBD5E1;
+  --color-sl-400: #94A3B8;
+  --color-sl-500: #64748B;
+  --color-sl-600: #475569;
+  --color-sl-700: #334155;
+  --color-sl-800: #1E293B;
+  --color-sl-900: #0F172A;
+
+  /* ── Radius ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:   0 10px 30px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-sl-50);
+  color: var(--color-sl-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Animations ── */
+@keyframes sl-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.5); }
+}
+
+@keyframes sl-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sl-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+@keyframes sl-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sl-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Utility classes ── */
+.sl-animate-fade-in    { animation: sl-fade-in 0.2s ease both; }
+.sl-animate-scale-in   { animation: sl-scale-in 0.15s ease both; }
+.sl-animate-spin       { animation: sl-spin 0.7s linear infinite; }
+.sl-animate-pulse-dot  { animation: sl-pulse-dot 1.5s ease-in-out infinite; }
+.sl-animate-shimmer {
+  background: linear-gradient(90deg, var(--color-sl-100) 25%, var(--color-sl-200) 50%, var(--color-sl-100) 75%);
+  background-size: 600px 100%;
+  animation: sl-shimmer 1.5s linear infinite;
+}

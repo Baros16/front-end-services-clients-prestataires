@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import Bouton from './components/bouton.jsx'
-import Button from './button.jsx'
+import {Button} from './components/commons'
+import ComponentShowcase from './pages/showcase/ComponentShowcase'
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <div>
-      <h1>Hello world !</h1>
+      <ComponentShowcase/>
     </div>
       
   )
