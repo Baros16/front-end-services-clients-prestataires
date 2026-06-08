@@ -2,9 +2,11 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { AuthGuard }                          from "./AuthGuard";
-import { ClientLayout, ProviderLayout, AdminLayout } from "./layouts";
-import { Spinner }                            from "../components/commons/Spinner";
+import { AuthGuard } from "./AuthGuard";
+import { ProviderLayout } from "../components/layouts/ProviderLayout";
+import { AdminLayout } from "../components/layouts/AdminLayout";
+import { ClientLayout } from "../components/layouts/ClientLayout";
+import { Spinner } from "../components/commons/Spinner";
 
 /**
  * AppRouter
