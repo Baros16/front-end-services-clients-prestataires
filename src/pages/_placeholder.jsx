@@ -4,10 +4,10 @@ import { Badge } from "../components/commons/Badge";
 // Extraction et centralisation des données du planning d'équipe (v2)
 const PLANNING_DATA = {
   // --- Espace Authentification ---
-  "/auth/inscription": { id: "01", week: "S2", priority: "P1", dev: "M2 · Tresor", title: "Inscription / Connexion" },
-  "/auth/connexion": { id: "01", week: "S2", priority: "P1", dev: "M2 · Tresor", title: "Inscription / Connexion" },
+  "/auth/register": { id: "01", week: "S2", priority: "P1", dev: "M2 · Tresor", title: "Inscription / Connexion" },
+  "/auth/login": { id: "01", week: "S2", priority: "P1", dev: "M2 · Tresor", title: "Inscription / Connexion" },
   "/auth/otp": { id: "02", week: "S2", priority: "P1", dev: "M2 · Tresor", title: "Vérification OTP" },
-  "/auth/admin-login": { id: "03", week: "S2", priority: "P1", dev: "M5 · Patricia", title: "Connexion Admin" },
+  "/auth/login/admin": { id: "03", week: "S2", priority: "P1", dev: "M5 · Patricia", title: "Connexion Admin" },
   "/auth/service-client-login": { id: "04", week: "S2", priority: "P1", dev: "M7 · Marcelle", title: "Connexion Service Client" },
 
   // --- Espace Client ---

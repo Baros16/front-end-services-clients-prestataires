@@ -25,6 +25,7 @@ import { Spinner } from "../components/commons/Spinner";
  */
 
 // ─── Lazy imports — Auth ─────────────────────────────────────────────────────
+const RegisterPage    = lazy(() => import("../pages/auth/RegisterPage"));
 const LoginPage       = lazy(() => import("../pages/auth/LoginPage"));
 const AdminLoginPage  = lazy(() => import("../pages/auth/AdminLoginPage"));
 const OtpPage         = lazy(() => import("../pages/auth/OtpPage"));
@@ -58,7 +59,7 @@ const NotFoundPage       = lazy(() => import("../pages/NotFoundPage"));
 function SmartRedirect() {
   try {
     const raw = localStorage.getItem("sl_mock_user");
-    if (!raw) return <Navigate to="/auth/login" replace />;
+    if (!raw) return <Navigate to="/auth/register" replace />;
     const { role } = JSON.parse(raw);
     if (role === "CLIENT")   return <Navigate to="/client/dashboard" replace />;
     if (role === "PROVIDER") return <Navigate to="/provider/dashboard" replace />;
@@ -67,7 +68,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-  return <Navigate to="/auth/login" replace />;
+  return <Navigate to="/auth/register" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
@@ -99,12 +100,12 @@ export function AppRouter() {
 
           {/* ── Auth (public) ── */}
           <Route path="/auth">
-            <Route index      element={<Navigate to="/auth/login" replace />} />
+            <Route index      element={<Navigate to="/auth/register" replace />} />
+            <Route path="register"    element={<RegisterPage/>} />
             <Route path="login"       element={<LoginPage />} />
             <Route path="login/admin" element={<AdminLoginPage />} />
             <Route path="otp"         element={<OtpPage />} />
           </Route>
-
           {/* ── Espace Client ── */}
           <Route
             path="/client"
