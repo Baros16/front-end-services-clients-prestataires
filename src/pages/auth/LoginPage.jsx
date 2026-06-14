@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
-import { Input } from "../../components/commons";
-import { Button } from "../../components/commons";
-import { AlertBanner } from "../../components/commons";
+import { Input } from "../../components/commons/Input";
+import { Button } from "../../components/commons/Button";
+import { AlertBanner } from "../../components/commons/AlertBanner";
 import { login } from "../../services/authService";
 
 export default function LoginPage() {
