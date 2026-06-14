@@ -17,6 +17,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+console.log("[mockSwitch] VITE_USE_MOCK =", import.meta.env.VITE_USE_MOCK);
+console.log("[mockSwitch] USE_MOCK =", USE_MOCK);
 
 /**
  * getMock — retourne les données mock ou appelle l'API selon VITE_USE_MOCK.
