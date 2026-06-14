@@ -1,41 +1,37 @@
-// src/data/admin/mockDashboard.js
-// Fallback mock — réponse de GET /admin/dashboard
-// Format exact : API_CONTRACT §8
-
-export const mockAdminDashboard = {
-  success: true,
-  data: {
-    metrics: {
-      activeDemands:    { value: 47,      trend: "+12%" },
-      ongoingMissions:  { value: 23,      trend: "+5%"  },
-      monthlyRevenue:   { value: 8400000, trend: "+31%" },
-      commissionEarned: { value: 672000,  trend: "+31%" }
+{
+  "success": true,
+  "data": {
+    "metrics": {
+      "activeDemands":    { "value": 47,      "trend": "+12%" },
+      "ongoingMissions":  { "value": 23,      "trend": "+5%"  },
+      "monthlyRevenue":   { "value": 8400000, "trend": "-9%" },
+      "commissionEarned": { "value": 672000,  "trend": "+7%" }
     },
-    pendingValidations: [
+    "pendingValidations": [
       {
-        id: "usr_jcm456",
-        role: "provider",
-        firstName: "Jean-Claude",
-        lastName: "Mbarga",
-        fullName: "Jean-Claude Mbarga",
-        phone: "+237699234567",
-        email: "jcm@email.cm",
-        avatarInitial: "J",
-        status: "pending_verification",
-        specialty: "Plomberie",
-        rating: 0,
-        completedMissions: 0,
-        isAvailable: false,
-        hourlyRat: 4000,
-        serviceZone: { city: "Bafoussam", radiusKm: 20 },
-        availability: {
-          monday:    { "start": "08:00", "end": "18:00", "available": true },
-          tuesday:   { "start": "08:00", "end": "18:00", "available": true },
-          wednesday: { "start": "08:00", "end": "18:00", "available": true },
-          thursday:  { "start": "08:00", "end": "18:00", "available": true },
-          friday:    { "start": "08:00", "end": "18:00", "available": true },
-          saturday:  { "start": "08:00", "end": "13:00", "available": true },
-          sunday:    { "start": null,    "end": null,    "available": false }
+        "id": "usr_jcm456",
+        "role": "provider",
+        "firstName": "Jean-Claude",
+        "lastName": "Mbarga",
+        "fullName": "Jean-Claude Mbarga",
+        "phone": "+237699234567",
+        "email": "jcm@email.cm",
+        "avatarInitial": "J",
+        "status": "pending_verification",
+        "specialty": "Plomberie",
+        "rating": 0,
+        "completedMissions": 0,
+        "isAvailable": false,
+        "hourlyRate": 4000,
+        "serviceZone": { "city": "Bafoussam", "radiusKm": 20 },
+        "availability": {
+          "monday":    { "start": "08:00", "end": "18:00", "available": true },
+          "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+          "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+          "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+          "friday":    { "start": "08:00", "end": "18:00", "available": true },
+          "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+          "sunday":    { "start": null,    "end": null,    "available": false }
         },
         "monthlyEarnings": 0,
         "certifications": ["Artisan certifié"],
@@ -69,7 +65,7 @@ export const mockAdminDashboard = {
         },
         "monthlyEarnings": 0,
         "certifications": ["Électricien agréé ARSEL"],
-        "estCertifie": true,
+        "estCertifie": false,
         "createdAt": "2026-05-18T10:00:00+01:00"
       }
     ],
@@ -149,4 +145,4 @@ export const mockAdminDashboard = {
       }
     ]
   }
-};
+}
