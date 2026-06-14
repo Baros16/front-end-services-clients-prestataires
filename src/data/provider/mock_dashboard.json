@@ -1,0 +1,76 @@
+{
+  "success": true,
+  "data": {
+    "provider": {
+      "id": "usr_jcm456",
+      "firstName": "Jean-Claude",
+      "lastName": "Mbarga",
+      "fullName": "Jean-Claude Mbarga",
+      "avatarInitial": "J",
+      "specialty": "Plomberie",
+      "rating": 4.8,
+      "isAvailable": true
+    },
+    "stats": {
+      "missionsThisMonth": 6,
+      "missionsTrend": "+2 vs mois dernier",
+      "monthlyEarnings": 185000,
+      "earningsTrend": "+35 000 XAF vs mois dernier",
+      "completedTotal": 47,
+      "pendingQuotes": 2
+    },
+    "activeMissions": [
+      {
+        "id": "mis_001",
+        "clientName": "Madeleine Kamdem",
+        "clientInitial": "M",
+        "category": "Plomberie",
+        "description": "Fuite sous l'évier de la cuisine",
+        "address": "Bafoussam, Quartier Commercial",
+        "status": "en_cours",
+        "startedAt": "2026-06-12T09:00:00+01:00",
+        "amount": 35000
+      },
+      {
+        "id": "mis_002",
+        "clientName": "Paul Nkeng",
+        "clientInitial": "P",
+        "category": "Plomberie",
+        "description": "Installation robinet salle de bain",
+        "address": "Bafoussam, Ngouache",
+        "status": "en_attente",
+        "startedAt": null,
+        "amount": 25000
+      }
+    ],
+    "recentMissions": [
+      {
+        "id": "mis_099",
+        "clientName": "Solange Tagne",
+        "category": "Plomberie",
+        "status": "terminee",
+        "completedAt": "2026-06-08",
+        "amount": 45000,
+        "rating": 5
+      },
+      {
+        "id": "mis_098",
+        "clientName": "Eric Fotso",
+        "category": "Plomberie",
+        "status": "terminee",
+        "completedAt": "2026-06-04",
+        "amount": 30000,
+        "rating": 4
+      },
+      {
+        "id": "mis_097",
+        "clientName": "Brigitte Messi",
+        "category": "Plomberie",
+        "status": "terminee",
+        "completedAt": "2026-05-30",
+        "amount": 20000,
+        "rating": 5
+      }
+    ]
+  }
+}
