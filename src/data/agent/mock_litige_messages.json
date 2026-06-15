@@ -1,0 +1,61 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "lmsg_005",
+      "litigeId": "lit_042",
+      "senderId": "usr_abc123",
+      "senderRole": "client",
+      "senderName": "Madeleine K.",
+      "content": "Voici les photos supplémentaires que vous m'avez demandées. On voit clairement que c'est l'ancien siphon.",
+      "attachmentUrl": "https://cdn.serviloc.cm/litiges/photo_siphon_ancien.jpg",
+      "sentAt": "2026-05-22T10:30:00+01:00"
+    },
+    {
+      "id": "lmsg_004",
+      "litigeId": "lit_042",
+      "senderId": "usr_agent01",
+      "senderRole": "agent",
+      "senderName": "Pauline F.",
+      "content": "Merci pour ces informations. Pouvez-vous me transmettre des photos du siphon actuel pour confirmer qu'il n'a pas été changé ?",
+      "attachmentUrl": null,
+      "sentAt": "2026-05-22T09:15:00+01:00"
+    },
+    {
+      "id": "lmsg_003",
+      "litigeId": "lit_042",
+      "senderId": "usr_jcm456",
+      "senderRole": "provider",
+      "senderName": "Jean-Claude M.",
+      "content": "J'ai bien effectué les travaux. Le joint a été remplacé. Concernant le siphon, le client ne m'a pas laissé le temps de finir.",
+      "attachmentUrl": null,
+      "sentAt": "2026-05-21T16:00:00+01:00"
+    },
+    {
+      "id": "lmsg_002",
+      "litigeId": "lit_042",
+      "senderId": "usr_agent01",
+      "senderRole": "agent",
+      "senderName": "Pauline F.",
+      "content": "Bonjour Jean-Claude, j'ai aussi pris en charge votre dossier dans le cadre du litige LIT-2026-0042. Pouvez-vous me donner votre version des faits ?",
+      "attachmentUrl": null,
+      "sentAt": "2026-05-21T14:30:00+01:00"
+    },
+    {
+      "id": "lmsg_001",
+      "litigeId": "lit_042",
+      "senderId": "usr_agent01",
+      "senderRole": "agent",
+      "senderName": "Pauline F.",
+      "content": "Bonjour Madeleine, j'ai bien pris en charge votre dossier. Pouvez-vous m'envoyer des photos supplémentaires montrant l'état actuel de votre installation ?",
+      "attachmentUrl": null,
+      "sentAt": "2026-05-21T14:00:00+01:00"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 30,
+    "total": 5,
+    "totalPages": 1
+  }
+}

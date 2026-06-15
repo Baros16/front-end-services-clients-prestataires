@@ -1,0 +1,128 @@
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id": "usr_abc123",
+      "role": "client",
+      "firstName": "Madeleine",
+      "lastName": "Kamdem",
+      "fullName": "Madeleine Kamdem",
+      "phone": "+237695123456",
+      "email": "mk@email.cm",
+      "avatarInitial": "M",
+      "status": "active",
+      "totalSpent": 55000,
+      "completedMissions": 3,
+      "pendingPayment": {
+        "amount": 25000,
+        "missionLabel": "Mission Plomberie en cours"
+      },
+      "location": {
+        "city": "Bafoussam",
+        "district": "Quartier Commercial"
+      },
+      "createdAt": "2026-03-15T10:00:00+01:00"
+    },
+    "recentDemands": [
+      {
+        "id": "dem_xyz789",
+        "clientId": "usr_abc123",
+        "category": {
+          "id": "cat_plomberie",
+          "label": "Plomberie",
+          "iconKey": "wrench"
+        },
+        "description": "Fuite sous l'évier de la cuisine, eau qui s'écoule en permanence",
+        "photos": [
+          {
+            "id": "photo_001",
+            "url": "https://cdn.serviloc.cm/demands/photo_001.jpg",
+            "name": "photo_sous_evier.jpg"
+          }
+        ],
+        "location": {
+          "address": "Bafoussam, Quartier Commercial",
+          "lat": 5.4764,
+          "lng": 10.4207
+        },
+        "status": "en_cours",
+        "isUrgent": false,
+        "estimatedBudget": {
+          "min": 20000,
+          "max": 30000
+        },
+        "providerId": "usr_jcm456",
+        "providerName": "Jean-Claude M.",
+        "quoteId": "quote_001",
+        "missionId": "msn_001",
+        "createdAt": "2026-05-21T08:00:00+01:00",
+        "updatedAt": "2026-05-21T09:32:00+01:00"
+      },
+      {
+        "id": "dem_abc001",
+        "clientId": "usr_abc123",
+        "category": {
+          "id": "cat_electricite",
+          "label": "Électricité",
+          "iconKey": "bolt"
+        },
+        "description": "Prise de courant défectueuse dans le salon, odeur de brûlé",
+        "photos": [],
+        "location": {
+          "address": "Bafoussam, Quartier Djeleng",
+          "lat": 5.4820,
+          "lng": 10.4150
+        },
+        "status": "terminee",
+        "isUrgent": true,
+        "estimatedBudget": {
+          "min": 10000,
+          "max": 15000
+        },
+        "providerId": "usr_elec789",
+        "providerName": "Thomas E.",
+        "quoteId": "quote_002",
+        "missionId": "msn_002",
+        "createdAt": "2026-05-10T14:00:00+01:00",
+        "updatedAt": "2026-05-12T16:00:00+01:00"
+      },
+      {
+        "id": "dem_def002",
+        "clientId": "usr_abc123",
+        "category": {
+          "id": "cat_nettoyage",
+          "label": "Nettoyage",
+          "iconKey": "broom"
+        },
+        "description": "Grand ménage appartement 3 pièces avant emménagement",
+        "photos": [],
+        "location": {
+          "address": "Bafoussam, Rue des Écoles",
+          "lat": 5.4795,
+          "lng": 10.4230
+        },
+        "status": "terminee",
+        "isUrgent": false,
+        "estimatedBudget": {
+          "min": 8000,
+          "max": 12000
+        },
+        "providerId": "usr_nettoie01",
+        "providerName": "Cécile N.",
+        "quoteId": "quote_003",
+        "missionId": "msn_003",
+        "createdAt": "2026-04-28T09:00:00+01:00",
+        "updatedAt": "2026-04-30T13:00:00+01:00"
+      }
+    ],
+    "financialSummary": {
+      "totalSpent": 55000,
+      "completedMissions": 3,
+      "pendingPayment": {
+        "amount": 25000,
+        "missionLabel": "Mission Plomberie en cours"
+      }
+    },
+    "unreadMessages": 2
+  }
+}

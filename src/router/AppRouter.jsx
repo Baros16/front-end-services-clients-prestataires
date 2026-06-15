@@ -44,7 +44,7 @@ const DemarrerMission    = lazy(() => import("../pages/provider/DemarrerMission"
 const SignalerLitige     = lazy(() => import("../pages/provider/SignalerLitige"));
 
 // ─── Lazy imports — Admin ────────────────────────────────────────────────────
-const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboard"));
+const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboardPage"));
 const ValidationPrestataire = lazy(() => import("../pages/admin/ValidationPrestataire"));
 const GestionUtilisateurs   = lazy(() => import("../pages/admin/GestionUtilisateurs"));
 const LitigesAdmin       = lazy(() => import("../pages/admin/LitigesAdmin"));

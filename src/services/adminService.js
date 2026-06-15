@@ -1,22 +1,81 @@
-
 // src/services/adminService.js
 
 import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import { mockAdminDashboard } from "../data/admin/mockDashboard.js";
+import mock_dashboard from "../data/admin/mock_dashboard.json";
 import { mockProviderDossier } from "../data/admin/mockProviderDossier.js";
 import { mockManagedUsers } from "../data/admin/mockUsers.js";
 import { mockLitiges } from "../data/admin/mockLitiges.js";
 
 const BASE = "/admin";
 
+// ─── Mapper : payload brut API → shape normalisée pour les composants ──────
+function toDashboard(raw) {
+  return {
+    metrics: {
+      activeRequests:  { value: raw.metrics.activeDemands.value,    trend: raw.metrics.activeDemands.trend    },
+      ongoingMissions: { value: raw.metrics.ongoingMissions.value,  trend: raw.metrics.ongoingMissions.trend  },
+      monthlyRevenue:  { value: raw.metrics.monthlyRevenue.value,   trend: raw.metrics.monthlyRevenue.trend   },
+      commission:      { value: raw.metrics.commissionEarned.value, trend: raw.metrics.commissionEarned.trend },
+    },
+    pendingProviders: raw.pendingValidations.map((p) => ({
+      id:            p.id,
+      name:          p.fullName,
+      specialty:     p.specialty,
+      submittedAt:   new Date(p.createdAt).toLocaleDateString("fr-FR"),
+      dossierStatus: p.estCertifie ? "ok" : "missing_docs",
+    })),
+    activeLitiges: raw.activeLitiges.map((l) => ({
+      id:        l.id,
+      reference: l.reference,
+      motif:     l.motif.title,
+      amount:    l.amount,
+      // "en_traitement" → "traitement" | "en_cours" → "en_cours" (déjà valide)
+      status:    l.status.replace(/^en_/, ""),
+    })),
+    popularCategories: raw.popularCategories.map((c) => ({
+      name:       c.label,
+      percentage: c.percentageShare,
+      color:      c.color,
+    })),
+    recentTransactions: raw.recentTransactions.map((t) => ({
+      id:           t.reference,
+      clientName:   t.clientName,
+      providerName: t.providerName,
+      service:      t.category,
+      amount:       t.amount,
+      commission:   t.commission,
+      status:       t.status, // "sequestre" | "libere" — déjà des StatusVariant valides
+    })),
+  };
+}
+
+// ─── Exports ──────────────────────────────────────────────────────────────
+
+/**
+ * BUG CORRIGÉ : toDashboard() était défini mais jamais appliqué.
+ * Sans ce fix, la page recevait le payload brut (clés API) au lieu
+ * des clés normalisées attendues par les composants.
+ */
 export async function getAdminDashboard() {
-  return getMock(mockAdminDashboard, () => axios.get(`${BASE}/dashboard`));
+  const raw = await getMock({ data: mock_dashboard.data }, () =>
+    axios.get(`${BASE}/dashboard`)
+  );
+  return toDashboard(raw);
 }
 
 export async function getPendingProviders(params = {}) {
+  // BUG NOTE : l'ancienne version référençait `mockAdminDashboard` (inexistant).
+  // Corrigé : on tire les pendingValidations directement depuis mock_dashboard.
+  const mockList = mock_dashboard.data.pendingValidations.map((p) => ({
+    id:            p.id,
+    name:          p.fullName,
+    specialty:     p.specialty,
+    submittedAt:   new Date(p.createdAt).toLocaleDateString("fr-FR"),
+    dossierStatus: p.estCertifie ? "ok" : "missing_docs",
+  }));
   return getMockList(
-    { data: mockAdminDashboard.data.pendingProviders, meta: { page: 1, limit: 20, total: 5, totalPages: 1 } },
+    { data: mockList, meta: { page: 1, limit: 20, total: mockList.length, totalPages: 1 } },
     () => axios.get(`${BASE}/providers`, { params: { status: "pending", ...params } })
   );
 }
@@ -68,7 +127,6 @@ export async function getLitiges(params = {}) {
 }
 
 export async function resolveLitige(litigeId, payload) {
-  // payload : { resolution, note }
   return getMock(
     { success: true, data: { litigeId, status: "resolu", ...payload } },
     () => axios.post(`${BASE}/litiges/${litigeId}/resolve`, payload)

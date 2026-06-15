@@ -1,0 +1,119 @@
+{
+  "success": true,
+  "data": {
+    "monthlyTotal": 185000,
+    "missions": [
+      {
+        "id": "msn_001",
+        "demandId": "dem_xyz789",
+        "quoteId": "quote_001",
+        "clientId": "usr_abc123",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Fuite cuisine — Madeleine K.",
+        "status": "en_cours",
+        "totalAmount": 23000,
+        "sequesteredAmount": 23000,
+        "paymentStatus": "sequestre",
+        "startedAt": "2026-05-21T09:32:00+01:00",
+        "estimatedDurationHours": 2,
+        "completedAt": null,
+        "steps": [],
+        "providerLocation": null,
+        "location": { "address": "Bafoussam, Quartier Commercial", "lat": 5.4764, "lng": 10.4207 }
+      },
+      {
+        "id": "msn_010",
+        "demandId": "dem_prv010",
+        "quoteId": "quote_010",
+        "clientId": "usr_client02",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Robinet cuisine — Pierre F.",
+        "status": "terminee",
+        "totalAmount": 18000,
+        "sequesteredAmount": 0,
+        "paymentStatus": "libere",
+        "startedAt": "2026-05-19T10:00:00+01:00",
+        "estimatedDurationHours": 1,
+        "completedAt": "2026-05-19T11:30:00+01:00",
+        "steps": [],
+        "providerLocation": null,
+        "location": { "address": "Bafoussam, Djeleng Nord", "lat": 5.4830, "lng": 10.4170 }
+      },
+      {
+        "id": "msn_009",
+        "demandId": "dem_prv009",
+        "quoteId": "quote_009",
+        "clientId": "usr_client03",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Tuyau percé — Sylvie T.",
+        "status": "terminee",
+        "totalAmount": 32000,
+        "sequesteredAmount": 0,
+        "paymentStatus": "libere",
+        "startedAt": "2026-05-17T08:30:00+01:00",
+        "estimatedDurationHours": 3,
+        "completedAt": "2026-05-17T12:00:00+01:00",
+        "steps": [],
+        "providerLocation": null,
+        "location": { "address": "Bafoussam, Cité des Fleurs", "lat": 5.4700, "lng": 10.4250 }
+      },
+      {
+        "id": "msn_008",
+        "demandId": "dem_prv008",
+        "quoteId": "quote_008",
+        "clientId": "usr_client04",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "WC bouché — Armelle N.",
+        "status": "terminee",
+        "totalAmount": 12000,
+        "sequesteredAmount": 0,
+        "paymentStatus": "libere",
+        "startedAt": "2026-05-15T14:00:00+01:00",
+        "estimatedDurationHours": 1,
+        "completedAt": "2026-05-15T15:30:00+01:00",
+        "steps": [],
+        "providerLocation": null,
+        "location": { "address": "Bafoussam, Quartier Centre", "lat": 5.4750, "lng": 10.4200 }
+      }
+    ],
+    "payouts": [
+      {
+        "id": "pay_018",
+        "amount": 22500,
+        "missionId": "msn_010",
+        "method": "orange_money",
+        "paidAt": "2026-05-21T14:00:00+01:00"
+      },
+      {
+        "id": "pay_017",
+        "amount": 31000,
+        "missionId": "msn_009",
+        "method": "mtn_momo",
+        "paidAt": "2026-05-19T16:30:00+01:00"
+      },
+      {
+        "id": "pay_016",
+        "amount": 11500,
+        "missionId": "msn_008",
+        "method": "orange_money",
+        "paidAt": "2026-05-17T10:00:00+01:00"
+      },
+      {
+        "id": "pay_015",
+        "amount": 9500,
+        "missionId": "msn_007",
+        "method": "mtn_momo",
+        "paidAt": "2026-05-14T12:00:00+01:00"
+      }
+    ]
+  },
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 18
+  }
+}

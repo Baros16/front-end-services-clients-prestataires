@@ -116,7 +116,7 @@ export default function RegisterPage() {
           <Input
             label="Téléphone"
             type="tel"
-            placeholder="+237 6XX XXX XXX"
+            placeholder="+2376XXXXXXXX"
             value={formData.phone}
             onChange={(value) => handleChange("phone", value)}
             required

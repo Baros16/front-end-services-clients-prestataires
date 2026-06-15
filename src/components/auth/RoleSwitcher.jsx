@@ -1,28 +1,22 @@
+import { Button} from "../commons/Button";
+
 export function RoleSwitcher({ role, onChange }) {
   return (
     <div className="flex gap-2 mb-4">
-      <button
-        type="button"
+      <Button
+        variant={role === "client" ? "primary" : "secondary"}
         onClick={() => onChange("client")}
-        className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-          role === "client"
-            ? "bg-brand text-white shadow-md"
-            : "bg-white text-sl-700 border border-sl-300 hover:bg-sl-100"
-        }`}
+        className="flex-1"
       >
         Client
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
+        variant={role === "provider" ? "primary" : "secondary"}
         onClick={() => onChange("provider")}
-        className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-          role === "provider"
-            ? "bg-brand text-white shadow-md"
-            : "bg-white text-sl-700 border border-sl-300 hover:bg-sl-100"
-        }`}
+        className="flex-1"
       >
         Prestataire
-      </button>
+      </Button>
     </div>
   );
 }
