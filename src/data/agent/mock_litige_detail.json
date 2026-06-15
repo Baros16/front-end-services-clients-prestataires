@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "data": {
+    "id": "lit_042",
+    "reference": "LIT-2026-0042",
+    "status": "en_traitement",
+    "motif": "Prestation incomplète",
+    "description": "Le plombier affirme avoir terminé la mission, mais le client constate que le siphon n'a pas été remplacé comme stipulé dans le devis DEV-2026-001. La fuite sous l'évier persiste.",
+    "amount": 23000,
+    "evidences": [
+      { "type": "photo", "url": "https://cdn.serviloc.cm/litiges/photo_sous_evier.jpg",   "name": "photo_sous_evier.jpg" },
+      { "type": "photo", "url": "https://cdn.serviloc.cm/litiges/photo_siphon_ancien.jpg", "name": "photo_siphon_ancien.jpg" }
+    ],
+    "client": {
+      "id": "usr_abc123",
+      "fullName": "Madeleine Kamdem",
+      "phone": "+237695123456",
+      "avatarInitial": "M"
+    },
+    "provider": {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude Mbarga",
+      "phone": "+237699234567",
+      "avatarInitial": "J"
+    },
+    "resolution": null,
+    "timeline": [
+      { "event": "Litige ouvert",      "at": "2026-05-21T11:00:00+01:00" },
+      { "event": "Assigné à l'agent Pauline F.", "at": "2026-05-21T11:30:00+01:00" },
+      { "event": "Premier contact client envoyé", "at": "2026-05-21T14:00:00+01:00" }
+    ],
+    "demandId": "dem_xyz789",
+    "missionId": "msn_001",
+    "transactionId": "txn_892",
+    "agentId": "usr_agent01",
+    "createdAt": "2026-05-21T11:00:00+01:00",
+    "assignedAt": "2026-05-21T11:30:00+01:00",
+    "resolvedAt": null
+  }
+}

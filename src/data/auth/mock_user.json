@@ -1,0 +1,50 @@
+{
+  "client": {
+    "id": "usr_abc123",
+    "role": "client",
+    "firstName": "Madeleine",
+    "lastName": "Kamdem",
+    "fullName": "Madeleine Kamdem",
+    "phone": "+237695123456",
+    "email": "mk@email.cm",
+    "avatarInitial": "M",
+    "createdAt": "2026-03-15T10:00:00+01:00",
+    "status": "active"
+  },
+  "provider": {
+    "id": "usr_jcm456",
+    "role": "provider",
+    "firstName": "Jean-Claude",
+    "lastName": "Mbarga",
+    "fullName": "Jean-Claude Mbarga",
+    "phone": "+237699234567",
+    "email": "jcm@email.cm",
+    "avatarInitial": "J",
+    "createdAt": "2025-11-10T08:00:00+01:00",
+    "status": "active"
+  },
+  "admin": {
+    "id": "usr_admin001",
+    "role": "admin",
+    "firstName": "Aristide",
+    "lastName": "Nkoulou",
+    "fullName": "Aristide Nkoulou",
+    "phone": "+237677000001",
+    "email": "admin@serviloc.cm",
+    "avatarInitial": "A",
+    "createdAt": "2025-09-01T08:00:00+01:00",
+    "status": "active"
+  },
+  "agent": {
+    "id": "usr_agent01",
+    "role": "agent",
+    "firstName": "Pauline",
+    "lastName": "Fotso",
+    "fullName": "Pauline Fotso",
+    "phone": "+237691000111",
+    "email": "p.fotso@serviloc.cm",
+    "avatarInitial": "P",
+    "createdAt": "2026-01-10T08:00:00+01:00",
+    "status": "active"
+  }
+}
