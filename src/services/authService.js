@@ -4,36 +4,11 @@
 import axios from "axios";
 import { getMock } from "./mockSwitch.js";
 import mockUser from "../data/auth/mock_user.json";
+import mockLoginResponse from "../data/auth/mockLoginResponse.json"
+import mockRegisterResponse from "../data/auth/mockRegisterResponse.json"
+import mockVerifyOtpResponse from "../data/auth/mockVerifyOtpResponse.json"
 
 const BASE = "/auth";
-
-const mockLoginResponse = {
-  success: true,
-  data: {
-    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_access_token",
-    refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_refresh_token",
-    user: mockUser.client,
-  },
-};
-
-const mockRegisterResponse = {
-  success: true,
-  data: {
-    userId: mockUser.client.id,
-    phone: mockUser.client.phone,
-    otpSent: true,
-    message: `Un code SMS a été envoyé au ${mockUser.client.phone}`,
-  },
-};
-
-const mockVerifyOtpResponse = {
-  success: true,
-  data: {
-    accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_access_token",
-    refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_refresh_token",
-    user: mockUser.client,
-  },
-};
 
 export async function login(email, password) {
   return getMock(mockLoginResponse, () =>

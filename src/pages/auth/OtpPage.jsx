@@ -55,9 +55,9 @@ export default function OTPVerificationPage() {
         JSON.stringify({ role: response.user.role.toUpperCase() }),
       );
       const role = response.user?.role;
-      if (role === "CLIENT") {
+      if (role === "client") {
         navigate("/client/dashboard");
-      } else if (role === "PROVIDER") {
+      } else if (role === "provider") {
         navigate("/provider/dashboard");
       } else {
         navigate("/");
@@ -102,7 +102,7 @@ export default function OTPVerificationPage() {
 
   const formatPhone = (phone) => {
     if (!phone) return "+237 XXX XXX XXX";
-    return phone.slice(0, 13) ;
+    return phone.slice(0, 13);
   };
 
   return (
@@ -110,7 +110,8 @@ export default function OTPVerificationPage() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
         <div className="flex justify-center mb-2">
           <span className="text-4xl">
-            <img src={envelope} alt="logo message" className="h-8 w-auto" /></span>
+            <img src={envelope} alt="logo message" className="h-8 w-auto" />
+          </span>
         </div>
         {/* Titre et sous-titre centrés */}
         <div className="text-center">

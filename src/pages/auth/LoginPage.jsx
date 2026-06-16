@@ -7,7 +7,6 @@ import { AlertBanner } from "../../components/commons/AlertBanner";
 import { login } from "../../services/authService";
 
 export default function LoginPage() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +31,6 @@ export default function LoginPage() {
       return;
     }
 
-
     setError("");
     setIsSubmitting(true);
 
@@ -49,9 +47,7 @@ export default function LoginPage() {
       const role = response.user.role;
 
       if (role === "client") navigate(`/client/dashboard`);
-      else if (role === "provider") navigate("provider/dashboard");
-      else if (role === " admin") navigate("admin/dashboard");
-      else if (role === "service_client") navigate("serivce_client/dashboard");
+      else if (role === "provider") navigate("/provider/dashboard");
       else navigate("/");
     } catch (err) {
       setError(err.message);
