@@ -93,7 +93,7 @@ export default function LoginPage() {
           disabled={isSubmitting}
           className="w-full mt-6"
         >
-          {isSubmitting ? "Connexion en cours..." : "Se connecter "}
+          {isSubmitting ? "Connexion en cours..." : "Se connecter"}
         </Button>
 
         <div className="text-center mt-4">
@@ -102,7 +102,7 @@ export default function LoginPage() {
             onClick={() => navigate("/auth/register")}
             className="text-black underline font-medium"
           >
-            Creer un compte
+            Créer un compte
           </button>
         </div>
       </div>
