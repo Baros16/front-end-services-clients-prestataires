@@ -1,0 +1,42 @@
+{
+  "success": true,
+  "data": {
+    "id": "quote_001",
+    "demandId": "dem_xyz789",
+    "providerId": "usr_jcm456",
+    "clientId": "usr_abc123",
+    "reference": "DEV-2026-001",
+    "status": "en_attente",
+    "laborDescription": "Remplacement joint + siphon évier cuisine",
+    "laborAmount": 15000,
+    "materials": [
+      {
+        "id": "mat_001",
+        "designation": "Joint silicone cuisine",
+        "quantity": 2,
+        "unitPrice": 1500,
+        "subtotal": 3000
+      },
+      {
+        "id": "mat_002",
+        "designation": "Siphon PVC universel",
+        "quantity": 1,
+        "unitPrice": 4500,
+        "subtotal": 4500
+      },
+      {
+        "id": "mat_003",
+        "designation": "Visserie + colliers",
+        "quantity": 1,
+        "unitPrice": 500,
+        "subtotal": 500
+      }
+    ],
+    "materialsTotal": 8000,
+    "totalAmount": 23000,
+    "estimatedDurationHours": 2,
+    "validityDays": 5,
+    "createdAt": "2026-05-20T14:00:00+01:00",
+    "expiresAt": "2026-05-25T14:00:00+01:00"
+  }
+}

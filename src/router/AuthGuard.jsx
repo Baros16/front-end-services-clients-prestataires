@@ -48,7 +48,7 @@ export function AuthGuard({ allowedRoles, children }) {
   if (!user) {
     return (
       <Navigate
-        to="/auth/login"
+        to="/auth/register"
         state={{ from: location }}   // pour rediriger après login
         replace
       />
@@ -57,7 +57,7 @@ export function AuthGuard({ allowedRoles, children }) {
 
   // Rôle non autorisé → renvoyer vers le bon espace
   if (!allowedRoles.includes(user.role)) {
-    const home = ROLE_HOME[user.role] ?? "/auth/login";
+    const home = ROLE_HOME[user.role] ?? "/auth/register";
     return <Navigate to={home} replace />;
   }
 

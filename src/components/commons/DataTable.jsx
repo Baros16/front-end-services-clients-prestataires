@@ -77,9 +77,12 @@ export function DataTable({
                   ${onRowClick ? "cursor-pointer active:bg-sl-100" : ""}
                 `}
               >
+                
                 {columns.map((col) => (
                   <td key={col.key} className="px-[14px] py-3 text-[13px] text-sl-700">
-                    {col.render(row)}
+                    {typeof col.render === "function"
+                      ? col.render(row)
+                      : row[col.key] ?? "—"}
                   </td>
                 ))}
               </tr>

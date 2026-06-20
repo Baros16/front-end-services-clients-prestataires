@@ -1,0 +1,66 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude Mbarga",
+      "specialty": "Plomberie",
+      "status": "pending_verification",
+      "documentsComplete": false,
+      "missingDocuments": ["casier_judiciaire"],
+      "submittedAt": "2026-05-20T08:00:00+01:00",
+      "reviewStatus": "reviewed",
+      "agentReview": {
+        "id": "rev_001",
+        "providerId": "usr_jcm456",
+        "agentId": "usr_agent01",
+        "agentName": "Pauline F.",
+        "verdict": "needs_revision",
+        "comment": "Dossier presque complet. Le casier judiciaire est manquant. Documents existants tous valides.",
+        "reviewedAt": "2026-05-22T09:00:00+01:00",
+        "finalDecision": null,
+        "decidedAt": null,
+        "decidedBy": null
+      }
+    },
+    {
+      "id": "usr_elec789",
+      "fullName": "Thomas Essama",
+      "specialty": "Électricité",
+      "status": "pending_verification",
+      "documentsComplete": true,
+      "missingDocuments": [],
+      "submittedAt": "2026-05-18T10:00:00+01:00",
+      "reviewStatus": "pending",
+      "agentReview": null
+    },
+    {
+      "id": "usr_nettoie02",
+      "fullName": "Sandrine Balla",
+      "specialty": "Nettoyage",
+      "status": "pending_verification",
+      "documentsComplete": true,
+      "missingDocuments": [],
+      "submittedAt": "2026-05-19T14:00:00+01:00",
+      "reviewStatus": "pending",
+      "agentReview": null
+    },
+    {
+      "id": "usr_serr01",
+      "fullName": "Gaëtan Onana",
+      "specialty": "Serrurerie",
+      "status": "pending_verification",
+      "documentsComplete": false,
+      "missingDocuments": ["assurance"],
+      "submittedAt": "2026-05-17T09:00:00+01:00",
+      "reviewStatus": "pending",
+      "agentReview": null
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 8,
+    "totalPages": 1
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "success": true,
+  "data": {
+    "provider": {
+      "id": "usr_jcm456",
+      "role": "provider",
+      "firstName": "Jean-Claude",
+      "lastName": "Mbarga",
+      "fullName": "Jean-Claude Mbarga",
+      "phone": "+237699234567",
+      "email": "jcm@email.cm",
+      "avatarInitial": "J",
+      "status": "pending_verification",
+      "specialty": "Plomberie",
+      "rating": 0,
+      "completedMissions": 0,
+      "isAvailable": false,
+      "hourlyRate": 4000,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 20
+      },
+      "availability": {
+        "monday":    { "start": "08:00", "end": "18:00", "available": true },
+        "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+        "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+        "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+        "friday":    { "start": "08:00", "end": "18:00", "available": true },
+        "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+        "sunday":    { "start": null,    "end": null,    "available": false }
+      },
+      "monthlyEarnings": 0,
+      "certifications": ["Artisan certifié"],
+      "estCertifie": true,
+      "createdAt": "2026-05-20T08:00:00+01:00"
+    },
+    "documents": [
+      {
+        "id": "doc_001",
+        "type": "carte_professionnelle",
+        "label": "Carte professionnelle",
+        "reference": "Artisan plombier N°PLB-2024-041",
+        "status": "valide",
+        "fileUrl": "https://cdn.serviloc.cm/docs/doc_001.pdf"
+      },
+      {
+        "id": "doc_002",
+        "type": "cni",
+        "label": "Carte nationale d'identité",
+        "reference": "CNI-CM-1990-087654",
+        "status": "valide",
+        "fileUrl": "https://cdn.serviloc.cm/docs/doc_002.pdf"
+      },
+      {
+        "id": "doc_003",
+        "type": "casier_judiciaire",
+        "label": "Casier judiciaire < 3 mois",
+        "reference": null,
+        "status": "manquant",
+        "fileUrl": null
+      },
+      {
+        "id": "doc_004",
+        "type": "assurance",
+        "label": "Attestation assurance responsabilité civile",
+        "reference": "ASSUR-RCP-2026-JCM",
+        "status": "valide",
+        "fileUrl": "https://cdn.serviloc.cm/docs/doc_004.pdf"
+      }
+    ],
+    "agentReview": {
+      "agentName": "Pauline F.",
+      "verdict": "needs_revision",
+      "comment": "Dossier presque complet. Le casier judiciaire est manquant. Documents existants tous valides.",
+      "reviewedAt": "2026-05-22T09:00:00+01:00"
+    }
+  }
+}

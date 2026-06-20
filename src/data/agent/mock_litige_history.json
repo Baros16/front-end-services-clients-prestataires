@@ -1,0 +1,108 @@
+{
+  "success": true,
+  "data": {
+    "conversationId": "conv_001",
+    "messages": [
+      {
+        "id": "msg_010",
+        "conversationId": "conv_001",
+        "senderId": "usr_abc123",
+        "senderRole": "client",
+        "content": "D'accord, je serai là à 8h. Merci beaucoup !",
+        "imageUrl": null,
+        "sentAt": "2026-05-21T09:00:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_009",
+        "conversationId": "conv_001",
+        "senderId": "usr_jcm456",
+        "senderRole": "provider",
+        "content": "D'accord, je peux intervenir demain matin.",
+        "imageUrl": null,
+        "sentAt": "2026-05-21T08:50:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_008",
+        "conversationId": "conv_001",
+        "senderId": "usr_abc123",
+        "senderRole": "client",
+        "content": "Est-ce que vous pouvez passer demain matin plutôt ? Je suis disponible à partir de 8h.",
+        "imageUrl": null,
+        "sentAt": "2026-05-21T08:40:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_007",
+        "conversationId": "conv_001",
+        "senderId": "usr_jcm456",
+        "senderRole": "provider",
+        "content": "J'ai envoyé le devis. N'hésitez pas à me poser des questions sur les matériaux choisis.",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T14:05:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_006",
+        "conversationId": "conv_001",
+        "senderId": "usr_jcm456",
+        "senderRole": "provider",
+        "content": "Je vous envoie le devis dans quelques minutes.",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T14:00:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_005",
+        "conversationId": "conv_001",
+        "senderId": "usr_abc123",
+        "senderRole": "client",
+        "content": "Oui, voici une photo. Ça fuit depuis ce matin.",
+        "imageUrl": "https://cdn.serviloc.cm/uploads/photo_001.jpg",
+        "sentAt": "2026-05-20T13:45:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_004",
+        "conversationId": "conv_001",
+        "senderId": "usr_jcm456",
+        "senderRole": "provider",
+        "content": "Pouvez-vous m'envoyer une photo pour que je puisse mieux évaluer ?",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T13:30:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_003",
+        "conversationId": "conv_001",
+        "senderId": "usr_abc123",
+        "senderRole": "client",
+        "content": "C'est une fuite sous l'évier de cuisine. L'eau coule même quand on n'utilise pas le robinet.",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T13:20:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_002",
+        "conversationId": "conv_001",
+        "senderId": "usr_jcm456",
+        "senderRole": "provider",
+        "content": "Bonjour Madeleine, j'ai bien reçu votre demande. De quel type de fuite s'agit-il ?",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T13:15:00+01:00",
+        "read": true
+      },
+      {
+        "id": "msg_001",
+        "conversationId": "conv_001",
+        "senderId": "usr_abc123",
+        "senderRole": "client",
+        "content": "Bonjour, j'ai un problème de fuite dans ma cuisine. Pouvez-vous m'aider ?",
+        "imageUrl": null,
+        "sentAt": "2026-05-20T13:05:00+01:00",
+        "read": true
+      }
+    ]
+  }
+}

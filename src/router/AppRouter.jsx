@@ -2,9 +2,11 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { AuthGuard }                          from "./AuthGuard";
-import { ClientLayout, ProviderLayout, AdminLayout } from "./layouts";
-import { Spinner }                            from "../components/commons/Spinner";
+import { AuthGuard } from "./AuthGuard";
+import { ProviderLayout } from "../components/layouts/ProviderLayout";
+import { AdminLayout } from "../components/layouts/AdminLayout";
+import { ClientLayout } from "../components/layouts/ClientLayout";
+import { Spinner } from "../components/commons/Spinner";
 
 /**
  * AppRouter
@@ -23,6 +25,7 @@ import { Spinner }                            from "../components/commons/Spinne
  */
 
 // ─── Lazy imports — Auth ─────────────────────────────────────────────────────
+const RegisterPage    = lazy(() => import("../pages/auth/RegisterPage"));
 const LoginPage       = lazy(() => import("../pages/auth/LoginPage"));
 const AdminLoginPage  = lazy(() => import("../pages/auth/AdminLoginPage"));
 const OtpPage         = lazy(() => import("../pages/auth/OtpPage"));
@@ -41,7 +44,7 @@ const DemarrerMission    = lazy(() => import("../pages/provider/DemarrerMission"
 const SignalerLitige     = lazy(() => import("../pages/provider/SignalerLitige"));
 
 // ─── Lazy imports — Admin ────────────────────────────────────────────────────
-const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboard"));
+const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboardPage"));
 const ValidationPrestataire = lazy(() => import("../pages/admin/ValidationPrestataire"));
 const GestionUtilisateurs   = lazy(() => import("../pages/admin/GestionUtilisateurs"));
 const LitigesAdmin       = lazy(() => import("../pages/admin/LitigesAdmin"));
@@ -56,7 +59,7 @@ const NotFoundPage       = lazy(() => import("../pages/NotFoundPage"));
 function SmartRedirect() {
   try {
     const raw = localStorage.getItem("sl_mock_user");
-    if (!raw) return <Navigate to="/auth/login" replace />;
+    if (!raw) return <Navigate to="/auth/register" replace />;
     const { role } = JSON.parse(raw);
     if (role === "CLIENT")   return <Navigate to="/client/dashboard" replace />;
     if (role === "PROVIDER") return <Navigate to="/provider/dashboard" replace />;
@@ -65,7 +68,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-  return <Navigate to="/auth/login" replace />;
+  return <Navigate to="/auth/register" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
@@ -97,12 +100,12 @@ export function AppRouter() {
 
           {/* ── Auth (public) ── */}
           <Route path="/auth">
-            <Route index      element={<Navigate to="/auth/login" replace />} />
+            <Route index      element={<Navigate to="/auth/register" replace />} />
+            <Route path="register"    element={<RegisterPage/>} />
             <Route path="login"       element={<LoginPage />} />
             <Route path="login/admin" element={<AdminLoginPage />} />
             <Route path="otp"         element={<OtpPage />} />
           </Route>
-
           {/* ── Espace Client ── */}
           <Route
             path="/client"
