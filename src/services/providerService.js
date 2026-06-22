@@ -1,58 +1,72 @@
 // src/services/providerService.js
 
-import axios from "axios";
+import axios from "./apiClient.js";
 import { getMock, getMockList } from "./mockSwitch.js";
-import { mockProviderDashboard } from "../data/provider/mockDashboard.js";
-import { mockAvailableDemands } from "../data/provider/mockAvailableDemands.js";
+
+// ✅ Import depuis les vrais fichiers JSON existants
+import mockDashboard       from "../data/provider/mock_dashboard.json";
+import mockAvailableDemands from "../data/provider/mockAvailableDemands.js";
+import mockLitigeMotifs    from "../data/shared/mock_litige_motifs.json";
 
 const BASE = "/provider";
 
 export async function getProviderDashboard() {
-  return getMock(mockProviderDashboard, () => axios.get(`${BASE}/dashboard`));
+  return getMock(mockDashboard, () =>
+    axios.get(`${BASE}/dashboard`).then((r) => r.data.data)
+  );
 }
 
 export async function getAvailableDemands(params = {}) {
-  // params : { page, limit, category }
   return getMockList(mockAvailableDemands, () =>
     axios.get(`${BASE}/demands/available`, { params })
   );
 }
 
+export async function getLitigeMotifs() {
+  return getMock(mockLitigeMotifs, () =>
+    axios.get(`/shared/litige-motifs`).then((r) => r.data.data)
+  );
+}
+
 export async function applyToDemand(demandId) {
   return getMock(
-    { success: true, data: { demandId, status: "applied" } },
-    () => axios.post(`${BASE}/demands/${demandId}/apply`)
+    { data: { demandId, status: "applied" } },
+    () => axios.post(`${BASE}/demands/${demandId}/apply`).then((r) => r.data.data)
   );
 }
 
 export async function submitQuote(demandId, payload) {
-  // payload : { laborDescription, laborAmount, materials[], estimatedDurationHours, validityDays }
   return getMock(
-    { success: true, data: { demandId, ...payload } },
-    () => axios.post(`${BASE}/demands/${demandId}/quote`, payload)
+    { data: { demandId, ...payload } },
+    () => axios.post(`${BASE}/demands/${demandId}/quote`, payload).then((r) => r.data.data)
   );
 }
 
 export async function startMission(missionId) {
   return getMock(
-    { success: true, data: { missionId, status: "en_cours" } },
-    () => axios.post(`${BASE}/missions/${missionId}/start`)
+    { data: { missionId, status: "en_cours" } },
+    () => axios.post(`${BASE}/missions/${missionId}/start`).then((r) => r.data.data)
   );
 }
 
 export async function updateStep(missionId, stepId, completed) {
   return getMock(
-    { success: true, data: { missionId, stepId, completed } },
-    () =>
-      axios.patch(`${BASE}/missions/${missionId}/steps/${stepId}`, {
-        completed,
-      })
+    { data: { missionId, stepId, completed } },
+    () => axios.patch(`${BASE}/missions/${missionId}/steps/${stepId}`, { completed }).then((r) => r.data.data)
   );
 }
 
 export async function completeMission(missionId) {
   return getMock(
-    { success: true, data: { missionId, status: "terminee" } },
-    () => axios.post(`${BASE}/missions/${missionId}/complete`)
+    { data: { missionId, status: "terminee" } },
+    () => axios.post(`${BASE}/missions/${missionId}/complete`).then((r) => r.data.data)
+  );
+}
+
+export async function reportLitige(missionId, payload) {
+  // payload : { motifId, description }
+  return getMock(
+    { data: { missionId, status: "ouvert" } },
+    () => axios.post(`${BASE}/missions/${missionId}/litige`, payload).then((r) => r.data.data)
   );
 }
