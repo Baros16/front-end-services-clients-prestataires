@@ -46,8 +46,8 @@ export default function LoginPage() {
 
       const role = response.user.role;
 
-      if (role === "client") navigate(`/client/dashboard`);
-      else if (role === "provider") navigate("/provider/dashboard");
+      if (role === "CLIENT") navigate(`/client/dashboard`);
+      else if (role === "PROVIDER") navigate("/provider/dashboard");
       else navigate("/");
     } catch (err) {
       setError(err.message);
@@ -95,12 +95,20 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Connexion en cours..." : "Se connecter "}
         </Button>
+          <div className="text-right mt-2">
+            <button
+              onClick={() => navigate("/auth/forgot-password")}
+              className="text-sm text-sl-500 hover: text-brand hover:underline transition-colors"
+            >
+              Mot de passe oublie ?
+            </button>
+          </div>
 
         <div className="text-center mt-4">
           <span className="text-gray-500">Pas inscrit ? </span>
           <button
             onClick={() => navigate("/auth/register")}
-            className="text-black underline font-medium"
+            className="text-brand underline font-medium hover:opacity-80"
           >
             Creer un compte
           </button>

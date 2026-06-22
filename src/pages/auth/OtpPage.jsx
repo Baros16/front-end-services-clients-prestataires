@@ -55,9 +55,9 @@ export default function OTPVerificationPage() {
         JSON.stringify({ role: response.user.role.toUpperCase() }),
       );
       const role = response.user?.role;
-      if (role === "client") {
+      if (role === "CLIENT") {
         navigate("/client/dashboard");
-      } else if (role === "provider") {
+      } else if (role === "PROVIDER") {
         navigate("/provider/dashboard");
       } else {
         navigate("/");

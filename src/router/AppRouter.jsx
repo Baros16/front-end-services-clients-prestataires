@@ -29,6 +29,8 @@ const RegisterPage    = lazy(() => import("../pages/auth/RegisterPage"));
 const LoginPage       = lazy(() => import("../pages/auth/LoginPage"));
 const AdminLoginPage  = lazy(() => import("../pages/auth/AdminLoginPage"));
 const OtpPage         = lazy(() => import("../pages/auth/OtpPage"));
+const ForgotPassword  = lazy(()  => import("../pages/auth/ForgotPassword"));
+const ResetPassword   = lazy(() => import("../pages/auth/ResetPassword"));
 
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
@@ -68,7 +70,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-  return <Navigate to="/auth/register" replace />;
+  return <Navigate to="/auth/login" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
@@ -100,12 +102,15 @@ export function AppRouter() {
 
           {/* ── Auth (public) ── */}
           <Route path="/auth">
-            <Route index      element={<Navigate to="/auth/register" replace />} />
+            <Route index      element={<Navigate to="/auth/login" replace />} />
             <Route path="register"    element={<RegisterPage/>} />
             <Route path="login"       element={<LoginPage />} />
             <Route path="login/admin" element={<AdminLoginPage />} />
             <Route path="otp"         element={<OtpPage />} />
+            <Route path="forgot-password"  element={<ForgotPassword />} />
+            <Route path="reset-password"  element={<ResetPassword />} />
           </Route>
+
           {/* ── Espace Client ── */}
           <Route
             path="/client"
