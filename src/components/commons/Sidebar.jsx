@@ -203,7 +203,7 @@ export function Sidebar({
             className={({ isActive }) => `
               flex items-center rounded-[var(--radius-md)]
               text-[13px] transition-all duration-150 cursor-pointer no-underline
-              ${collapsed ? "justify-center px-0 py-[10px]" : "gap-3 px-3 py-[9px]"}
+              ${collapsed ? " relative justify-center px-0 py-[10px]" : "gap-3 px-3 py-[9px]"}
               ${isActive ? t.itemActive : t.itemBase}
             `}
           >
