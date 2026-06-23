@@ -2,18 +2,18 @@
 
 import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import { mockProviderDashboard } from "../data/provider/mockDashboard.js";
-import { mockAvailableDemands } from "../data/provider/mockAvailableDemands.js";
+import  mock_dashboard  from "../data/provider/mock_dashboard.json";
+import  mock_avilable_demands  from "../data/provider/mock_available_demands.json";
 
 const BASE = "/provider";
 
 export async function getProviderDashboard() {
-  return getMock(mockProviderDashboard, () => axios.get(`${BASE}/dashboard`));
+  return getMock(mock_dashboard, () => axios.get(`${BASE}/dashboard`));
 }
 
 export async function getAvailableDemands(params = {}) {
   // params : { page, limit, category }
-  return getMockList(mockAvailableDemands, () =>
+  return getMockList(mock_avilable_demands, () =>
     axios.get(`${BASE}/demands/available`, { params })
   );
 }
