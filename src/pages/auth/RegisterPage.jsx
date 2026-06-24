@@ -15,6 +15,7 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     password: "",
+    confirmPassword:"",
   });
   const [role, setRole] = useState("client");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,35 +31,40 @@ export default function RegisterPage() {
       !formData.lastName ||
       !formData.phone ||
       !formData.email ||
-      !formData.password
+      !formData.password ||
+      !formData.confirmPassword
     ) {
       setError("Tous les champs sont obligatoires");
       return;
     }
 
-    // Vérification email
     const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Email invalide. Format attendu nom@gmail.com");
       return;
     }
 
-    // Vérification téléphone (+237 suivi de 9 chiffres)
+   
     const phoneRegex = /^\+237[0-9]{9}$/;
     if (!phoneRegex.test(formData.phone)) {
       setError("Téléphone invalide. Format attendu: +237XXXXXXXXX");
       return;
     }
 
-    // Vérification mot de passe (minimum 6 caractères)
+    
     if (formData.password.length < 6) {
       setError("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
 
-    // Vérification prénom et nom (minimum 2 caractères)
+    
     if (formData.firstName.length < 4 || formData.lastName.length < 4) {
       setError("Le prénom et le nom doivent contenir au moins 4 caractères");
+      return;
+    }
+
+     if (formData.Password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
 
@@ -73,6 +79,7 @@ export default function RegisterPage() {
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword
       };
 
       const response = await register(payload);
@@ -135,6 +142,14 @@ export default function RegisterPage() {
             placeholder="••••••••"
             value={formData.password}
             onChange={(value) => handleChange("password", value)}
+            required
+          />
+           <Input
+            label="Confirmation mot de passe"
+            type="password"
+            placeholder="••••••••"
+            value={formData.confirPassword}
+            onChange={(value) => handleChange("confirmPassword", value)}
             required
           />
         </div>

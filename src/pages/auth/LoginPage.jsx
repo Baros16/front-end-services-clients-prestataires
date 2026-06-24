@@ -48,6 +48,7 @@ export default function LoginPage() {
 
       if (role === "CLIENT") navigate(`/client/dashboard`);
       else if (role === "PROVIDER") navigate("/provider/dashboard");
+      else if (role === "ADMIN") navigate("/admin/dashboard");
       else navigate("/");
     } catch (err) {
       setError(err.message);
@@ -93,7 +94,7 @@ export default function LoginPage() {
           disabled={isSubmitting}
           className="w-full mt-6"
         >
-          {isSubmitting ? "Connexion en cours..." : "Se connecter "}
+          {isSubmitting ? "Connexion en cours..." : "Se connecter"}
         </Button>
           <div className="text-right mt-2">
             <button
