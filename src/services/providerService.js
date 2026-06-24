@@ -5,7 +5,7 @@ import { getMock, getMockList } from "./mockSwitch.js";
 
 // ✅ Import depuis les vrais fichiers JSON existants
 import mockDashboard       from "../data/provider/mock_dashboard.json";
-import mockAvailableDemands from "../data/provider/mockAvailableDemands.js";
+import mockAvailableDemands from "../data/provider/mock_available_demands.json";
 import mockLitigeMotifs    from "../data/shared/mock_litige_motifs.json";
 
 const BASE = "/provider";
