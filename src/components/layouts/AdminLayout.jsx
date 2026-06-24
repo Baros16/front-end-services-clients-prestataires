@@ -11,6 +11,7 @@ const ADMIN_NAV = [
   { id: "utilisateurs", label: "Utilisateurs",           icon: "👥", href: "/admin/utilisateurs" },
   { id: "validation",   label: "Validation prestataire", icon: "✅", href: "/admin/validation" },
   { id: "litiges",      label: "Litiges",                icon: "⚖️", href: "/admin/litiges", count: 7 },
+  { id: "statistiques", label: "Statstiques",            icon: "📊", href: "/admin/statistiques"}
 ];
 
 // ── Layout ────────────────────────────────────────────────────────────────────
