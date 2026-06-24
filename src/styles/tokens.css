@@ -26,6 +26,23 @@
   --color-warning:       #D97706;
   --color-warning-light: #FEF3C7;
 
+  /* ── Catégories de service ───────────────────────────────── */
+  --color-cat-plomberie:   #2563eb;
+  --color-cat-electricite: #d97706;
+  --color-cat-nettoyage:   #16a34a;
+  --color-cat-serrurerie:  #7c3aed;
+  --color-cat-peinture:    #db2777;
+  --color-cat-autre:       #9ca3af;
+
+  /* ── Surfaces ─────────────────────────────────────────────── */
+  --color-surface:         #ffffff;
+  --color-surface-subtle:  #fafafa;
+
+  /* ── Sémantique états ─────────────────────────────────────── */
+  --color-error-light:     #fff1f2;
+  --color-warning-light:   #fffbeb;
+  --color-info-border:     #bfdbfe;
+
   /* ── Neutral scale ── */
   --color-sl-50:  #F8FAFC;
   --color-sl-100: #F1F5F9;
