@@ -58,6 +58,7 @@ const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboardPage"
 const ValidationPrestataire = lazy(() => import("../pages/admin/ValidationPrestataire"));
 const GestionUtilisateurs   = lazy(() => import("../pages/admin/GestionUtilisateurs"));
 const LitigesAdmin       = lazy(() => import("../pages/admin/LitigesAdmin"));
+const LitigeDetailPage = lazy(() => import("../pages/service-client/LitigeDetailPage"));
 const StatistiquesAdmin      = lazy(() => import("../pages/admin/StatistiquesAdmin"));   // M1 — écran 26
 const CommissionsPage        = lazy(() => import("../pages/admin/CommissionsPage"));     // M6 — écran 27
 const PaiementsPage          = lazy(() => import("../pages/admin/PaiementsPage"));       // M7 — écran 28
