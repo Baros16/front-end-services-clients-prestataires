@@ -63,7 +63,7 @@ export default function RegisterPage() {
       return;
     }
 
-     if (formData.Password !== formData.confirmPassword) {
+     if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
       return;
     }
