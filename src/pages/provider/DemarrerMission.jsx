@@ -1,218 +1,275 @@
 // src/pages/provider/StartMissionPage.jsx
-// M4 Kenfack — Semaine 3 — Écran 18 : Démarrer Mission (UC24)
-// Layout 2 colonnes : colonne gauche (détails + carte) / colonne droite (client + checklist + séquestre)
+// M4 Kenfack — Écran 18 : Démarrer Mission (UC24)
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-// ✅ Composants communs Krisan
-import {PageHeader}    from "../../components/commons/PageHeader";
-import {StatusBadge}   from "../../components/commons/StatusBadge";
-import {AmountDisplay} from "../../components/commons/AmountDisplay";
-import {MapEmbed}      from "../../components/commons/MapEmbed";
-import {SkeletonLoader} from "../../components/commons/SkeletonLoader";
-import {AlertBanner}   from "../../components/commons/AlertBanner";
+import {
+  PageHeader, Card, AmountDisplay, MapEmbed,
+  SkeletonLoader, AlertBanner, Button, StatusBadge,
+  UserAvatarCircle,
+} from "../../components/commons";
+import { CheckCircle, MessageCircle } from "../../components/commons/Icons";
 
-// ✅ Composants prestataire Krisan
-import PreDepartChecklist from "../../components/provider/PreDepartChecklist";
-import ClientMiniCard     from "../../components/provider/ClientMiniCard";
-import SequestredReminderCard from "../../components/provider/SequestredReminderCard";
-
-// ✅ Service + mock fallback
 import { getProviderDashboard, startMission } from "../../services/providerService";
 import mockDashboard from "../../data/provider/mock_dashboard.json";
+import { formatXAF } from "../../utils/formatters";
 
-// ─── CHECKLIST ITEMS PAR DÉFAUT ───────────────────────────────────────────────
 const DEFAULT_CHECKLIST = [
-  { id: "c1", label: "Matériaux préparés",    checked: false },
-  { id: "c2", label: "Outils chargés",        checked: false },
-  { id: "c3", label: "Adresse confirmée",     checked: false },
-  { id: "c4", label: "Téléphone chargé",      checked: false },
+  { id: "c1", label: "Matériaux préparés"             },
+  { id: "c2", label: "Outils chargés dans le véhicule" },
+  { id: "c3", label: "Adresse client confirmée"        },
+  { id: "c4", label: "Téléphone chargé"                },
 ];
 
-// =============================================================================
 export default function StartMissionPage() {
-  const navigate          = useNavigate();
-  const { missionId }     = useParams();           // /provider/missions/:missionId/start
+  const navigate      = useNavigate();
+  const { missionId } = useParams();
 
   const [mission,    setMission]    = useState(null);
-  const [profile,    setProfile]    = useState(null);
-  const [checklist,  setChecklist]  = useState(DEFAULT_CHECKLIST);
-  const [isLoading,  setIsLoading]  = useState(true);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState(null);
+  const [checked,    setChecked]    = useState({});
   const [isStarting, setIsStarting] = useState(false);
   const [started,    setStarted]    = useState(false);
 
   useEffect(() => {
     getProviderDashboard()
       .then((d) => {
-        setProfile(d.profile);
-        // Cherche la mission par ID, sinon prend la première "en_attente"
-        const found = d.recentMissions.find((m) => m.id === missionId)
-          ?? d.recentMissions.find((m) => m.status === "en_cours")
+        const m = d.recentMissions.find((r) => r.id === missionId)
+          ?? d.recentMissions.find((r) => r.status === "en_cours")
           ?? d.recentMissions[0];
-        setMission(found);
+        setMission(m);
+        const init = {};
+        DEFAULT_CHECKLIST.forEach((c) => { init[c.id] = false; });
+        setChecked(init);
       })
       .catch(() => {
-        const d = mockDashboard.data;
-        setProfile(d.profile);
-        setMission(d.recentMissions[0]);
+        const m = mockDashboard.data.recentMissions[0];
+        setMission(m);
+        const init = {};
+        DEFAULT_CHECKLIST.forEach((c) => { init[c.id] = false; });
+        setChecked(init);
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => setLoading(false));
   }, [missionId]);
 
-  // Toggle item checklist
-  const handleToggle = (itemId) => {
-    setChecklist((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, checked: !item.checked } : item
-      )
-    );
-  };
+  const toggle      = (id) => setChecked((p) => ({ ...p, [id]: !p[id] }));
+  const allChecked  = DEFAULT_CHECKLIST.every((c) => checked[c.id]);
 
-  // Démarrer la mission
   const handleStart = async () => {
     if (!allChecked) return;
     setIsStarting(true);
-    try {
-      await startMission(mission.id);
-      setStarted(true);
-    } catch {
-      // fallback : on considère comme démarré quand même (démo)
-      setStarted(true);
-    } finally {
-      setIsStarting(false);
-    }
+    try   { await startMission(mission.id); setStarted(true); }
+    catch { setStarted(true); } // fallback démo
+    finally { setIsStarting(false); }
   };
 
-  const allChecked = checklist.every((i) => i.checked);
+  if (loading) return (
+    <div className="p-6"><SkeletonLoader variant="row" count={5} /></div>
+  );
 
-  // ── ÉTAT CHARGEMENT ───────────────────────────────────────────────────────
-  if (isLoading) {
-    return (
-      <>
-        <PageHeader title="Démarrer la mission" />
-        <div className="p-6 space-y-4">
-          <SkeletonLoader variant="row" count={4} />
-        </div>
-      </>
-    );
-  }
+  if (error) return (
+    <div className="p-6">
+      <AlertBanner type="error" message={error} />
+    </div>
+  );
 
-  // ── ÉTAT SUCCÈS ───────────────────────────────────────────────────────────
-  if (started) {
-    return (
-      <>
-        <PageHeader title="Mission démarrée" />
-        <div className="p-6 flex items-center justify-center min-h-64">
-          <div className="text-center space-y-4 max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto text-3xl">✅</div>
-            <h2 className="text-xl font-semibold text-sl-900">Mission démarrée !</h2>
-            <p className="text-sm text-sl-500">
-              Le client a été notifié. Bonne intervention !
-            </p>
-            <button
-              onClick={() => navigate("/provider/missions")}
-              className="mt-4 px-6 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand/90"
-            >
-              Voir mes missions 
-            </button>
-          </div>
+  if (started) return (
+    <div className="p-6 flex items-center justify-center min-h-[60vh]">
+      <div className="text-center space-y-4 max-w-sm">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+          style={{ background: "var(--color-success-light)" }}
+        >
+          <CheckCircle size={32} style={{ color: "var(--color-success)" }} />
         </div>
-      </>
-    );
-  }
+        <h2 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)", color: "var(--color-sl-900)" }}>
+          Mission démarrée !
+        </h2>
+        <p className="text-sm" style={{ color: "var(--color-sl-500)" }}>
+          Le client a été notifié. Bonne intervention.
+        </p>
+        <Button variant="primary" onClick={() => navigate("/provider/dashboard")}>
+          Retour au tableau de bord
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
-    <>
-      {/* En-tête avec badge statut */}
+    <div className="p-4 md:p-6 space-y-5">
       <PageHeader
-        title={mission.title}
-        subtitle={mission.location.address}
-        badge={{ label: "PAYÉE & SÉQUESTRÉE", variant: "sequestre" }}
+        title="Missions en attente"
+        subtitle="Missions payées, prêtes à démarrer"
       />
 
-      <div className="p-6">
-        {/* Layout 2 colonnes — maquette 12_PREST_Demarrer_Mission */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
-          {/* ── COLONNE GAUCHE (2/3) ──────────────────────────────────────── */}
-          <div className="xl:col-span-2 space-y-5">
+        {/* Colonne gauche */}
+        <div className="xl:col-span-2 space-y-5">
 
-            {/* Triplet infos mission */}
-            <div className="bg-white border border-sl-100 rounded-xl p-5 grid grid-cols-3 gap-4 text-sm">
+          {/* Fiche mission */}
+          <Card>
+            <div className="flex items-start justify-between mb-4">
               <div>
-                <p className="text-[10px] font-medium uppercase tracking-wider text-sl-400 mb-1">Catégorie</p>
-                <p className="font-semibold text-sl-900">{mission.category}</p>
+                <p className="text-xs mb-1" style={{ color: "var(--color-sl-400)" }}>
+                  Mission confirmée · Paiement reçu
+                </p>
+                <h2
+                  className="text-xl font-bold"
+                  style={{ fontFamily: "var(--font-display)", color: "var(--color-sl-900)" }}
+                >
+                  {mission.title}
+                </h2>
               </div>
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-wider text-sl-400 mb-1">Montant séquestré</p>
-                {/* ✅ AmountDisplay — jamais xaf() custom */}
-                <AmountDisplay amount={mission.sequesteredAmount} size="md" />
-              </div>
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-wider text-sl-400 mb-1">Durée estimée</p>
-                <p className="font-semibold text-sl-900">{mission.estimatedDurationHours}h</p>
-              </div>
+              <StatusBadge label="SÉQUESTRÉE" variant="sequestre" />
             </div>
 
-            {/* ✅ MapEmbed — composant Krisan §1.17, jamais un div bleu custom */}
+            {/* Triplet infos */}
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              <MetricInfo label="CLIENT"        value="Madeleine K." />
+              <MetricInfo label="MONTANT"       value={<AmountDisplay amount={mission.totalAmount} size="md" />} />
+              <MetricInfo label="DURÉE ESTIMÉE" value={`${mission.estimatedDurationHours}h`} />
+            </div>
+
+            {/* Carte */}
             <MapEmbed
               address={mission.location.address}
-              label="Localisation du client"
-              height="220px"
+              label={`Adresse : ${mission.location.address}`}
+              height="200px"
               interactive={false}
             />
 
-            {/* Bouton CTA principal */}
-            {!allChecked && (
-              // ✅ AlertBanner — composant Krisan pour les messages d'avertissement
-              <AlertBanner
-                variant="warning"
-                message="Cochez tous les éléments de la checklist avant de démarrer."
-              />
-            )}
-            <button
-              onClick={handleStart}
-              disabled={!allChecked || isStarting}
-              className={`w-full py-4 rounded-xl font-semibold text-base transition-all ${
-                allChecked && !isStarting
-                  ? "bg-brand text-white hover:bg-brand/90 active:scale-[0.99]"
-                  : "bg-sl-100 text-sl-400 cursor-not-allowed"
-              }`}
+            {/* CTA */}
+            <div
+              className="mt-5 rounded-xl p-4 text-center space-y-3"
+              style={{ background: "var(--color-sl-50)" }}
             >
-              {isStarting ? "Démarrage en cours…" : "🚀 Démarrer la mission maintenant"}
-            </button>
+              <p className="text-sm" style={{ color: "var(--color-sl-500)" }}>
+                Prêt à commencer l'intervention ?
+              </p>
+              <Button
+                variant="primary"
+                disabled={!allChecked || isStarting}
+                onClick={handleStart}
+                className="w-full active:scale-95"
+              >
+                {isStarting ? "Démarrage…" : "Démarrer la mission maintenant"}
+              </Button>
+              {allChecked && (
+                <p className="text-xs" style={{ color: "var(--color-sl-400)" }}>
+                  Le client sera notifié et l'heure de début enregistrée
+                </p>
+              )}
+              {!allChecked && (
+                <p className="text-xs" style={{ color: "var(--color-warning)" }}>
+                  Cochez tous les éléments de la checklist avant de démarrer
+                </p>
+              )}
+            </div>
+          </Card>
 
-          </div>
+        </div>
 
-          {/* ── COLONNE DROITE (1/3) ─────────────────────────────────────── */}
-          <div className="space-y-4">
+        {/* Colonne droite */}
+        <div className="space-y-4">
 
-            {/* ✅ ClientMiniCard — composant Krisan §4.x
-                Affiche : avatar + nom + téléphone + StatusBadge "PAYÉE" */}
-            <ClientMiniCard
-              clientId={mission.clientId}
-              missionStatus={mission.status}
-              paymentStatus={mission.paymentStatus}
-            />
+          {/* Client */}
+          <Card title="CLIENT">
+            <ClientCard />
+          </Card>
 
-            {/* ✅ PreDepartChecklist — composant Krisan §4.16
-                Items cochables : Matériaux, Outils, Adresse, Téléphone
-                Fond vert + texte barré quand coché */}
-            <PreDepartChecklist
-              items={checklist}
-              onToggle={handleToggle}
-            />
+          {/* Checklist */}
+          <Card title="CHECKLIST AVANT DÉPART">
+            <div className="space-y-2">
+              {DEFAULT_CHECKLIST.map((item) => (
+                <ChecklistItem
+                  key={item.id}
+                  label={item.label}
+                  checked={!!checked[item.id]}
+                  onToggle={() => toggle(item.id)}
+                />
+              ))}
+            </div>
+          </Card>
 
-            {/* ✅ SequestredReminderCard — composant Krisan §4.x
-                Rappel ambre : le montant est sécurisé jusqu'à la fin */}
-            <SequestredReminderCard
-              amount={mission.sequesteredAmount}
-            />
+          {/* Rappel séquestre */}
+          <AlertBanner
+            type="info"
+            title="Rappel séquestre"
+            message={`${formatXAF(mission.sequesteredAmount)} séquestrés. Libération après double validation.`}
+          />
 
-          </div>
         </div>
       </div>
-    </>
+    </div>
+  );
+}
+
+function MetricInfo({ label, value }) {
+  return (
+    <div
+      className="rounded-lg p-3"
+      style={{ background: "var(--color-sl-50)" }}
+    >
+      <p className="text-[10px] font-medium uppercase tracking-wider mb-1"
+         style={{ color: "var(--color-sl-400)" }}>
+        {label}
+      </p>
+      <div className="font-semibold text-sm" style={{ color: "var(--color-sl-900)" }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function ClientCard() {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3">
+        <UserAvatarCircle initial="M" size="lg" />
+        <div>
+          <p className="font-semibold text-sm" style={{ color: "var(--color-sl-900)" }}>
+            Madeleine Kamdem
+          </p>
+          <p className="text-xs" style={{ color: "var(--color-sl-400)" }}>
+            3 missions · Client vérifié
+          </p>
+        </div>
+      </div>
+      <Button variant="secondary" className="w-full active:scale-95">
+        <MessageCircle size={14} className="mr-1.5" />
+        Contacter le client
+      </Button>
+    </div>
+  );
+}
+
+function ChecklistItem({ label, checked, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center gap-3 text-left py-2 active:scale-95 transition-transform"
+    >
+      <div
+        className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+        style={{
+          background:   checked ? "var(--color-brand)"   : "transparent",
+          borderColor:  checked ? "var(--color-brand)"   : "var(--color-sl-300)",
+        }}
+      >
+        {checked && <CheckCircle size={12} color="white" />}
+      </div>
+      <span
+        className="text-sm"
+        style={{
+          color:          checked ? "var(--color-sl-400)" : "var(--color-sl-800)",
+          textDecoration: checked ? "line-through"        : "none",
+        }}
+      >
+        {label}
+      </span>
+    </button>
   );
 }

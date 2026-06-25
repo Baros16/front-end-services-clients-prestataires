@@ -44,3 +44,6 @@ export { Spinner }           from "./Spinner";
 export { AlertBanner }       from "./AlertBanner";
 export { EmptyState }        from "./EmptyState";
 export { SkeletonLoader }    from "./SkeletonLoader";
+
+// Ajouter à src/components/common/index.js
+export * from './Icons';

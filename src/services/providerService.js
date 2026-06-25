@@ -70,3 +70,4 @@ export async function reportLitige(missionId, payload) {
     () => axios.post(`${BASE}/missions/${missionId}/litige`, payload).then((r) => r.data.data)
   );
 }
+
