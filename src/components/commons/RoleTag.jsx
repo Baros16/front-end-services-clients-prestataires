@@ -21,7 +21,7 @@ export function RoleTag({ role, className = "" }) {
   return (
     <span
       className={`
-        inline-block px-[10px] py-[3px] rounded-full
+        inline-block w-fit h-fit px-[10px] py-[3px] rounded-full
         text-[10px] font-bold tracking-[0.12em] uppercase
         font-[family-name:var(--font-body)]
         ${styles} ${className}
