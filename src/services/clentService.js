@@ -3,10 +3,11 @@
 
 import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import { mockClientDashboard } from "../data/client/mockDashboard.js";
-import { mockDemands } from "../data/client/mockDemands.js";
-import { mockQuote } from "../data/client/mockQuote.js";
-import { mockMission } from "../data/client/mockMission.js";
+ 
+import mockClientDashboard from "../data/client/mock_dashboard.json";
+import mockDemands from "../data/client/mock_demands.json";
+import mockQuote from "../data/client/mock_quote.json";
+import mockMission from "../data/client/mock_mission.json";
 
 const BASE = "/client";
 
@@ -69,4 +70,29 @@ export async function createLitige(missionId, payload) {
     { success: true, data: { missionId, status: "ouvert" } },
     () => axios.post(`${BASE}/missions/${missionId}/litige`, payload)
   );
+}
+export async function getCategories() {
+  const mockCategories = [
+    { id: 1, name: "Plomberie",     icon: "🔧" },
+    { id: 2, name: "Électricité",   icon: "⚡" },
+    { id: 3, name: "Jardinage",     icon: "🌿" },
+    { id: 4, name: "Ménage",        icon: "🧹" },
+    { id: 5, name: "Informatique",  icon: "💻" },
+    { id: 6, name: "Peinture",      icon: "🎨" },
+  ];
+  return getMock(mockCategories, () => axios.get(`${BASE}/categories`));
+}
+
+export async function uploadPhoto(file) {
+  const mockResponse = {
+    success: true,
+    data: { photoId: `photo_${Date.now()}`, url: URL.createObjectURL(file) },
+  };
+  return getMock(mockResponse, () => {
+    const form = new FormData();
+    form.append("photo", file);
+    return axios.post(`${BASE}/photos/upload`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  });
 }

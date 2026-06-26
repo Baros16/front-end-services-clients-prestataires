@@ -1,11 +1,11 @@
 
 
 const STATUS_CONFIG = {
-  en_cours:       { label: "En cours",        classes: "bg-info-light text-info" },
+  en_cours:       { label: "En cours",         classes: "bg-info-light text-info" },
   terminee:       { label: "Terminée",         classes: "bg-success-light text-success" },
   annulee:        { label: "Annulée",          classes: "bg-danger-light text-danger" },
   en_attente:     { label: "En attente",       classes: "bg-accent-light text-warning" },
-  ouvert:         { label: "Ouvert",           classes: "bg-danger-light text-danger" },
+  ouvert:         { label: "Ouvert",         classes: "bg-success-light text-success" },
   traitement:     { label: "En traitement",    classes: "bg-accent-light text-warning" },
   resolu:         { label: "Résolu",           classes: "bg-success-light text-success" },
   disponible:     { label: "Disponible",       classes: "bg-success-light text-success" },
