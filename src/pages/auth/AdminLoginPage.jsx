@@ -1,11 +1,5 @@
 // src/pages/auth/AdminLoginPage.jsx
-// TODO Semaine 2 — M5
-import { useLocation } from "react-router-dom";
-import PlaceHolderPage from "../_placeholder";
-
+// TODO — Écran 03 M5
 export default function AdminLoginPage() {
-  const { pathname } = useLocation();
-  return (
-    <PlaceHolderPage/>
-  );
+  return <div>Admin Login — À venir</div>;
 }

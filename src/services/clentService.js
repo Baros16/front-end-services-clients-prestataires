@@ -3,10 +3,10 @@
 
 import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import { mockClientDashboard } from "../data/client/mockDashboard.js";
-import { mockDemands } from "../data/client/mockDemands.js";
-import { mockQuote } from "../data/client/mockQuote.js";
-import { mockMission } from "../data/client/mockMission.js";
+import  mockClientDashboard  from "../data/client/mock_dashboard.json";
+import  mockDemands  from "../data/client/mock_demands.json";
+import  mockQuote  from "../data/client/mock_quote.json";
+import  mockMission  from "../data/client/mock_mission.json";
 
 const BASE = "/client";
 
