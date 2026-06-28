@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getMission, rateMission } from "../../services/clentService";
 import mockUser from "../../data/auth/mock_user.json";
 import {
@@ -33,7 +33,7 @@ export default function NotationPrestataire() {
     const loadMission = async () => {
       try {
         setLoading(true);
-       
+
         const data = await getMission(missionId);
         setMission(data);
       } catch (err) {
@@ -49,7 +49,6 @@ export default function NotationPrestataire() {
     }
   }, [missionId]);
 
- 
   const getProviderInfo = () => {
     const providerMock = mockUser.provider;
     return {
@@ -106,7 +105,7 @@ export default function NotationPrestataire() {
 
       setSuccess(true);
       setTimeout(() => {
-         navigate("/client/dashboard");
+        navigate("/client/dashboard");
       }, 2000);
     } catch (err) {
       setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
@@ -141,9 +140,12 @@ export default function NotationPrestataire() {
             <span className="text-4xl" role="img" aria-label="Confettis">
               🎉
             </span>
-            <h2 className="text-lg font-bold text-sl-900">Mission terminée !</h2>
+            <h2 className="text-lg font-bold text-sl-900">
+              Mission terminée !
+            </h2>
             <p className="text-sl-600">
-              {mission?.category || "Plomberie"} · {mission?.location?.address || "Bafoussam, Quartier Commercial"}
+              {mission?.category || "Plomberie"} ·{" "}
+              {mission?.location?.address || "Bafoussam, Quartier Commercial"}
             </p>
             <div className="bg-success-light/80 border border-success/30 rounded-lg px-6 py-3 mt-1 mx-6 w-full">
               <p className="text-sm text-success-dark">Paiement libéré</p>
@@ -175,13 +177,11 @@ export default function NotationPrestataire() {
                     showValue={true}
                     readonly
                   />
-                   <span className="ml-2 text-sm font-medium text-sl-600 self-center">
-                  {provider.rating}
+                  <span className="ml-2 text-sm font-medium text-sl-600 self-center">
+                    {provider.rating}
                   </span>
                 </div>
-                <p className="text-sm text-sl-500">
-                  {provider.specialty}
-                </p>
+                <p className="text-sm text-sl-500">{provider.specialty}</p>
               </div>
             </div>
             <div className="flex justify-center">
@@ -251,7 +251,7 @@ export default function NotationPrestataire() {
         <Button
           variant="primary"
           onClick={handleSubmit}
-          disabled={isSubmitting || rating === 0}
+          disabled={isSubmitting}
           className="w-full md:w-auto"
         >
           {isSubmitting ? "Envoi en cours..." : "Envoyer la note"}
@@ -263,8 +263,7 @@ export default function NotationPrestataire() {
 
 // ─── Composant pour les critères ──────────────────────────────────────────
 
-
-  function CriteriaGroup({ label, options, selected, onChange }) {
+function CriteriaGroup({ label, options, selected, onChange }) {
   return (
     <div>
       <label className="block text-sm font-medium text-sl-700 mb-2">
