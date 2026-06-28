@@ -8,6 +8,9 @@ import WelcomeBanner from "../../components/client/dashboard/WelcomeBanner.jsx";
 import ServiceCategoryGrid from "../../components/client/dashboard/CategoryGrid.jsx";
 import RecentDemandsList from "../../components/client/dashboard/RecentDemandsList.jsx";
 import DashboardMetrics from "../../components/client/dashboard/DashboardMetrics.jsx";
+import { Button } from "../../components/commons/index.js"
+import { Bell } from "../../components/commons/Icons.jsx";
+
 
 export default function ClientDashboard() {
 
@@ -39,18 +42,22 @@ className="p-4 md:p-6"
 <PageHeader
 title="Tableau de bord"
 actions={
-<button 
+  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <Button 
+      variant="ghost"
+      size="md"
+    > 
+      <Bell size={18} />
+    </Button>  
+<Button 
+ variant="secondary"
+ size="md"
+ className="!bg-black !text-white !border-black hover:!bg-gray-900"
  onClick={() => navigate("/client/nouvelle-demande")}
- style={{
-  background: "var(--color-sl-900)",
-  borderRadius: "var(--radius-md)",
-  fontFamily: "var(--font-body)",
-}}
-className="text-white text-xs md:text-sm font-semibold px-3 py-1.5 md:px-4 md:py-2 hover:opacity-90
-active:scale-95 transition-all"
 >
 + Nouvelle demande
-</button>
+</Button>
+</div>
 }
 />
 <WelcomeBanner

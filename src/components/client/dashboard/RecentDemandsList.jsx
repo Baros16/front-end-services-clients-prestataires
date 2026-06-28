@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { StatusBadge } from "../../commons/index.js";
 import { formatDate } from "../../../utils/formatters.js";
 import { Wrench, Zap, Brush, Key, Sparkles, Plus } from "../../commons/Icons.jsx";
+import { Button } from "../../commons/index.js";
 
 const CATEGORY_ICONS = {
 cat_plomberie: <Wrench size={16} />,
@@ -33,13 +34,13 @@ className="text-xs font-semibold uppercase tracking-wide"
 >
 Mes demandes récentes
 </p>
-<button
-onClick={() => navigate("/client/mes-demandes")}
-style={{ fontFamily: "var(--font-body)", color: "var(--color-brand)" }}
-className="text-xs font-medium hover:underline active:scale-95 transition-all"
+<Button
+  variant="secondary"
+  size="sm"
+  onClick={() => navigate("/client/mes-demandes")}
 >
 Tout voir
-</button></div>
+</Button></div>
 <div className="flex flex-col">
 {demands.map((demand) => {
 const icon = CATEGORY_ICONS[demand.category?.id] || <Wrench size={16} />;

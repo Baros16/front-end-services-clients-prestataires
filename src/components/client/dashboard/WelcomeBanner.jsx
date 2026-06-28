@@ -2,6 +2,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { MapPin, Zap } from "../../../components/commons/Icons.jsx";
+import { Button } from "../../commons/Button.jsx";
 
 export default function WelcomeBanner({ profile, location }) {
 
@@ -30,19 +31,14 @@ className="text-xl md:text-2xl font-bold tracking-tight"
 >
 Besoin d'un service rapidement ?
 </h2>
-<button
-onClick={() => navigate("/client/nouvelle-demande")}
-style={{
-background: "var(--color-accent)",
-borderRadius: "var(--radius-md)",
-fontFamily: "var(--font-body)",
-}}
-className="mt-4 text-black text-sm font-semibold px-4 py-2 inline-flex items-center
-gap-2 hover:opacity-90 active:scale-95 transition-all"
+<Button
+ variant="ghost"
+ className="mt-2 bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-white/90 transition-all w-fit"
+ onClick={() => navigate("/client/nouvelle-demande")}
 >
-<Zap size={14} />
+    <Zap size={14} />
 Trouver un prestataire maintenant →
-</button>
+</Button>
 </div><div className="md:text-right flex flex-col gap-1">
 <p
 style={{ fontFamily: "var(--font-body)", color: "var(--color-sl-400)" }}
