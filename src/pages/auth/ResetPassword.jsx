@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AlertBanner } from "../../components/commons";
-import { Input } from "../../components/commons";
-import { Button } from "../../components/commons";
+import { Input ,Button, AlertBanner} from "../../components/commons";
 import { OTPDigitInput } from "../../components/auth/OTPDigitInput";
 import { resetPassword } from "../../services/authService";
 

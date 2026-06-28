@@ -41,7 +41,7 @@ export { Star, StarOff }                                     from 'lucide-react'
 
 // ─── Fichiers & documents ─────────────────────────────────────
 export { FileText, File, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
-export { Upload, Download, Trash2, Edit, Eye }               from 'lucide-react';
+export { Upload, Download, Trash2, Edit, Eye, EyeOff }               from 'lucide-react';
 
 // ─── Feedback & états ─────────────────────────────────────────
 export { AlertTriangle, Loader2 }                            from 'lucide-react';

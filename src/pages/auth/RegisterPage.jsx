@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../../components/commons/Input";
-import { Button } from "../../components/commons/Button";
-import { AlertBanner } from "../../components/commons/AlertBanner";
+import { Button, Input, AlertBanner } from "../../components/commons";
 import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
 import { register } from "../../services/authService.js";
+import { Eye, EyeOff } from "../../components/commons";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -15,8 +14,10 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     password: "",
-    confirmPassword:"",
+    confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState("client");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -44,26 +45,23 @@ export default function RegisterPage() {
       return;
     }
 
-   
     const phoneRegex = /^\+237[0-9]{9}$/;
     if (!phoneRegex.test(formData.phone)) {
       setError("Téléphone invalide. Format attendu: +237XXXXXXXXX");
       return;
     }
 
-    
     if (formData.password.length < 6) {
       setError("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
 
-    
     if (formData.firstName.length < 4 || formData.lastName.length < 4) {
       setError("Le prénom et le nom doivent contenir au moins 4 caractères");
       return;
     }
 
-     if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas");
       return;
     }
@@ -79,7 +77,7 @@ export default function RegisterPage() {
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
-        confirmPassword: formData.confirmPassword
+        confirmPassword: formData.confirmPassword,
       };
 
       const response = await register(payload);
@@ -138,18 +136,28 @@ export default function RegisterPage() {
           />
           <Input
             label="Mot de passe"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={formData.password}
             onChange={(value) => handleChange("password", value)}
+            rightIcon={
+              <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
             required
           />
-           <Input
+          <Input
             label="Confirmation mot de passe"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             placeholder="••••••••"
-            value={formData.confirPassword}
+            value={formData.confirmPassword}
             onChange={(value) => handleChange("confirmPassword", value)}
+            rightIcon={
+              <button type="button" onClick={() => setShowConfirmPassword((prev) => !prev)}>
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
             required
           />
         </div>

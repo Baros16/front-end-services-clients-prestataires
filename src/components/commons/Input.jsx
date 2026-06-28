@@ -13,6 +13,8 @@ export function Input({
   disabled = false,
   name,
   className = "",
+  leftIcon,
+  rightIcon,
 }) {
   const [focused, setFocused] = useState(false);
   const isTextarea = type === "textarea";
@@ -21,6 +23,7 @@ export function Input({
     "w-full font-[family-name:var(--font-body)] text-[14px] px-3 py-[10px] " +
     "rounded-[var(--radius-sm)] outline-none transition-all duration-150 " +
     "placeholder:text-sl-300";
+  const iconPaddingClass = leftIcon || rightIcon ? "pr-10" : "";
 
   const inputState = error
     ? "border-[1.5px] border-danger"
@@ -40,7 +43,7 @@ export function Input({
     onChange: (e) => onChange?.(e.target.value),
     onFocus: () => setFocused(true),
     onBlur: () => setFocused(false),
-    className: `${inputBase} ${inputState} ${inputColor}`,
+    className: `${inputBase} ${iconPaddingClass} ${inputState} ${inputColor}`,
   };
 
   return (
@@ -52,15 +55,29 @@ export function Input({
         </label>
       )}
 
-      {isTextarea ? (
-        <textarea
-          {...sharedProps}
-          rows={4}
-          className={`${sharedProps.className} resize-y min-h-[100px]`}
-        />
-      ) : (
-        <input type={type} {...sharedProps} />
-      )}
+      <div className="relative w-full">
+        {leftIcon && (
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-sl-400 pointer-events-none">
+            {leftIcon}
+          </div>
+        )}
+
+        {isTextarea ? (
+          <textarea
+            {...sharedProps}
+            rows={4}
+            className={`${sharedProps.className} resize-y min-h-[100px]`}
+          />
+        ) : (
+          <input type={type} {...sharedProps} />
+        )}
+
+        {rightIcon && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-sl-500">
+            {rightIcon}
+          </div>
+        )}
+      </div>
 
       {error && (
         <span className="text-[12px] text-danger font-medium">⚠ {error}</span>

@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button } from "../../components/commons/Button";
-import { AlertBanner } from "../../components/commons/AlertBanner";
+import { Button,AlertBanner } from "../../components/commons";
 import { OTPDigitInput } from "../../components/auth/OTPDigitInput";
 import { verifyOtp, resendOtp } from "../../services/authService";
-import envelope from "../../assets/envelope.svg";
+import {Mail} from "../../components/commons";
 
 export default function OTPVerificationPage() {
   const navigate = useNavigate();
@@ -109,9 +108,7 @@ export default function OTPVerificationPage() {
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
         <div className="flex justify-center mb-2">
-          <span className="text-4xl">
-            <img src={envelope} alt="logo message" className="h-8 w-auto" />
-          </span>
+          <Mail size={36} className="text-sl-500" />
         </div>
         {/* Titre et sous-titre centrés */}
         <div className="text-center">

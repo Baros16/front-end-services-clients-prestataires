@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { AlertBanner } from "../../components/commons";
-import { Input } from "../../components/commons";
-import { Button } from "../../components/commons";
+import { AlertBanner,Button,Input } from "../../components/commons";
 import { forgotPassword } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 

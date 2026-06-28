@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
-import { Input } from "../../components/commons/Input";
-import { Button } from "../../components/commons/Button";
-import { AlertBanner } from "../../components/commons/AlertBanner";
+import { Input,Button,AlertBanner } from "../../components/commons";
 import { login } from "../../services/authService";
+import { Eye, EyeOff } from "../../components/commons";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,11 +74,16 @@ export default function LoginPage() {
           />
           <Input
             label="Mot de passe"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={password}
             onChange={setPassword}
             required
+            rightIcon={
+              <button onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
           />
         </div>
 
