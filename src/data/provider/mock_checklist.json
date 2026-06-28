@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": [
+    { "id": "c1", "label": "Matériaux préparés" },
+    { "id": "c2", "label": "Outils chargés dans le véhicule" },
+    { "id": "c3", "label": "Adresse client confirmée" },
+    { "id": "c4", "label": "Téléphone chargé" }
+  ]
+}
