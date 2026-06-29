@@ -1,7 +1,5 @@
 // src/components/admin/users/UserFilterTabs.jsx
-
-import { TabBar } from '../../commons/TabBar';
-
+import { TabBar } from '../../commons';
 const TABS = [
 { id: 'all', label: 'Tous', count: 5 },
 { id: 'client', label: 'Clients', count: 2 },
