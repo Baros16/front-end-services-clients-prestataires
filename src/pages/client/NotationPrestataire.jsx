@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getMission, rateMission } from "../../services/clentService";
-import mockUser from "../../data/auth/mock_user.json";
+import mockProviderDashboard from "../../data/provider/mock_dashboard.json";
 import {
   PageHeader,
   Card,
@@ -50,12 +50,12 @@ export default function NotationPrestataire() {
   }, [missionId]);
 
   const getProviderInfo = () => {
-    const providerMock = mockUser.provider;
+    const providerData = mockProviderDashboard.data.profile;
     return {
-      fullName: providerMock.fullName,
-      avatarInitial: providerMock.avatarInitial,
-      specialty: "Plombier certifié",
-      rating: 5,
+      fullName: providerData.fullName,
+      avatarInitial: providerData.avatarInitial,
+      specialty: providerData.specialty,
+      rating: providerData.rating,
     };
   };
 
@@ -130,7 +130,7 @@ export default function NotationPrestataire() {
     <div className="mx-auto">
       <PageHeader
         title="Noter le prestataire"
-        subtitle={`Mission ${mission?.category || ""} terminée`}
+        subtitle={`Mission ${mission?.category} terminée`}
         className="mb-6"
       />
       <div className="max-w-4xl mx-auto px-4 py-6">
@@ -144,13 +144,13 @@ export default function NotationPrestataire() {
               Mission terminée !
             </h2>
             <p className="text-sl-600">
-              {mission?.category || "Plomberie"} ·{" "}
-              {mission?.location?.address || "Bafoussam, Quartier Commercial"}
+              {mission?.category}
+              {mission?.location?.address}
             </p>
             <div className="bg-success-light/80 border border-success/30 rounded-lg px-6 py-3 mt-1 mx-6 w-full">
               <p className="text-sm text-success-dark">Paiement libéré</p>
               <AmountDisplay
-                amount={mission?.totalAmount || 23000}
+                amount={mission?.totalAmount}
                 size="lg"
                 variant="positive"
               />
