@@ -5,9 +5,11 @@ import { TabBar } from '../../components/commons/TabBar';
 import { AlertBanner } from '../../components/commons/AlertBanner';
 import { EmptyState } from '../../components/commons/EmptyState';
 import { SkeletonLoader } from '../../components/commons/SkeletonLoader';
-import { DemandCard } from '../../components/provider/DemandeDisponible/DemandCard';
+import { DemandCard } from '../../components/provider/demandedisponible/DemandCard';
 import { Button } from '../../components/commons/Button';
-import {AvailabilityToggle} from "../../components/provider/AvailabilityToggle";
+import { AvailabilityToggle } from "../../components/provider/AvailabilityToggle";
+import { SortMenu } from '../../components/provider/demandedisponible/SortMenu';
+import { sortDemands } from '../../components/provider/demandedisponible/sortUtils';
 import { getAvailableDemands, applyToDemand, updateAvailability } from '../../services/providerService';
 
 const TABS = [
@@ -24,6 +26,7 @@ export default function DemandesDisponibles() {
   const [activeTab, setActiveTab]     = useState('priority');
   const [isAvailable, setIsAvailable] = useState(true);
   const [applyingId, setApplyingId]   = useState(null);
+  const [activeSort, setActiveSort]   = useState('recent');
 
   useEffect(() => {
     (async () => {
@@ -44,7 +47,25 @@ export default function DemandesDisponibles() {
     })();
   }, []);
 
-  const filteredDemands = allDemands.filter((d) => d.zone === activeTab);
+  // Auto-fermeture succès après 3 secondes
+  useEffect(() => {
+     if (!successMsg) return;
+      const timer = setTimeout(() => setSuccessMsg(null), 3000);
+      return () => clearTimeout(timer);
+    }, [successMsg]);
+
+// Auto-fermeture erreur après 3 secondes
+  useEffect(() => {
+   if (!error) return;
+     const timer = setTimeout(() => setError(null), 3000);
+      return () => clearTimeout(timer);
+  }, [error]);
+
+  const filteredDemands = sortDemands(
+    allDemands.filter((d) => d.zone === activeTab),
+    activeSort
+  );
+
   const tabsWithCount = TABS.map((t) => ({
     ...t,
     count: allDemands.filter((d) => d.zone === t.id).length,
@@ -80,56 +101,18 @@ export default function DemandesDisponibles() {
     console.log('[DemandesDisponibles] Voir détails →', demandId);
   };
 
-  /* ── Bouton Filtrer avec tokens CSS ── */
   const headerActions = (
     <div className="flex items-center gap-2">
-      <button
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '8px 12px',
-          border: '1px solid var(--color-sl-200)',
-          borderRadius: 'var(--radius-md)',
-          fontSize: '0.875rem',
-          color: 'var(--color-sl-700)',
-          background: 'white',
-          cursor: 'pointer',
-          fontFamily: 'var(--font-body)',
-          transition: 'background 150ms ease',
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-sl-50)')}
-        onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
-      >
-        <svg
-          width="15" height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="4" y1="6" x2="20" y2="6"/>
-          <line x1="8" y1="12" x2="16" y2="12"/>
-          <line x1="11" y1="18" x2="13" y2="18"/>
-        </svg>
-        <span className="hidden sm:inline">Filtrer</span>
-      </button>
-
+      <SortMenu activeSort={activeSort} onSortChange={setActiveSort} />
       <AvailabilityToggle isAvailable={isAvailable} onToggle={handleAvailabilityToggle} />
     </div>
   );
 
   return (
-    <div
-      className="flex flex-col h-full"
-      style={{ background: 'var(--color-sl-50)' }}
-    >
+    <div className="flex flex-col h-full" style={{ background: 'var(--color-sl-50)' }}>
       <PageHeader
         title="Demandes disponibles"
-        withDot = "true"
+        withDot="true"
         subtitle="Demandes correspondant à vos compétences"
         actions={headerActions}
       />
@@ -138,29 +121,24 @@ export default function DemandesDisponibles() {
 
       <div className="flex-1 overflow-y-auto" style={{ padding: '1rem 1.5rem' }}>
 
-        {/* ── Bannière succès ── */}
         {successMsg && (
           <div style={{ marginBottom: '1rem' }}>
-            <AlertBanner
-              type="success"
-              message={successMsg}
-              onClose={() => setSuccessMsg(null)}
+            <AlertBanner type="success" message={successMsg} onClose={() => setSuccessMsg(null)} 
+            size="sm"
+            className="max-w-sm"
             />
           </div>
         )}
 
-        {/* ── Bannière erreur ── */}
         {error && (
           <div style={{ marginBottom: '1rem' }}>
-            <AlertBanner
-              type="danger"
-              message={error}
-              onClose={() => setError(null)}
+            <AlertBanner type="danger" message={error} onClose={() => setError(null)}  
+            size="sm" 
+            className="max-w-sm"
             />
           </div>
         )}
 
-        {/* ── Skeleton chargement ── */}
         {isLoading && (
           <SkeletonLoader
             variant="card"
@@ -169,7 +147,6 @@ export default function DemandesDisponibles() {
           />
         )}
 
-        {/* ── Grille des demandes ── */}
         {!isLoading && filteredDemands.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredDemands.map((demand) => (
@@ -184,7 +161,6 @@ export default function DemandesDisponibles() {
           </div>
         )}
 
-        {/* ── État vide ── */}
         {!isLoading && filteredDemands.length === 0 && !error && (
           <EmptyState
             title="Aucune demande disponible"
@@ -194,12 +170,8 @@ export default function DemandesDisponibles() {
                 : "Aucune demande dans les zones éloignées."
             }
             action={
-              <Button
-                variant="primary"
-                size="md"
-                          onClick={() => window.location.reload()}
-        >
-          Rafraîchir
+              <Button variant="primary" size="md" onClick={() => window.location.reload()}>
+                Rafraîchir
               </Button>
             }
           />

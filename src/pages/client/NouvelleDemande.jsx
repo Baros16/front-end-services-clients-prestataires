@@ -16,11 +16,11 @@ import SectionCard   from "../../components/commons/SectionCard.jsx";
 
 // Composants spécifiques à cet écran
 
-import  StepIndicator          from '../../components/provider/demandes/StepIndicator.jsx';
-import  CategorySelector    from '../../components/provider/demandes/CategorySelector';
-import  DemandDescriptionField from '../../components/provider/demandes/DemandDescriptionField';
-import  LocationSidePanel  from '../../components/provider/demandes/LocationSidePanel';
-import  RecapSidePanel    from '../../components/provider/demandes/RecapSidePanel';
+import  StepIndicator          from '../../components/client/clients/demandes/StepIndicator.jsx';
+import  CategorySelector    from '../../components/client/clients/demandes/CategorySelector';
+import  DemandDescriptionField from '../../components/client/clients/demandes/DemandDescriptionField';
+import  LocationSidePanel  from '../../components/client/clients/demandes/LocationSidePanel';
+import  RecapSidePanel    from '../../components/client/clients/demandes/RecapSidePanel';
 
 // Service API / mock
 import { getCategories, uploadPhoto, createDemand } from  '../../services/clentService';
@@ -167,6 +167,8 @@ export default function NouvelleDemande() {
   };
 
   const handleCancel = () => navigate(-1);
+
+  
 
   // ─────────────────────────────────────────────────────────────────────────
   return (

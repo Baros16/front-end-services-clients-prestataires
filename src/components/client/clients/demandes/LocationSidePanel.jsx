@@ -1,5 +1,5 @@
 // src/components/client/demand/LocationSidePanel.jsx
-import {MapEmbed} from '../../commons/MapEmbed';
+import {MapEmbed} from '../../../../components/commons/MapEmbed';
 
 /**
  * LocationSidePanel — Panneau carte + adresse avec bouton Modifier

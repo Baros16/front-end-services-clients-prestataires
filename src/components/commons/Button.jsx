@@ -32,7 +32,12 @@ export function Button({
     danger:
       "bg-danger text-white shadow-[0_2px_6px_rgba(220,38,38,0.25)] " +
       "hover:brightness-110 active:scale-[0.98]",
-  };
+    dark:                                                              // ← nouveau
+      "bg-[#0F172A] text-white " +
+      "hover:bg-[#1E293B] active:scale-[0.98]",
+};
+  
+
 
   return (
     <button

@@ -1,5 +1,5 @@
 // src/components/client/demand/RecapSidePanel.jsx
-import { Button } from '../../../components/commons/Button';
+import { Button } from '../../../../components/commons/Button';
 
 export default function RecapSidePanel({ recap, onCancel, onSubmit, isSubmitting }) {
   const rows = [
