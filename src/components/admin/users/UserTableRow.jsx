@@ -1,66 +1,7 @@
 // src/components/admin/users/UserTableRow.jsx
 
-import { Button } from '../../commons';
+import { RoleTag, StatutBadge, RatingStars, Button } from '../../commons';
 
-
-function RoleCapsule({ role }) {
-const isProvider = role === 'provider';
-return (
-<span style={{
-display: 'inline-block',
-padding: '3px 12px',
-borderRadius: '20px',
-fontSize: '11px',
-fontWeight: 700,
-letterSpacing: '0.4px',
-border: `1px solid ${isProvider ? 'var(--color-brand-light)' : 'var(--color-info)'}`,
-color: isProvider ? 'var(--color-brand-light)' : 'var(--color-info)',
-background: 'white',
-fontFamily: 'var(--font-body)',
-}}>
-{isProvider ? 'PRESTATAIRE' : 'CLIENT'}
-</span>
-);
-}
-function StatutBadge({ status }) {
-const isActive = status === 'active';
-return (
-<span style={{
-display: 'inline-block',
-padding: '4px 12px',
-borderRadius: '20px',
-fontSize: '12px',
-fontWeight: 700,
-background: 'white',
-color: isActive ? 'var(--color-success)' : 'var(--color-danger)',
-border: `1px solid ${isActive ? 'var(--color-success)' : 'var(--color-danger)'}`,
-fontFamily: 'var(--font-body)',
-}}>
-{isActive ? 'ACTIF' : 'SUSPENDU'}
-</span>
-);
-}
-function StarRating({ value }) {
-return (<span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-{[1, 2, 3, 4, 5].map(i => (
-<span key={i} style={{
-color: i <= Math.round(value) ? 'var(--color-accent)' : 'var(--color-sl-300)',
-fontSize: '14px',
-}}>★</span>
-))}
-{value && (
-<span style={{
-fontSize: '12px',
-color: 'var(--color-sl-500)',
-marginLeft: '4px',
-fontFamily: 'var(--font-body)',
-}}>
-{value.toFixed(1)}
-</span>
-)}
-</span>
-);
-}
 function SuspensionTooltip({ reason, byRole }) {
 if (!reason) return null;
 return (
@@ -81,6 +22,8 @@ textOverflow: 'ellipsis',
 }
 export default function UserTableRow({ user, isLoading, onSuspend, onReactivate, onView }) {
 const isActive = user.status === 'active';
+const role = user.role === 'provider'? 'PRESTATAIRE' : 'CLIENT';
+
 return (
    <tr 
     style={{
@@ -149,7 +92,6 @@ fontFamily: 'var(--font-body)',
 <StatutBadge status={user.status} />
 {!isActive && (
 <SuspensionTooltip
-className="!border !border-red-500 !text-red-600 !bg-red-50"
 byRole={user.suspendedByRole}
 />
 )}

@@ -1,24 +1,128 @@
 // src/pages/admin/GestionUtilisateurs.jsx
-
-import { useState, useEffect, useCallback }  from 'react'
-import { PageHeader, SearchInput, SkeletonLoader, EmptyState, AlertBanner } from '../../components/commons'; 
-import { Users } from '../../components/commons/Icons';
-import { Search } from '../../components/commons/Icons';
-import { getManagedUsers, suspendUser, reactivateUser } from '../../services/adminService';
+import { useState, useEffect, useCallback } from 'react';
+import {AlertBanner,EmptyState,DataTable,RoleTag,StatusBadge,RatingStars,Button,} from '../../components/commons';
+import { Search, Users } from '../../components/commons/Icons';
+import mockUsersJson from '../../data/admin/mock_users.json';
 import UserFilterTabs from '../../components/admin/users/UserFilterTabs';
-import UserTableRow from '../../components/admin/users/UserTableRow';
-import  mockUsersJson  from '../../data/admin/mock_users.json';
 
-const TABLE_COLUMNS = [
-{ key: 'user', label: 'UTILISATEUR', align: 'left' },
-{ key: 'role', label: 'RÔLE', align: 'left' },
-{ key: 'phone', label: 'TÉLÉPHONE', align: 'left' },
-{ key: 'missions', label: 'MISSIONS', align: 'center' },
-{ key: 'rating', label: 'NOTE', align: 'left' },
-{ key: 'status', label: 'STATUT', align: 'left' },
-{ key: 'actions', label: 'ACTIONS', align: 'left' },
+const TABLE_COLUMNS = (actionLoad, handleSuspend, handleReactivate, handleView) => [
+{
+key: 'user',
+header: 'UTILISATEUR',
+render: (row) => (
+<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+<div style={{
+width: 34, height: 34, borderRadius: '50%',
+background: 'var(--color-sl-200)',
+display: 'flex', alignItems: 'center', justifyContent: 'center',
+fontWeight: 700, fontSize: 13,
+color: 'var(--color-sl-700)',
+flexShrink: 0,
+}}>
+{row.avatarInitial}
+</div>
+<div>
+<p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--color-sl-900)',
+fontFamily: 'var(--font-body)' }}>
+{row.fullName}
+</p>
+<p style={{ margin: 0, fontSize: '12px', color: 'var(--color-sl-400)', fontFamily:
+'var(--font-body)' }}>
+{row.email}
+</p>
+</div>
+</div>
+),
+},{
+key: 'role',
+header: 'RÔLE',
+render: (row) => (
+<RoleTag role={row.role === 'provider' ? 'PRESTATAIRE' : 'CLIENT'} />
+),
+},
+{
+key: 'phone',
+header: 'TÉLÉPHONE',
+},
+{
+key: 'missionsCount',
+header: 'MISSIONS',
+},
+{
+key: 'rating',
+header: 'NOTE',
+render: (row) => (
+<RatingStars value={row.rating ?? 0} size="sm" />
+),
+},
+{
+key: 'status',
+header: 'STATUT',
+render: (row) => {
+const isActive = row.status === 'active';
+return (
+<div>
+<StatusBadge
+variant={isActive ? 'actif' : 'suspendu'}
+size="sm"
+/>
+{!isActive && row.suspensionReason && (
+<p style={{
+margin: '4px 0 0',
+fontSize: '11px',
+color: 'var(--color-danger)',
+fontFamily: 'var(--font-body)',
+fontStyle: 'italic',
+maxWidth: 180,
+whiteSpace: 'nowrap',
+overflow: 'hidden',
+textOverflow: 'ellipsis',}}>
+{row.suspendedByRole === 'agent' ? 'Agent' : 'Admin'} —
+{row.suspensionReason}
+</p>
+)}
+</div>
+);
+},
+},
+{
+key: 'actions',
+header: 'ACTIONS',
+render: (row) => {
+const isActive = row.status === 'active';
+return (
+<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+<Button
+variant="ghost"
+size="sm"
+onClick={() => handleView(row)}
+className="!border !border-gray-300 !text-gray-900 !bg-white"
+>
+Voir
+</Button>
+{isActive ? (
+<Button
+variant="ghost"
+size="sm"
+onClick={() => handleSuspend(row)}
+className="!border !border-red-400 !text-red-600 !bg-red-50"
+>
+Susp.
+</Button>
+) : (
+<Button
+variant="ghost"
+size="sm"
+onClick={() => handleReactivate(row)}
+className="!border !border-green-500 !text-green-600 !bg-green-50"
+>
+Réactiver
+</Button>
+)}
+</div>);
+},
+},
 ];
-
 export default function GestionUtilisateurs() {
 const [users, setUsers] = useState([]);
 const [loading, setLoading] = useState(true);
@@ -26,22 +130,19 @@ const [error, setError] = useState(null);
 const [activeTab, setActiveTab] = useState('all');
 const [search, setSearch] = useState('');
 const [actionLoad, setActionLoad] = useState(null);
-// ── Fetch ──────────────────────────────────────────────
 const fetchUsers = useCallback(() => {
 setLoading(true);
 setError(null);
-  try {
-
-       const list = mockUsersJson.data ?? [];
-       setUsers(list);
-    } catch { 
-        setError('Impossible de charger les utilisateurs.');
-    } finally { 
-        setLoading(false);
-    }
-}, []);     
+try {
+const list = mockUsersJson.data ?? [];
+setUsers(list);
+} catch {
+setError('Impossible de charger les utilisateurs.');
+} finally {
+setLoading(false);
+}
+}, []);
 useEffect(() => { fetchUsers(); }, [fetchUsers]);
-// ── Filtrage local ──────────────────────────────────────────
 const filtered = users.filter(u => {
 const q = search.toLowerCase();
 const matchSearch =
@@ -55,26 +156,17 @@ case 'suspended': return matchSearch && u.status === 'suspended';
 default: return matchSearch;
 }
 });
-// ── Actions ─────────────────────────────────────────────
-const handleSuspend = async (user) => {
-setActionLoad(user.id);
-try {
-await suspendUser(user.id, 'Suspension manuelle admin');
-setUsers(prev =>
+const handleSuspend = (user) => {
+setActionLoad(user.id);setUsers(prev =>
 prev.map(u => u.id === user.id
-? { ...u, status: 'suspended', suspendedByRole: 'admin', suspensionReason: 'Suspension manuelle admin' }
+? { ...u, status: 'suspended', suspendedByRole: 'admin',suspensionReason: 'Suspension manuelle admin'  }
 : u
- )
+)
 );
-} catch {
-setError('Échec de la suspension. Veuillez réessayer.');
-} finally {
 setActionLoad(null);
-}
 };
-const handleReactivate = async (user) => {
+const handleReactivate = (user) => {
 setActionLoad(user.id);
-try {await reactivateUser(user.id);
 setUsers(prev =>
 prev.map(u => u.id === user.id
 ? { ...u, status: 'active', suspendedBy: null, suspendedByRole: null, suspensionReason:
@@ -82,19 +174,13 @@ null }
 : u
 )
 );
-} catch {
-setError('Échec de la réactivation. Veuillez réessayer.');
-} finally {
 setActionLoad(null);
-}
 };
 const handleView = (user) => {
-// TODO S3 : navigate(`/admin/users/${user.id}`)
 console.info('[UserManagement] Voir profil :', user.id);
 };
-// ── Render ─────────────────────────────────────────────
 return (
-<div style={{   
+<div style={{
 padding: '32px 36px',
 minHeight: '100dvh',
 background: 'var(--color-sl-50)',
@@ -105,12 +191,11 @@ fontFamily: 'var(--font-body)',
 background: 'white',
 borderRadius: 'var(--radius-lg)',
 border: '1px solid var(--color-sl-200)',
-boxShadow: 'var(--shadow-card)',    
+boxShadow: 'var(--shadow-card)',
 padding: '16px 24px',
 display: 'flex',
 justifyContent: 'space-between',
-alignItems: 'center',
-marginBottom: 20,
+alignItems: 'center',marginBottom: 20,
 }}>
 <div>
 <h1 style={{
@@ -125,46 +210,55 @@ Gestion des utilisateurs
 <p style={{
 fontSize: '13px',
 color: 'var(--color-sl-500)',
-margin: '4px 0 0',
+margin: '4px 00',
 fontFamily: 'var(--font-body)',
 }}>
 Clients & Prestataires
 </p>
 </div>
 <div style={{ position: 'relative' }}>
-    <span style={{
-        position: 'absolute',
-        left: 10,
-        top: '50%',
-        transform: 'translateY(-50%)',
-        color: 'var(--color-sl-400)',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-    }}>
-        <Search size={14} />
-    </span>       
+<span style={{
+position: 'absolute',
+left: 10,
+top: '50%',
+transform: 'translateY(-50%)',
+color: 'var(--color-sl-400)',
+pointerEvents: 'none',
+display: 'flex',
+alignItems: 'center',
+}}>
+<Search size={14} />
+</span>
 <input
 type="text"
 value={search}
 onChange={e => setSearch(e.target.value)}
 placeholder="Rechercher..."
 style={{
-    padding: '8px 14px 8px 32px',
-    border: '1px solid var(--color-sl-200)',
-    borderRadius: 'var(--radius-md)',
-    fontSize: '13px',
-    color: 'var(--color-sl-700)',
-    fontFamily: 'var(--font-body)',
-    outline: 'none',
-    width: '200px',
-    background: 'white',
+padding: '8px 14px 8px 32px',
+border: '1px solid var(--color-sl-200)',
+borderRadius: 'var(--radius-md)',fontSize: '13px',
+color: 'var(--color-sl-700)',
+fontFamily: 'var(--font-body)',
+outline: 'none',
+width: '200px',
+background: 'white',
 }}
 />
 </div>
 </div>
+{/* Erreur */}
+{error && (
+<div style={{ marginBottom: 16}}>
+<AlertBanner
+message={error}
+variant="error"
+onDismiss={() => setError(null)}
+/>
+</div>
+)}
 {/* Onglets */}
-<div style={{ marginBottom: 20 }}>
+<div style={{ marginBottom: 20}}>
 <UserFilterTabs activeTabId={activeTab} onChange={setActiveTab} />
 </div>
 {/* Tableau */}
@@ -175,56 +269,21 @@ border: '1px solid var(--color-sl-200)',
 boxShadow: 'var(--shadow-card)',
 overflow: 'hidden',
 }}>
-{loading ? (
-<div style={{ padding: 24 }}>
-<SkeletonLoader variant="row" count={5} />
-</div>
-) : filtered.length === 0 ? (
+<DataTable
+columns={TABLE_COLUMNS(actionLoad, handleSuspend, handleReactivate, handleView)}
+data={filtered}
+keyExtractor={(row) => row.id}
+isLoading={loading}
+emptyState={
 <EmptyState
-icon={<Users size={32} />}
-title="Aucun utilisateur trouvé"
-description={
+title="Aucun utilisateur trouvé"description={
 search
 ? `Aucun résultat pour "${search}".`
 : 'Aucun utilisateur dans cette catégorie.'
 }
 />
-) : (
-<table style={{ width: '100%', borderCollapse: 'collapse' }}>
-<thead>
-<tr style={{ borderBottom: '1px solid var(--color-sl-100)' }}>
-{TABLE_COLUMNS.map(col => (
-<th
-key={col.key}style={{
-padding: '12px 16px',
-textAlign: col.align,
-fontSize: '11px',
-fontWeight: 700,
-color: 'var(--color-sl-400)',
-letterSpacing: '0.8px',
-fontFamily: 'var(--font-body)',
-background: 'white',
-}}
->
-{col.label}
-</th>
-))}
-</tr>
-</thead>
-<tbody>
-{filtered.map(user => (
-<UserTableRow
-key={user.id}
-user={user}
-isLoading={actionLoad === user.id}
-onSuspend={handleSuspend}
-onReactivate={handleReactivate}
-onView={handleView}
+}
 />
-))}
-</tbody>
-</table>
-)}
 </div>
 </div>
 );
