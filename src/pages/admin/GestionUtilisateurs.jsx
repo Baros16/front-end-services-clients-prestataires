@@ -152,6 +152,7 @@ onChange={(e) => setSearch(e.target.value)}placeholder="Rechercher..."
 onClear={() => setSearch('')}
 />
 }
+ className="mb-5"
 />
 {/* Erreur */}
 {error && (
