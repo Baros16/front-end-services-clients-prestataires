@@ -10,7 +10,7 @@ import ProviderSummaryCard   from '../../components/client/quote/ProviderSummary
 import PaymentMethodSelector from '../../components/client/quote/PaymentMethodSelector';
 import PaymentMethodPanel from '../../components/client/quote/PaymentMethodPanel';
 import ProviderAvatarReveal from '../../components/client/quote/ProviderAvatarReveal';
-import { getQuoteDetail, acceptQuote, rejectQuote } from '../../services/clentService';
+import { getQuoteDetail, acceptQuote, rejectQuote } from '../../services/clientService';
 import { formatXAF } from '../../utils/formatters';
 
 // Toggle temporaire pour comparer les 2 variantes paiement — à retirer une fois choisie
