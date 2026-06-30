@@ -5,18 +5,23 @@ export const mockLitigeDetail = {
   reference: "LIT-2026-0042",
   motif: "PRESTATION_INCOMPLETE",
   clientDescription:
-    "L'ancien siphon n'a pas été remplacé comme prévu dans le devis. Le prestataire a seulement nettoyé l'installation existante.",
+    "Le plombier n'a pas remplacé le siphon comme prévu dans le devis. Il est parti après avoir changé le joint uniquement.",
   attachments: [
     {
       id: "att_001",
-      name: "photo_siphon_ancien.jpg",
-      url: "https://cdn.serviloc.cm/litiges/photo_siphon_ancien.jpg",
+      name: "photo_eau_evier.jpg",
+      url: "https://cdn.serviloc.cm/litiges/photo_eau_evier.jpg",
+    },
+    {
+      id: "att_002",
+      name: "siphon_intact.jpg",
+      url: "https://cdn.serviloc.cm/litiges/siphon_intact.jpg",
     },
   ],
   originalQuote: {
     labour: 15000,
-    materials: 8000,
-    total: 23000,
+    materials: 10000,
+    total: 25000,
   },
   status: "EN_COURS",
 };
@@ -26,14 +31,14 @@ export const mockParties = {
     id: "usr_abc123",
     name: "Madeleine K.",
     avatarInitial: "M",
-    rating: 4.2,
+    rating: 4.3,
     role: "client",
   },
   provider: {
     id: "usr_prov456",
     name: "Jean-Claude T.",
     avatarInitial: "J",
-    rating: 4.7,
+    rating: 4.4,
     role: "provider",
   },
 };
@@ -93,8 +98,8 @@ export const mockProviderMessages = [
     senderRole: "provider",
     senderName: "Jean-Claude T.",
     content:
-      "Bonjour Pauline, j'ai bien remplacé le siphon comme convenu dans le devis. Je peux fournir une photo si nécessaire.",
-    attachmentUrl: null,
+      "Bonjour, j'ai remplacé le joint comme convenu. Le siphon ne nécessitait pas de remplacement. Je joins à ceci une photo.",
+    attachmentUrl: "https://cdn.serviloc.cm/litiges/joint_remplace.jpg",
     sentAt: "2026-05-21T16:00:00+01:00",
   },
 ];

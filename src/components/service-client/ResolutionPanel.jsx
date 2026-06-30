@@ -1,4 +1,6 @@
 // src/components/service-client/ResolutionPanel.jsx
+import { Card } from "../commons/Card";
+
 const RESOLUTION_OPTIONS = [
   { value: 'remboursement_partiel', label: 'Remboursement partiel' },
   { value: 'annulation_complete', label: 'Annulation complète' },
@@ -15,9 +17,7 @@ export default function ResolutionPanel({
   isSubmitting,
 }) {
   return (
-    <div className="border rounded-lg p-4 bg-white">
-      <h3 className="font-bold text-lg mb-3">Proposition de résolution</h3>
-
+    <Card title="Proposition de résolution">
       <div className="space-y-2 mb-4">
         {RESOLUTION_OPTIONS.map((opt) => {
           const isSelected = selectedResolution === opt.value;
@@ -66,6 +66,6 @@ export default function ResolutionPanel({
           Clôturer le litige
         </button>
       </div>
-    </div>
+    </Card>
   );
 }

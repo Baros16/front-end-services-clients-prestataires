@@ -1,5 +1,6 @@
 // src/components/service-client/LitigeDetailsPanel.jsx
 import { createElement } from 'react';
+import { Card } from '../commons/Card';
 
 function AttachmentLink({ att }) {
   return createElement(
@@ -11,7 +12,7 @@ function AttachmentLink({ att }) {
       className: 'inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded text-sm text-brand hover:bg-gray-50 transition-colors',
     },
     createElement('span', null, '📷'),
-    createElement('span', null, ' ' + att.name)
+    createElement('span', { className: 'truncate max-w-[90px]', title: att.name }, ' ' + att.name)
   );
 }
 
@@ -19,8 +20,7 @@ export default function LitigeDetailsPanel({ litige }) {
   if (!litige) return null;
 
   return (
-    <div className="border rounded-lg p-4 bg-white">
-      <h3 className="font-bold text-lg mb-2">Détails du litige</h3>
+    <Card title="Détails du litige">
       <p className="text-sm text-gray-500 mb-1">Référence : {litige.reference}</p>
       <p className="text-sm text-gray-500 mb-3">Statut : {litige.status}</p>
 
@@ -28,14 +28,14 @@ export default function LitigeDetailsPanel({ litige }) {
       <p className="mb-3">{litige.motif}</p>
 
       <p className="font-semibold mb-1">Description du client :</p>
-      <blockquote className="border-l-4 border-gray-300 pl-3 italic mb-3">
+      <blockquote className="bg-gray-100 rounded-lg rounded-tl-none p-3 text-sm not-italic mb-3">
         {litige.clientDescription}
       </blockquote>
 
       {litige.attachments && litige.attachments.length > 0 && (
         <div className="mb-3">
           <p className="font-semibold mb-1">Pièces jointes :</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto">
             {litige.attachments.map(function (att) {
               return <AttachmentLink key={att.id} att={att} />;
             })}
@@ -55,6 +55,6 @@ export default function LitigeDetailsPanel({ litige }) {
           </table>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
