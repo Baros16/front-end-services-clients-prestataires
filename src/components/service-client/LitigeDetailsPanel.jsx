@@ -1,4 +1,20 @@
 // src/components/service-client/LitigeDetailsPanel.jsx
+import { createElement } from 'react';
+
+function AttachmentLink({ att }) {
+  return createElement(
+    'a',
+    {
+      href: att.url,
+      target: '_blank',
+      rel: 'noreferrer',
+      className: 'inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded text-sm text-brand hover:bg-gray-50 transition-colors',
+    },
+    createElement('span', null, '📷'),
+    createElement('span', null, ' ' + att.name)
+  );
+}
+
 export default function LitigeDetailsPanel({ litige }) {
   if (!litige) return null;
 
@@ -16,18 +32,14 @@ export default function LitigeDetailsPanel({ litige }) {
         {litige.clientDescription}
       </blockquote>
 
-      {litige.attachments?.length > 0 && (
+      {litige.attachments && litige.attachments.length > 0 && (
         <div className="mb-3">
           <p className="font-semibold mb-1">Pièces jointes :</p>
-          <ul className="list-disc list-inside">
-            {litige.attachments.map((att) => (
-              <li key={att.id}>
-                <a href={att.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">
-                  {att.name}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="flex flex-wrap gap-2">
+            {litige.attachments.map(function (att) {
+              return <AttachmentLink key={att.id} att={att} />;
+            })}
+          </div>
         </div>
       )}
 

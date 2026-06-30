@@ -8,9 +8,10 @@ export default function MediationChatPanel({
   onPartyChange,
   onSend,
   agentId,
+  clientName,
+  providerName,
 }) {
   const [inputValue, setInputValue] = useState('');
-
   const messages = activeParty === 'client' ? clientMessages : providerMessages;
 
   const handleSubmit = (e) => {
@@ -22,22 +23,22 @@ export default function MediationChatPanel({
 
   return (
     <div className="border rounded-lg p-4 bg-white flex flex-col h-full">
-      <h3 className="font-bold text-lg mb-2">Médiation</h3>
+      <h3 className="font-bold text-lg mb-2">Contact avec les parties</h3>
 
       <div className="flex gap-2 mb-3">
         <button
           type="button"
           onClick={() => onPartyChange('client')}
-          className={`px-3 py-1 rounded ${activeParty === 'client' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1 rounded ${activeParty === 'client' ? 'bg-brand text-white' : 'bg-gray-100'}`}
         >
-          Client
+          Client {clientName ? `(${clientName})` : ''}
         </button>
         <button
           type="button"
           onClick={() => onPartyChange('provider')}
-          className={`px-3 py-1 rounded ${activeParty === 'provider' ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+          className={`px-3 py-1 rounded ${activeParty === 'provider' ? 'bg-brand text-white' : 'bg-gray-100'}`}
         >
-          Prestataire
+          Prestataire {providerName ? `(${providerName})` : ''}
         </button>
       </div>
 
@@ -46,13 +47,13 @@ export default function MediationChatPanel({
           <div
             key={msg.id}
             className={`p-2 rounded max-w-[80%] ${
-              msg.senderId === agentId ? 'bg-blue-50 ml-auto' : 'bg-gray-100'
+              msg.senderId === agentId ? 'bg-brand-xlight ml-auto' : 'bg-gray-100'
             }`}
           >
             <p className="text-xs font-semibold mb-1">{msg.senderName}</p>
             <p className="text-sm">{msg.content}</p>
             {msg.attachmentUrl && (
-              <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline">
+              <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" className="text-xs text-brand underline">
                 Voir la pièce jointe
               </a>
             )}
@@ -68,7 +69,7 @@ export default function MediationChatPanel({
           placeholder="Écrire un message..."
           className="flex-1 border rounded px-2 py-1"
         />
-        <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded">
+        <button type="submit" className="bg-brand text-white px-3 py-1 rounded hover:bg-brand-light transition-colors">
           Envoyer
         </button>
       </form>
