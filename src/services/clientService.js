@@ -12,7 +12,7 @@ import mockMission from "../data/client/mock_mission.json";
 export async function getClientDashboard() {
   return getMock(
     mockClientDashboard,
-    () => apiClient.get(`/client/dashboard`).then(r => r.data.data),
+    () => apiClient.get(`/client/dashboard`),
   );
 }
 
@@ -23,7 +23,7 @@ export async function getClientDashboard() {
 export async function getClientDemands(params = {}) {
   return getMockList(
     mockDemands,
-    () => apiClient.get(`/client/demands`, { params }).then(r => r.data.data),
+    () => apiClient.get(`/client/demands`, { params }),
   );
 }
 
@@ -33,8 +33,8 @@ export async function getClientDemands(params = {}) {
  */
 export async function createDemand(payload) {
   return getMock(
-    { success: true, data: payload },
-    () => apiClient.post(`/client/demands`, payload).then(r => r.data.data),
+    { data: { success: true, data: payload } },
+    () => apiClient.post(`/client/demands`, payload),
   );
 }
 
@@ -45,19 +45,21 @@ export async function createDemand(payload) {
  */
 export function getQuoteDetail(quoteId) {
   const enriched = {
-    ...mockQuote.data,
-    provider: {
-      id: 'usr_jcm456',
-      fullName: 'Jean-Claude Mbarga',
-      avatarInitial: 'J',
-      rating: 4.8,
-      missionsCount: 47,
+    data: {
+      ...mockQuote.data,
+      provider: {
+        id: 'usr_jcm456',
+        fullName: 'Jean-Claude Mbarga',
+        avatarInitial: 'J',
+        rating: 4.8,
+        missionsCount: 47,
+      },
+      demand: { category: 'Plomberie', description: 'Fuite cuisine' },
     },
-    demand: { category: 'Plomberie', description: 'Fuite cuisine' },
   };
   return getMock(
     enriched,
-    () => apiClient.get(`/client/devis/${quoteId}`).then(r => r.data.data),
+    () => apiClient.get(`/client/devis/${quoteId}`),
   );
 }
 
@@ -66,10 +68,8 @@ export function getQuoteDetail(quoteId) {
  */
 export async function acceptQuote(demandId, paymentMethod) {
   return getMock(
-    { success: true, data: { demandId, status: "en_cours", paymentMethod } },
-    () => apiClient
-      .post(`/client/demands/${demandId}/quote/accept`, { paymentMethod })
-      .then(r => r.data.data),
+    { data: { success: true, data: { demandId, status: "en_cours", paymentMethod } } },
+    () => apiClient.post(`/client/demands/${demandId}/quote/accept`, { paymentMethod }),
   );
 }
 
@@ -78,10 +78,8 @@ export async function acceptQuote(demandId, paymentMethod) {
  */
 export async function rejectQuote(demandId) {
   return getMock(
-    { success: true, data: { demandId, status: "ouverte" } },
-    () => apiClient
-      .post(`/client/demands/${demandId}/quote/reject`)
-      .then(r => r.data.data),
+    { data: { success: true, data: { demandId, status: "ouverte" } } },
+    () => apiClient.post(`/client/demands/${demandId}/quote/reject`),
   );
 }
 
@@ -91,7 +89,7 @@ export async function rejectQuote(demandId) {
 export async function getMission(missionId) {
   return getMock(
     mockMission,
-    () => apiClient.get(`/client/missions/${missionId}`).then(r => r.data.data),
+    () => apiClient.get(`/client/missions/${missionId}`),
   );
 }
 
@@ -100,8 +98,8 @@ export async function getMission(missionId) {
  */
 export async function validateMission(missionId) {
   return getMock(
-    { success: true, data: { missionId, status: "terminee" } },
-    () => apiClient.post(`/client/missions/${missionId}/validate`).then(r => r.data.data),
+    { data: { success: true, data: { missionId, status: "terminee" } } },
+    () => apiClient.post(`/client/missions/${missionId}/validate`),
   );
 }
 
@@ -111,8 +109,8 @@ export async function validateMission(missionId) {
  */
 export async function rateMission(missionId, payload) {
   return getMock(
-    { success: true, data: { missionId, ...payload } },
-    () => apiClient.post(`/client/missions/${missionId}/rate`, payload).then(r => r.data.data),
+    { data: { success: true, data: { missionId, ...payload } } },
+    () => apiClient.post(`/client/missions/${missionId}/rate`, payload),
   );
 }
 
@@ -122,7 +120,22 @@ export async function rateMission(missionId, payload) {
  */
 export async function createLitige(missionId, payload) {
   return getMock(
+    { data: { success: true, data: { missionId, status: "ouvert" } } },
+    () => apiClient.post(`/client/missions/${missionId}/litige`, payload),
+  );
+}
+export async function rateMission(missionId, payload) {
+  // payload : { rating: 1-5, comment }
+  return getMock(
+    { success: true, data: { missionId, ...payload } },
+    () => axios.post(`${BASE}/missions/${missionId}/rate`, payload)
+  );
+}
+
+export async function createLitige(missionId, payload) {
+  // payload : { motifId, description, evidencePhotoIds }
+  return getMock(
     { success: true, data: { missionId, status: "ouvert" } },
-    () => apiClient.post(`/client/missions/${missionId}/litige`, payload).then(r => r.data.data),
+    () => axios.post(`${BASE}/missions/${missionId}/litige`, payload)
   );
 }
