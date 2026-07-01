@@ -1,0 +1,86 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_abc123",
+      "fullName": "Madeleine Kamdem",
+      "email": "mk@email.cm",
+      "phone": "+237695123456",
+      "role": "client",
+      "avatarInitial": "M",
+      "missionsCount": 3,
+      "rating": 4.2,
+      "status": "active",
+      "suspendedBy": null,
+      "suspendedByRole": null,
+      "suspensionReason": null,
+      "createdAt": "2026-03-15T10:00:00+01:00"
+    },
+    {
+      "id": "usr_client02",
+      "fullName": "Pierre Fotso",
+      "email": "p.fotso.client@email.cm",
+      "phone": "+237691200300",
+      "role": "client",
+      "avatarInitial": "P",
+      "missionsCount": 7,
+      "rating": 4.8,
+      "status": "active",
+      "suspendedBy": null,
+      "suspendedByRole": null,
+      "suspensionReason": null,
+      "createdAt": "2025-12-01T09:00:00+01:00"
+    },
+    {
+      "id": "usr_client03",
+      "fullName": "Sylvie Tamba",
+      "email": "s.tamba@email.cm",
+      "phone": "+237677500600",
+      "role": "client",
+      "avatarInitial": "S",
+      "missionsCount": 1,
+      "rating": 3.5,
+      "status": "suspended",
+      "suspendedBy": "usr_agent01",
+      "suspendedByRole": "agent",
+      "suspensionReason": "Comportement inapproprié lors d'une mission — litige LIT-2026-0038",
+      "createdAt": "2026-02-20T14:00:00+01:00"
+    },
+    {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude Mbarga",
+      "email": "jcm@email.cm",
+      "phone": "+237699234567",
+      "role": "provider",
+      "avatarInitial": "J",
+      "missionsCount": 47,
+      "rating": 4.8,
+      "status": "active",
+      "suspendedBy": null,
+      "suspendedByRole": null,
+      "suspensionReason": null,
+      "createdAt": "2025-11-10T08:00:00+01:00"
+    },
+    {
+      "id": "usr_nettoie01",
+      "fullName": "Cécile Ngo Bum",
+      "email": "c.ngobum@email.cm",
+      "phone": "+237692800900",
+      "role": "provider",
+      "avatarInitial": "C",
+      "missionsCount": 29,
+      "rating": 4.7,
+      "status": "active",
+      "suspendedBy": null,
+      "suspendedByRole": null,
+      "suspensionReason": null,
+      "createdAt": "2026-01-05T10:00:00+01:00"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 5,
+    "totalPages": 1
+  }
+}

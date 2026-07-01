@@ -1,0 +1,64 @@
+{
+  "success": true,
+  "data": {
+    "demands": {
+      "total": 248,
+      "open": 47,
+      "inProgress": 23,
+      "completed": 168,
+      "cancelled": 10
+    },
+    "missions": {
+      "total": 168,
+      "completed": 155,
+      "inDispute": 8,
+      "completionRate": 92.3
+    },
+    "financials": {
+      "totalRevenue": 8400000,
+      "commissionEarned": 672000,
+      "sequesteredAmount": 575000,
+      "periodBreakdown": [
+        { "month": "2026-05", "revenue": 2100000, "commission": 168000 },
+        { "month": "2026-04", "revenue": 1850000, "commission": 148000 },
+        { "month": "2026-03", "revenue": 1600000, "commission": 128000 },
+        { "month": "2026-02", "revenue": 1450000, "commission": 116000 },
+        { "month": "2026-01", "revenue": 1400000, "commission": 112000 }
+      ]
+    },
+    "topProviders": [
+      {
+        "id": "usr_jcm456",
+        "fullName": "Jean-Claude M.",
+        "completedMissions": 47,
+        "rating": 4.8
+      },
+      {
+        "id": "usr_elec789",
+        "fullName": "Thomas E.",
+        "completedMissions": 38,
+        "rating": 4.6
+      },
+      {
+        "id": "usr_nettoie01",
+        "fullName": "Cécile N.",
+        "completedMissions": 29,
+        "rating": 4.7
+      },
+      {
+        "id": "usr_peint02",
+        "fullName": "Rodrigue A.",
+        "completedMissions": 22,
+        "rating": 4.3
+      }
+    ],
+    "popularCategories": [
+      { "id": "cat_plomberie",   "label": "Plomberie",   "demandCount": 84, "percentageShare": 34 },
+      { "id": "cat_electricite", "label": "Électricité", "demandCount": 62, "percentageShare": 25 },
+      { "id": "cat_nettoyage",   "label": "Nettoyage",   "demandCount": 47, "percentageShare": 19 },
+      { "id": "cat_serrurerie",  "label": "Serrurerie",  "demandCount": 31, "percentageShare": 12 },
+      { "id": "cat_peinture",    "label": "Peinture",    "demandCount": 15, "percentageShare": 6  },
+      { "id": "cat_autre",       "label": "Autre",       "demandCount": 9,  "percentageShare": 4  }
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "lit_042",
+      "reference": "LIT-2026-0042",
+      "status": "en_traitement",
+      "motif": "Prestation incomplète",
+      "amount": 23000,
+      "client":   { "id": "usr_abc123",    "fullName": "Madeleine Kamdem" },
+      "provider": { "id": "usr_jcm456",    "fullName": "Jean-Claude Mbarga" },
+      "createdAt": "2026-05-21T11:00:00+01:00",
+      "assignedAt": "2026-05-21T11:30:00+01:00",
+      "unrepliedMessages": 2
+    },
+    {
+      "id": "lit_040",
+      "reference": "LIT-2026-0040",
+      "status": "en_traitement",
+      "motif": "Travaux non conformes au devis",
+      "amount": 45000,
+      "client":   { "id": "usr_alice01",   "fullName": "Alice Nguetse" },
+      "provider": { "id": "usr_jcm456",    "fullName": "Jean-Claude Mbarga" },
+      "createdAt": "2026-05-18T10:00:00+01:00",
+      "assignedAt": "2026-05-18T11:30:00+01:00",
+      "unrepliedMessages": 1
+    },
+    {
+      "id": "lit_039",
+      "reference": "LIT-2026-0039",
+      "status": "en_traitement",
+      "motif": "Prestataire absent sans prévenir",
+      "amount": 12000,
+      "client":   { "id": "usr_benoit02",  "fullName": "Benoît Mbappé" },
+      "provider": { "id": "usr_peint02",   "fullName": "Rodrigue Atangana" },
+      "createdAt": "2026-05-16T09:00:00+01:00",
+      "assignedAt": "2026-05-16T10:00:00+01:00",
+      "unrepliedMessages": 0
+    },
+    {
+      "id": "lit_036",
+      "reference": "LIT-2026-0036",
+      "status": "resolu",
+      "motif": "Matériaux de mauvaise qualité",
+      "amount": 35000,
+      "client":   { "id": "usr_claire03",  "fullName": "Claire Ondoua" },
+      "provider": { "id": "usr_plo003",    "fullName": "Serge Kengni" },
+      "createdAt": "2026-05-10T14:00:00+01:00",
+      "assignedAt": "2026-05-10T15:00:00+01:00",
+      "unrepliedMessages": 0
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 4,
+    "totalPages": 1
+  }
+}

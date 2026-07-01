@@ -1,0 +1,25 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "motif_incomplete",
+      "title": "Prestation incomplète",
+      "description": "Les travaux prévus n'ont pas été entièrement réalisés"
+    },
+    {
+      "id": "motif_malfacon",
+      "title": "Malfaçon",
+      "description": "La qualité de la prestation ne correspond pas aux standards attendus"
+    },
+    {
+      "id": "motif_non_paiement",
+      "title": "Refus de paiement",
+      "description": "Le client refuse de valider la mission sans motif valable"
+    },
+    {
+      "id": "motif_comportement",
+      "title": "Comportement inapproprié",
+      "description": "Comportement du prestataire ou du client non conforme aux règles de la plateforme"
+    }
+  ]
+}

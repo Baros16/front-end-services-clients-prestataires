@@ -1,0 +1,136 @@
+{
+  "success": true,
+  "data": {
+    "metrics": {
+      "open": 7,
+      "inProgress": 4,
+      "resolvedThisMonth": 12,
+      "totalBlockedAmount": 287000
+    },
+    "litiges": [
+      {
+        "id": "lit_042",
+        "reference": "LIT-2026-0042",
+        "demandId": "dem_xyz789",
+        "missionId": "msn_001",
+        "transactionId": "txn_892",
+        "clientId": "usr_abc123",
+        "providerId": "usr_jcm456",
+        "agentId": "usr_agent01",
+        "motif": {
+          "id": "motif_incomplete",
+          "title": "Prestation incomplète",
+          "description": "Les travaux prévus n'ont pas été entièrement réalisés"
+        },
+        "description": "Le plombier n'a pas remplacé le siphon comme prévu dans le devis.",
+        "evidences": [
+          { "id": "ev_001", "url": "https://cdn.serviloc.cm/litiges/photo_sous_evier.jpg", "name": "photo_sous_evier.jpg" }
+        ],
+        "amount": 23000,
+        "status": "en_traitement",
+        "resolution": null,
+        "timeline": [
+          { "event": "Litige ouvert",      "at": "2026-05-21T11:00:00+01:00" },
+          { "event": "Assigné à l'agent", "at": "2026-05-21T11:30:00+01:00" }
+        ],
+        "createdAt": "2026-05-21T11:00:00+01:00",
+        "assignedAt": "2026-05-21T11:30:00+01:00",
+        "resolvedAt": null
+      },
+      {
+        "id": "lit_041",
+        "reference": "LIT-2026-0041",
+        "demandId": "dem_abc001",
+        "missionId": "msn_002",
+        "transactionId": "txn_880",
+        "clientId": "usr_client04",
+        "providerId": "usr_elec789",
+        "agentId": "usr_agent02",
+        "motif": {
+          "id": "motif_malfacon",
+          "title": "Malfaçon",
+          "description": "La qualité de la prestation ne correspond pas aux standards attendus"
+        },
+        "description": "L'installation électrique est non conforme, le disjoncteur disjoncte chaque jour.",
+        "evidences": [
+          { "id": "ev_002", "url": "https://cdn.serviloc.cm/litiges/photo_disj.jpg", "name": "photo_disjoncteur.jpg" }
+        ],
+        "amount": 45000,
+        "status": "ouvert",
+        "resolution": null,
+        "timeline": [
+          { "event": "Litige ouvert", "at": "2026-05-20T16:00:00+01:00" }
+        ],
+        "createdAt": "2026-05-20T16:00:00+01:00",
+        "assignedAt": null,
+        "resolvedAt": null
+      },
+      {
+        "id": "lit_038",
+        "reference": "LIT-2026-0038",
+        "demandId": "dem_def002",
+        "missionId": "msn_003",
+        "transactionId": "txn_860",
+        "clientId": "usr_client03",
+        "providerId": "usr_nettoie01",
+        "agentId": "usr_agent01",
+        "motif": {
+          "id": "motif_comportement",
+          "title": "Comportement inapproprié",
+          "description": "Comportement du prestataire non conforme aux règles de la plateforme"
+        },
+        "description": "Le client a refusé de payer après validation de la mission de manière frauduleuse.",
+        "evidences": [],
+        "amount": 9500,
+        "status": "resolu",
+        "resolution": "en_faveur_prestataire",
+        "timeline": [
+          { "event": "Litige ouvert",           "at": "2026-05-05T10:00:00+01:00" },
+          { "event": "Assigné à l'agent",       "at": "2026-05-05T10:30:00+01:00" },
+          { "event": "Résolution proposée",     "at": "2026-05-07T09:00:00+01:00" },
+          { "event": "Acceptée par les parties","at": "2026-05-07T15:00:00+01:00" }
+        ],
+        "createdAt": "2026-05-05T10:00:00+01:00",
+        "assignedAt": "2026-05-05T10:30:00+01:00",
+        "resolvedAt": "2026-05-07T15:00:00+01:00"
+      },
+      {
+        "id": "lit_035",
+        "reference": "LIT-2026-0035",
+        "demandId": "dem_ghi003",
+        "missionId": "msn_004",
+        "transactionId": "txn_840",
+        "clientId": "usr_abc123",
+        "providerId": "usr_serr01",
+        "agentId": "usr_agent01",
+        "motif": {
+          "id": "motif_non_paiement",
+          "title": "Refus de paiement",
+          "description": "Le client refuse de valider la mission sans motif valable"
+        },
+        "description": "Le prestataire réclame le paiement complet de la prestation réalisée.",
+        "evidences": [
+          { "id": "ev_003", "url": "https://cdn.serviloc.cm/litiges/photo_serrure.jpg", "name": "photo_serrure_neuve.jpg" }
+        ],
+        "amount": 18000,
+        "status": "cloture",
+        "resolution": "remboursement_partiel",
+        "timeline": [
+          { "event": "Litige ouvert",              "at": "2026-04-18T08:00:00+01:00" },
+          { "event": "Assigné à l'agent",          "at": "2026-04-18T09:00:00+01:00" },
+          { "event": "Résolution proposée",        "at": "2026-04-20T11:00:00+01:00" },
+          { "event": "Acceptée par les deux parties", "at": "2026-04-21T10:00:00+01:00" },
+          { "event": "Litige clôturé",             "at": "2026-04-21T10:30:00+01:00" }
+        ],
+        "createdAt": "2026-04-18T08:00:00+01:00",
+        "assignedAt": "2026-04-18T09:00:00+01:00",
+        "resolvedAt": "2026-04-21T10:30:00+01:00"
+      }
+    ]
+  },
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 23
+  }
+}

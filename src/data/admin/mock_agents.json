@@ -1,0 +1,56 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_agent01",
+      "role": "agent",
+      "firstName": "Pauline",
+      "lastName": "Fotso",
+      "fullName": "Pauline Fotso",
+      "email": "p.fotso@serviloc.cm",
+      "phone": "+237691000111",
+      "avatarInitial": "P",
+      "status": "active",
+      "agentCode": "AGT-007",
+      "department": "Service Client",
+      "assignedLitigesCount": 4,
+      "createdAt": "2026-01-10T08:00:00+01:00"
+    },
+    {
+      "id": "usr_agent02",
+      "role": "agent",
+      "firstName": "Hervé",
+      "lastName": "Nguemba",
+      "fullName": "Hervé Nguemba",
+      "email": "h.nguemba@serviloc.cm",
+      "phone": "+237691000222",
+      "avatarInitial": "H",
+      "status": "active",
+      "agentCode": "AGT-008",
+      "department": "Service Client",
+      "assignedLitigesCount": 2,
+      "createdAt": "2026-02-01T08:00:00+01:00"
+    },
+    {
+      "id": "usr_agent03",
+      "role": "agent",
+      "firstName": "Blandine",
+      "lastName": "Awono",
+      "fullName": "Blandine Awono",
+      "email": "b.awono@serviloc.cm",
+      "phone": "+237691000333",
+      "avatarInitial": "B",
+      "status": "suspended",
+      "agentCode": "AGT-009",
+      "department": "Service Client",
+      "assignedLitigesCount": 0,
+      "createdAt": "2026-03-15T08:00:00+01:00"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 3,
+    "totalPages": 1
+  }
+}

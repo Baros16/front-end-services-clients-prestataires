@@ -2,7 +2,19 @@
 
 > **Document fondateur — à maintenir par les deux équipes (frontend + backend)**
 > Toute modification d'un endpoint, d'un format de réponse ou d'un schéma doit être notifiée 48h à l'avance avec un diff explicite dans ce fichier.
-> Dernière mise à jour : 31 mai 2026 · Version 1.0
+> Dernière mise à jour : Juin 2026 · Version 2.0
+
+**Changelog v2.0 :**
+- Ajout section 9 — Endpoints Agent Service Client (UC30-agent, UC31-agent, UC35–UC38)
+- Ajout section 6.x — Chat/Conversations (UC5, UC16, UC22)
+- Ajout `GET /client/providers/search` (UC13, UC15)
+- Ajout `POST /client/missions/:id/litige` prestataire symétrique (UC12)
+- Ajout `POST /provider/missions/:id/rate` (UC26)
+- Ajout `PATCH /provider/profile` (UC18)
+- Ajout `GET /admin/stats` (UC33)
+- Ajout `GET|POST /admin/agents` et endpoints de gestion agents
+- Mise à jour schémas : `Litige`, `ProviderReview`, `AgentProfile`, `Conversation`, `Message`
+- Mise à jour JWT : `role` = `"agent"` (remplace `"service_client"`)
 
 ---
 
@@ -16,10 +28,11 @@
 6. [Endpoints — Client](#6-endpoints--client)
 7. [Endpoints — Prestataire](#7-endpoints--prestataire)
 8. [Endpoints — Admin](#8-endpoints--admin)
-9. [Upload de fichiers](#9-upload-de-fichiers)
-10. [Calendrier de livraison backend](#10-calendrier-de-livraison-backend)
-11. [Données mock frontend (fallback)](#11-données-mock-frontend-fallback)
-12. [Règles de coordination](#12-règles-de-coordination)
+9. [Endpoints — Agent Service Client](#9-endpoints--agent-service-client)
+10. [Upload de fichiers](#10-upload-de-fichiers)
+11. [Calendrier de livraison backend](#11-calendrier-de-livraison-backend)
+12. [Données mock frontend (fallback)](#12-données-mock-frontend-fallback)
+13. [Règles de coordination](#13-règles-de-coordination)
 
 ---
 
@@ -69,7 +82,9 @@ Authorization: Bearer <access_token>
 | Champ | Valeurs possibles | Usage frontend |
 |-------|-------------------|----------------|
 | `sub` | UUID utilisateur | ID courant |
-| `role` | `"client"` \| `"provider"` \| `"admin"` \| `"service_client"` | Routing et affichage |
+| `role` | `"client"` \| `"provider"` \| `"admin"` \| `"agent"` | Routing et affichage conditionnel |
+
+> ⚠️ **v2.0** : `"service_client"` est remplacé par `"agent"` dans toute la codebase.
 
 ### 2.3 Rafraîchissement automatique
 
@@ -87,10 +102,12 @@ const response = await fetch('/v1/auth/refresh', {
 
 | Rôle | Espaces accessibles | Espace interdit |
 |------|--------------------|-----------------| 
-| `client` | `/client/*` | Tout le reste |
-| `provider` | `/provider/*` | Tout le reste |
-| `admin` | `/admin/*` | Tout le reste |
-| `service_client` | `/admin/litiges/*` (lecture seule + médiation) | Tout le reste |
+| `client` | `/client/**`, `/auth/**` | Tout le reste |
+| `provider` | `/provider/**`, `/auth/**` | Tout le reste |
+| `admin` | `/admin/**`, `/auth/**` | Tout le reste |
+| `agent` | `/agent/**`, `/auth/**` | Tout le reste |
+
+> Les préfixes sont contrôlés par le Gateway. Un token `role=agent` ne peut jamais atteindre `/admin/**`.
 
 ---
 
@@ -145,11 +162,13 @@ const response = await fetch('/v1/auth/refresh', {
 | 401 | `UNAUTHORIZED` | Token absent ou invalide |
 | 401 | `TOKEN_EXPIRED` | Access token expiré |
 | 401 | `INVALID_CREDENTIALS` | Email/mot de passe incorrects |
-| 403 | `FORBIDDEN` | Rôle insuffisant pour cette ressource |
+| 403 | `FORBIDDEN` | Rôle insuffisant ou ressource non autorisée |
 | 404 | `NOT_FOUND` | Ressource introuvable |
 | 409 | `ALREADY_EXISTS` | Conflit (ex: email déjà utilisé) |
+| 409 | `ALREADY_VALIDATED` | Ressource déjà dans cet état (ex: devis déjà accepté) |
 | 422 | `UNPROCESSABLE` | Logique métier impossible (ex: mission déjà démarrée) |
 | 429 | `RATE_LIMITED` | Trop de requêtes |
+| 503 | `SERVICE_UNAVAILABLE` | Microservice downstream indisponible |
 | 500 | `SERVER_ERROR` | Erreur serveur — contacter le backend |
 
 ---
@@ -176,6 +195,7 @@ const response = await fetch('/v1/auth/refresh', {
 ```
 
 > `status` : `"active"` | `"suspended"` | `"pending_verification"`
+> `role` : `"client"` | `"provider"` | `"admin"` | `"agent"`
 
 ### 4.2 `ClientProfile` (extension de User)
 
@@ -237,11 +257,32 @@ const response = await fetch('/v1/auth/refresh', {
   },
   "monthlyEarnings": 185000,
   "certifications": ["Artisan certifié"],
+  "estCertifie": true,
   "createdAt": "2025-11-10T08:00:00+01:00"
 }
 ```
 
-### 4.4 `ServiceDemand` (demande de service)
+### 4.4 `AgentProfile` (nouveau — v2.0)
+
+```json
+{
+  "id": "usr_agent01",
+  "role": "agent",
+  "firstName": "Pauline",
+  "lastName": "Fotso",
+  "fullName": "Pauline Fotso",
+  "email": "p.fotso@serviloc.cm",
+  "phone": "+237691000111",
+  "avatarInitial": "P",
+  "status": "active",
+  "agentCode": "AGT-007",
+  "department": "Service Client",
+  "assignedLitigesCount": 4,
+  "createdAt": "2026-01-10T08:00:00+01:00"
+}
+```
+
+### 4.5 `ServiceDemand` (demande de service)
 
 ```json
 {
@@ -282,7 +323,7 @@ const response = await fetch('/v1/auth/refresh', {
 
 > `status` : `"ouverte"` | `"en_cours"` | `"terminee"` | `"annulee"` | `"litige"`
 
-### 4.5 `Quote` (devis)
+### 4.6 `Quote` (devis)
 
 ```json
 {
@@ -328,7 +369,7 @@ const response = await fetch('/v1/auth/refresh', {
 
 > `status` : `"en_attente"` | `"accepte"` | `"refuse"` | `"expire"`
 
-### 4.6 `Mission`
+### 4.7 `Mission`
 
 ```json
 {
@@ -347,12 +388,12 @@ const response = await fetch('/v1/auth/refresh', {
   "estimatedDurationHours": 2,
   "completedAt": null,
   "steps": [
-    { "id": "step_001", "label": "Coupure eau principale vérifiée",    "completed": true,  "order": 1 },
-    { "id": "step_002", "label": "Démontage siphon fissuré",           "completed": true,  "order": 2 },
-    { "id": "step_003", "label": "Remplacement joint silicone ×2",     "completed": true,  "order": 3 },
-    { "id": "step_004", "label": "Installation siphon PVC neuf",       "completed": true,  "order": 4 },
+    { "id": "step_001", "label": "Coupure eau principale vérifiée",        "completed": true,  "order": 1 },
+    { "id": "step_002", "label": "Démontage siphon fissuré",               "completed": true,  "order": 2 },
+    { "id": "step_003", "label": "Remplacement joint silicone ×2",         "completed": true,  "order": 3 },
+    { "id": "step_004", "label": "Installation siphon PVC neuf",           "completed": true,  "order": 4 },
     { "id": "step_005", "label": "Test d'étanchéité (5 min eau courante)", "completed": false, "order": 5 },
-    { "id": "step_006", "label": "Nettoyage zone d'intervention",     "completed": false, "order": 6 }
+    { "id": "step_006", "label": "Nettoyage zone d'intervention",          "completed": false, "order": 6 }
   ],
   "providerLocation": {
     "lat": 5.4764,
@@ -371,17 +412,60 @@ const response = await fetch('/v1/auth/refresh', {
 > `status` : `"en_attente"` | `"en_cours"` | `"terminee"` | `"litige"`
 > `paymentStatus` : `"sequestre"` | `"libere"` | `"litige"` | `"rembourse"`
 
-### 4.7 `Litige`
+### 4.8 `Conversation` (nouveau — v2.0)
+
+```json
+{
+  "id": "conv_001",
+  "demandId": "dem_xyz789",
+  "client": {
+    "id": "usr_abc123",
+    "fullName": "Madeleine Kamdem",
+    "avatarInitial": "M"
+  },
+  "provider": {
+    "id": "usr_jcm456",
+    "fullName": "Jean-Claude Mbarga",
+    "avatarInitial": "J"
+  },
+  "lastMessagePreview": "D'accord, je peux intervenir demain matin.",
+  "lastMessageAt": "2026-05-21T09:00:00+01:00",
+  "unreadCount": 2,
+  "hasQuote": true,
+  "quoteStatus": "en_attente",
+  "createdAt": "2026-05-20T13:00:00+01:00"
+}
+```
+
+### 4.9 `Message` (nouveau — v2.0)
+
+```json
+{
+  "id": "msg_001",
+  "conversationId": "conv_001",
+  "senderId": "usr_jcm456",
+  "senderRole": "provider",
+  "content": "Bonjour, je suis disponible demain à 8h.",
+  "imageUrl": null,
+  "sentAt": "2026-05-20T14:30:00+01:00",
+  "read": true
+}
+```
+
+> `senderRole` : `"client"` | `"provider"` | `"agent"`
+
+### 4.10 `Litige` (mis à jour — v2.0)
 
 ```json
 {
   "id": "lit_042",
-  "reference": "#L-042",
+  "reference": "LIT-2026-0042",
   "demandId": "dem_xyz789",
   "missionId": "msn_001",
+  "transactionId": "txn_892",
   "clientId": "usr_abc123",
   "providerId": "usr_jcm456",
-  "agentId": null,
+  "agentId": "usr_agent01",
   "motif": {
     "id": "motif_incomplete",
     "title": "Prestation incomplète",
@@ -396,17 +480,78 @@ const response = await fetch('/v1/auth/refresh', {
     }
   ],
   "amount": 23000,
-  "status": "ouvert",
+  "status": "en_traitement",
   "resolution": null,
+  "timeline": [
+    { "event": "Litige ouvert",      "at": "2026-05-21T11:00:00+01:00" },
+    { "event": "Assigné à l'agent", "at": "2026-05-21T11:30:00+01:00" }
+  ],
   "createdAt": "2026-05-21T11:00:00+01:00",
-  "updatedAt": "2026-05-21T11:00:00+01:00"
+  "assignedAt": "2026-05-21T11:30:00+01:00",
+  "resolvedAt": null
 }
 ```
 
-> `status` : `"ouvert"` | `"traitement"` | `"resolu"` | `"annule"`
-> `resolution` : `null` | `"remboursement_partiel"` | `"annulation_complete"` | `"dedommagement"`
+> `status` : `"ouvert"` | `"assigne"` | `"en_traitement"` | `"resolu"` | `"cloture"`
+> `resolution` : `null` | `"remboursement_partiel"` | `"remboursement_total"` | `"en_faveur_prestataire"`
 
-### 4.8 `Transaction`
+### 4.11 `Resolution` (nouveau — v2.0)
+
+```json
+{
+  "id": "res_001",
+  "litigeId": "lit_042",
+  "agentId": "usr_agent01",
+  "type": "remboursement_partiel",
+  "refundAmount": 11500,
+  "note": "Remboursement de 50% accordé — prestation partiellement réalisée.",
+  "clientAccepted": true,
+  "providerAccepted": false,
+  "proposedAt": "2026-05-22T10:00:00+01:00",
+  "closedAt": null
+}
+```
+
+> `type` : `"remboursement_partiel"` | `"remboursement_total"` | `"en_faveur_prestataire"`
+
+### 4.12 `LitigeMessage` (nouveau — v2.0)
+
+```json
+{
+  "id": "lmsg_001",
+  "litigeId": "lit_042",
+  "senderId": "usr_agent01",
+  "senderRole": "agent",
+  "senderName": "Pauline F.",
+  "content": "Bonjour, j'ai bien pris en charge votre dossier. Pouvez-vous m'envoyer des photos supplémentaires ?",
+  "attachmentUrl": null,
+  "sentAt": "2026-05-21T14:00:00+01:00"
+}
+```
+
+> `senderRole` : `"agent"` | `"client"` | `"provider"`
+
+### 4.13 `ProviderReview` (nouveau — v2.0)
+
+```json
+{
+  "id": "rev_001",
+  "providerId": "usr_jcm456",
+  "agentId": "usr_agent01",
+  "agentName": "Pauline F.",
+  "verdict": "approved",
+  "comment": "Dossier complet. Tous les justificatifs sont valides. Casier judiciaire récent.",
+  "reviewedAt": "2026-05-22T09:00:00+01:00",
+  "finalDecision": null,
+  "decidedAt": null,
+  "decidedBy": null
+}
+```
+
+> `verdict` : `"approved"` | `"rejected"` | `"needs_revision"`
+> `finalDecision` : `null` (en attente) | `"validated"` | `"rejected"`
+
+### 4.14 `Transaction`
 
 ```json
 {
@@ -431,7 +576,7 @@ const response = await fetch('/v1/auth/refresh', {
 > `paymentMethod` : `"orange_money"` | `"mtn_momo"`
 > `status` : `"sequestre"` | `"libere"` | `"litige"` | `"rembourse"`
 
-### 4.9 `ManagedUser` (vue admin)
+### 4.15 `ManagedUser` (vue admin)
 
 ```json
 {
@@ -444,14 +589,18 @@ const response = await fetch('/v1/auth/refresh', {
   "missionsCount": 3,
   "rating": 4.2,
   "status": "active",
+  "suspendedBy": null,
+  "suspendedByRole": null,
+  "suspensionReason": null,
   "createdAt": "2026-02-10T00:00:00+01:00"
 }
 ```
 
 > `role` : `"client"` | `"provider"`
 > `status` : `"active"` | `"suspended"`
+> Quand `status = "suspended"` : `suspendedBy`, `suspendedByRole` (`"admin"` | `"agent"`), `suspensionReason` sont renseignés.
 
-### 4.10 `ServiceCategory`
+### 4.16 `ServiceCategory`
 
 ```json
 {
@@ -464,15 +613,37 @@ const response = await fetch('/v1/auth/refresh', {
 }
 ```
 
-> `iconKey` : `"wrench"` | `"bolt"` | `"broom"` | `"key"` | `"brush"` | `"plus"` — le frontend résout l'icône depuis cette clé.
+> `iconKey` : `"wrench"` | `"bolt"` | `"broom"` | `"key"` | `"brush"` | `"plus"`
+
+### 4.17 `ProviderSearchResult` (nouveau — v2.0)
+
+```json
+{
+  "id": "usr_jcm456",
+  "fullName": "Jean-Claude Mbarga",
+  "avatarInitial": "J",
+  "specialty": "Plomberie",
+  "rating": 4.8,
+  "hourlyRate": 4000,
+  "distanceKm": 0.8,
+  "isAvailable": true,
+  "completedMissions": 47,
+  "serviceZone": {
+    "city": "Bafoussam",
+    "radiusKm": 20
+  }
+}
+```
 
 ---
 
 ## 5. Endpoints — Auth
 
+> Ces endpoints sont accessibles sans token. `POST /auth/login` accepte tous les rôles.
+
 ### `POST /auth/register`
 
-Inscription d'un nouvel utilisateur (client ou prestataire).
+Inscription d'un nouvel utilisateur (client ou prestataire uniquement — les agents sont créés par l'admin).
 
 **Request body**
 
@@ -486,6 +657,8 @@ Inscription d'un nouvel utilisateur (client ou prestataire).
   "password": "motdepasse123"
 }
 ```
+
+> `role` : `"client"` | `"provider"` uniquement. Les rôles `"admin"` et `"agent"` ne sont pas auto-inscriptibles.
 
 **Response 201**
 
@@ -503,10 +676,11 @@ Inscription d'un nouvel utilisateur (client ou prestataire).
 
 **Erreurs possibles**
 
-| Code | `error.code` |
-|------|-------------|
-| 409 | `ALREADY_EXISTS` — email ou téléphone déjà enregistré |
-| 400 | `VALIDATION_ERROR` — champ manquant ou format invalide |
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 409 | `ALREADY_EXISTS` | Email ou téléphone déjà enregistré |
+| 400 | `VALIDATION_ERROR` | Champ manquant ou format invalide |
+| 400 | `INVALID_ROLE` | Rôle non autorisé à l'auto-inscription |
 
 ---
 
@@ -531,18 +705,18 @@ Vérification du code OTP reçu par SMS.
   "data": {
     "accessToken": "eyJhbGci...",
     "refreshToken": "eyJhbGci...",
-    "user": { ...ClientProfile }
+    "user": { "...ClientProfile ou ProviderProfile selon le rôle" }
   }
 }
 ```
 
 **Erreurs possibles**
 
-| Code | `error.code` |
-|------|-------------|
-| 400 | `INVALID_OTP` — code incorrect, avec `attemptsRemaining` dans `error` |
-| 400 | `OTP_EXPIRED` — code expiré |
-| 400 | `OTP_MAX_ATTEMPTS` — compte bloqué |
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `INVALID_OTP` | Code incorrect — `error` contient `attemptsRemaining` |
+| 400 | `OTP_EXPIRED` | Code expiré |
+| 400 | `OTP_MAX_ATTEMPTS` | Compte bloqué temporairement |
 
 ---
 
@@ -550,13 +724,7 @@ Vérification du code OTP reçu par SMS.
 
 Renvoi du code OTP (soumis après expiration du countdown de 45s).
 
-**Request body**
-
-```json
-{
-  "userId": "usr_abc123"
-}
-```
+**Request body** : `{ "userId": "usr_abc123" }`
 
 **Response 200**
 
@@ -574,7 +742,7 @@ Renvoi du code OTP (soumis après expiration du countdown de 45s).
 
 ### `POST /auth/login`
 
-Connexion (Client, Prestataire, Admin, Service Client).
+Connexion pour tous les rôles (Client, Prestataire, Admin, Agent).
 
 **Request body**
 
@@ -593,18 +761,18 @@ Connexion (Client, Prestataire, Admin, Service Client).
   "data": {
     "accessToken": "eyJhbGci...",
     "refreshToken": "eyJhbGci...",
-    "user": { ...User }
+    "user": { "...User selon le rôle" }
   }
 }
 ```
 
 **Erreurs possibles**
 
-| Code | `error.code` |
-|------|-------------|
-| 401 | `INVALID_CREDENTIALS` — email/mot de passe incorrects, avec `attemptsRemaining` |
-| 401 | `ACCOUNT_BLOCKED` — compte bloqué après 5 tentatives |
-| 403 | `ACCOUNT_SUSPENDED` — compte suspendu par un admin |
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 401 | `INVALID_CREDENTIALS` | Email/mot de passe incorrects — `error` contient `attemptsRemaining` |
+| 401 | `ACCOUNT_BLOCKED` | Compte bloqué après 5 tentatives |
+| 403 | `ACCOUNT_SUSPENDED` | Compte suspendu — `error` contient `reason` |
 
 ---
 
@@ -612,13 +780,7 @@ Connexion (Client, Prestataire, Admin, Service Client).
 
 Rafraîchissement du token (appelé automatiquement par le frontend).
 
-**Request body**
-
-```json
-{
-  "refreshToken": "eyJhbGci..."
-}
-```
+**Request body** : `{ "refreshToken": "eyJhbGci..." }`
 
 **Response 200**
 
@@ -650,7 +812,7 @@ Révocation du refresh token.
 
 ### `GET /client/me`
 
-Profil complet du client connecté (dashboard, welcome banner, financial summary).
+Profil complet du client connecté.
 
 **Response 200** → `{ "data": { ...ClientProfile } }`
 
@@ -666,8 +828,8 @@ Données agrégées du tableau de bord client.
 {
   "success": true,
   "data": {
-    "profile": { ...ClientProfile },
-    "recentDemands": [ ...ServiceDemand[] ],
+    "profile": { "...ClientProfile" },
+    "recentDemands": [ "...ServiceDemand[]" ],
     "financialSummary": {
       "totalSpent": 55000,
       "completedMissions": 3,
@@ -709,11 +871,22 @@ Création d'une nouvelle demande de service.
     "lat": 5.4764,
     "lng": 10.4207
   },
-  "isUrgent": false
+  "isUrgent": false,
+  "estimatedBudget": {
+    "min": 20000,
+    "max": 30000
+  }
 }
 ```
 
 **Response 201** → `{ "data": { ...ServiceDemand } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Description vide ou champ manquant |
+| 404 | `NOT_FOUND` | `categoryId` inexistante |
 
 ---
 
@@ -731,11 +904,17 @@ Devis associé à une demande.
 
 **Response 200** → `{ "data": { ...Quote } }`
 
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 404 | `NOT_FOUND` | Aucun devis pour cette demande |
+
 ---
 
 ### `POST /client/demands/:demandId/quote/accept`
 
-Acceptation d'un devis et paiement.
+Acceptation d'un devis et déclenchement du paiement.
 
 **Request body**
 
@@ -745,6 +924,8 @@ Acceptation d'un devis et paiement.
   "phoneNumber": "+237695123456"
 }
 ```
+
+> `paymentMethod` : `"orange_money"` | `"mtn_momo"`
 
 **Response 200**
 
@@ -759,6 +940,14 @@ Acceptation d'un devis et paiement.
   }
 }
 ```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 409 | `ALREADY_VALIDATED` | Devis déjà accepté ou expiré |
+| 422 | `PAYMENT_FAILED` | Solde insuffisant ou API Mobile Money refus |
+| 503 | `SERVICE_UNAVAILABLE` | Service Paiement indisponible |
 
 ---
 
@@ -780,7 +969,7 @@ Suivi d'une mission en cours (steps, localisation prestataire, montant séquestr
 
 ### `POST /client/missions/:missionId/validate`
 
-Validation de fin de mission par le client (libère le séquestre).
+Validation de fin de mission par le client.
 
 **Response 200**
 
@@ -789,11 +978,15 @@ Validation de fin de mission par le client (libère le séquestre).
   "success": true,
   "data": {
     "missionId": "msn_001",
+    "validatedBy": "client",
+    "bothValidated": true,
     "paymentStatus": "libere",
     "releasedAmount": 23000
   }
 }
 ```
+
+> Si `bothValidated: false`, le paiement n'est pas encore libéré — en attente de la validation prestataire.
 
 ---
 
@@ -815,7 +1008,28 @@ Notation du prestataire après mission terminée.
 }
 ```
 
-**Response 201** → `{ "data": { "ratingId": "rat_001", "providerId": "usr_jcm456" } }`
+> `rating` : entier entre 1 et 5 inclus.
+
+**Response 201**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ratingId": "rat_001",
+    "targetId": "usr_jcm456",
+    "targetRole": "provider",
+    "rating": 5
+  }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Note hors limites (1-5) |
+| 409 | `ALREADY_EXISTS` | Mission déjà évaluée par ce client (délai dépassé) |
 
 ---
 
@@ -834,6 +1048,206 @@ Signalement d'un litige sur une mission.
 ```
 
 **Response 201** → `{ "data": { ...Litige } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 404 | `NOT_FOUND` | Mission introuvable |
+| 409 | `ALREADY_EXISTS` | Litige déjà ouvert pour cette mission |
+
+---
+
+### `PATCH /client/litiges/:litigeId/resolution/accept`
+
+Le client accepte la proposition de résolution faite par l'agent.
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "litigeId": "lit_042",
+    "clientAccepted": true,
+    "providerAccepted": false,
+    "status": "en_traitement"
+  }
+}
+```
+
+---
+
+### `PATCH /client/litiges/:litigeId/resolution/reject`
+
+Le client refuse la proposition de résolution — l'agent peut en proposer une nouvelle.
+
+**Request body** : `{ "reason": "Le remboursement proposé est insuffisant." }`
+
+**Response 200** → `{ "data": { "litigeId": "lit_042", "status": "en_traitement" } }`
+
+---
+
+### `GET /client/conversations`
+
+Liste des conversations du client connecté, triées par dernier message.
+
+**Query params** : `?page=1&limit=20`
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "conv_001",
+      "demandId": "dem_xyz789",
+      "provider": {
+        "id": "usr_jcm456",
+        "fullName": "Jean-Claude Mbarga",
+        "avatarInitial": "J"
+      },
+      "lastMessagePreview": "D'accord, je peux intervenir demain matin.",
+      "lastMessageAt": "2026-05-21T09:00:00+01:00",
+      "unreadCount": 2,
+      "hasQuote": true,
+      "quoteStatus": "en_attente"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 3, "totalPages": 1 }
+}
+```
+
+---
+
+### `POST /client/conversations`
+
+Ouvrir une conversation avec un prestataire (flux urgence UC16 — sans demande préalable).
+
+**Request body**
+
+```json
+{
+  "providerId": "usr_jcm456",
+  "demandId": "dem_xyz789"
+}
+```
+
+> `demandId` est optionnel. S'il est absent, la conversation est libre (non rattachée à une demande).
+> Si une conversation existe déjà pour ce couple `(clientId, providerId, demandId)`, l'existante est retournée (idempotent).
+
+**Response 201**
+
+```json
+{
+  "success": true,
+  "data": { "...Conversation" }
+}
+```
+
+---
+
+### `GET /client/conversations/:conversationId/messages`
+
+Messages d'une conversation, du plus récent au plus ancien.
+
+**Query params** : `?page=1&limit=30`
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "msg_001",
+      "senderId": "usr_jcm456",
+      "senderRole": "provider",
+      "content": "Bonjour, je suis disponible demain à 8h.",
+      "imageUrl": null,
+      "sentAt": "2026-05-20T14:30:00+01:00",
+      "read": true
+    }
+  ],
+  "meta": { "page": 1, "limit": 30, "total": 12, "totalPages": 1 }
+}
+```
+
+---
+
+### `POST /client/conversations/:conversationId/messages`
+
+Envoyer un message dans une conversation.
+
+**Request body**
+
+```json
+{
+  "content": "Bonjour, êtes-vous disponible demain matin ?",
+  "imageId": null
+}
+```
+
+> `imageId` : optionnel — ID retourné par `POST /uploads/photos`.
+
+**Response 201** → `{ "data": { ...Message } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Contenu vide et pas d'image |
+| 403 | `FORBIDDEN` | Le client n'est pas partie de cette conversation |
+
+---
+
+### `GET /client/providers/search`
+
+Recherche de prestataires disponibles par service et géolocalisation (flux urgence UC13/UC15).
+
+**Query params**
+
+| Paramètre | Type | Obligatoire | Description |
+|-----------|------|-------------|-------------|
+| `specialty` | string | Oui | Ex: `"Plomberie"` |
+| `lat` | float | Oui | Latitude client |
+| `lng` | float | Oui | Longitude client |
+| `radiusKm` | int | Non (défaut: 15) | Rayon de recherche |
+| `minRating` | float | Non | Note minimale ex: `4.0` |
+| `maxRate` | int | Non | Tarif horaire max en XAF |
+| `page` | int | Non (défaut: 1) | Pagination |
+| `limit` | int | Non (défaut: 20) | Pagination |
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude Mbarga",
+      "avatarInitial": "J",
+      "specialty": "Plomberie",
+      "rating": 4.8,
+      "hourlyRate": 4000,
+      "distanceKm": 0.8,
+      "isAvailable": true,
+      "completedMissions": 47,
+      "serviceZone": { "city": "Bafoussam", "radiusKm": 20 }
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 6, "totalPages": 1 }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | `specialty`, `lat` ou `lng` manquants |
+| 503 | `SERVICE_UNAVAILABLE` | Service Utilisateurs indisponible — résultat du cache si disponible |
 
 ---
 
@@ -857,6 +1271,39 @@ Profil complet du prestataire connecté.
 
 ---
 
+### `PATCH /provider/profile`
+
+Mise à jour du profil professionnel complet (UC18).
+
+**Request body**
+
+```json
+{
+  "specialty": "Plomberie",
+  "hourlyRate": 4000,
+  "serviceZone": {
+    "city": "Bafoussam",
+    "radiusKm": 20
+  },
+  "certifications": ["Artisan certifié"],
+  "documentIds": ["doc_001", "doc_002"]
+}
+```
+
+> Tous les champs sont optionnels — seuls les champs envoyés sont mis à jour.
+> `documentIds` : IDs retournés par `POST /uploads/documents`. Ce champ remplace la liste existante.
+
+**Response 200** → `{ "data": { ...ProviderProfile } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | `hourlyRate` négatif, `radiusKm` invalide |
+| 404 | `NOT_FOUND` | Un `documentId` est introuvable |
+
+---
+
 ### `GET /provider/dashboard`
 
 Données agrégées du tableau de bord prestataire.
@@ -867,20 +1314,20 @@ Données agrégées du tableau de bord prestataire.
 {
   "success": true,
   "data": {
-    "profile": { ...ProviderProfile },
+    "profile": { "...ProviderProfile" },
     "metrics": {
       "missionsThisMonth": 18,
       "netEarnings": 185000,
       "averageRating": 4.8,
       "availableDemandsCount": 11,
       "trends": {
-        "missions": { "value": "+3", "direction": "up",     "subtext": "+3 vs avril" },
-        "earnings": { "value": "+22%", "direction": "up",   "subtext": "+22%" },
-        "rating":   { "value": "+0.1", "direction": "up",   "subtext": "+0.1" }
+        "missions": { "value": "+3",   "direction": "up", "subtext": "+3 vs avril" },
+        "earnings": { "value": "+22%", "direction": "up", "subtext": "+22%" },
+        "rating":   { "value": "+0.1", "direction": "up", "subtext": "+0.1" }
       }
     },
-    "recentMissions": [ ...Mission[] ],
-    "availability": { ...scheduleObject }
+    "recentMissions": [ "...Mission[]" ],
+    "availability": { "...scheduleObject" }
   }
 }
 ```
@@ -889,15 +1336,9 @@ Données agrégées du tableau de bord prestataire.
 
 ### `PATCH /provider/availability`
 
-Mise à jour du statut de disponibilité en temps réel (toggle "Disponible / Indisponible").
+Mise à jour du statut de disponibilité en temps réel (toggle).
 
-**Request body**
-
-```json
-{
-  "isAvailable": true
-}
-```
+**Request body** : `{ "isAvailable": true }`
 
 **Response 200** → `{ "data": { "isAvailable": true } }`
 
@@ -912,14 +1353,14 @@ Mise à jour du planning hebdomadaire.
 ```json
 {
   "schedule": {
-    "monday":    { "start": "08:00", "end": "18:00", "available": true },
-    "saturday":  { "start": "08:00", "end": "13:00", "available": true },
-    "sunday":    { "start": null,    "end": null,    "available": false }
+    "monday":   { "start": "08:00", "end": "18:00", "available": true },
+    "saturday": { "start": "08:00", "end": "13:00", "available": true },
+    "sunday":   { "start": null,    "end": null,    "available": false }
   }
 }
 ```
 
-**Response 200** → `{ "data": { "schedule": { ...updatedSchedule } } }`
+**Response 200** → `{ "data": { "schedule": { "...updatedSchedule" } } }`
 
 ---
 
@@ -929,7 +1370,7 @@ Liste des demandes disponibles correspondant aux compétences et à la zone du p
 
 **Query params** : `?page=1&limit=20&zone=priority&category=cat_plomberie`
 
-> `zone` : `"priority"` (zone prioritaire, défaut) | `"extended"` (zones éloignées)
+> `zone` : `"priority"` (défaut) | `"extended"`
 
 **Response 200**
 
@@ -958,7 +1399,7 @@ Liste des demandes disponibles correspondant aux compétences et à la zone du p
 
 ### `POST /provider/demands/:demandId/apply`
 
-Postuler à une demande (indique l'intention de créer un devis).
+Postuler à une demande.
 
 **Response 201**
 
@@ -972,6 +1413,12 @@ Postuler à une demande (indique l'intention de créer un devis).
   }
 }
 ```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 409 | `ALREADY_EXISTS` | Demande déjà attribuée à un autre prestataire |
 
 ---
 
@@ -988,13 +1435,21 @@ Création d'un devis pour une demande.
   "materials": [
     { "designation": "Joint silicone cuisine", "quantity": 2, "unitPrice": 1500 },
     { "designation": "Siphon PVC universel",   "quantity": 1, "unitPrice": 4500 },
-    { "designation": "Visserie + colliers",    "quantity": 1, "unitPrice": 500 }
+    { "designation": "Visserie + colliers",    "quantity": 1, "unitPrice": 500  }
   ],
-  "estimatedDurationHours": 2
+  "estimatedDurationHours": 2,
+  "validityDays": 5
 }
 ```
 
 **Response 201** → `{ "data": { ...Quote } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Prix négatif ou champ manquant |
+| 404 | `NOT_FOUND` | Demande introuvable ou déjà attribuée |
 
 ---
 
@@ -1018,7 +1473,7 @@ Détail d'une mission.
 
 ### `POST /provider/missions/:missionId/start`
 
-Démarrage d'une mission (notifie le client, enregistre l'heure de début).
+Démarrage d'une mission.
 
 **Response 200**
 
@@ -1033,11 +1488,17 @@ Démarrage d'une mission (notifie le client, enregistre l'heure de début).
 }
 ```
 
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 422 | `UNPROCESSABLE` | Paiement non encore confirmé |
+
 ---
 
 ### `PATCH /provider/missions/:missionId/steps/:stepId`
 
-Mise à jour d'une étape de mission (cocher/décocher).
+Mise à jour d'une étape de mission.
 
 **Request body** : `{ "completed": true }`
 
@@ -1047,9 +1508,132 @@ Mise à jour d'une étape de mission (cocher/décocher).
 
 ### `POST /provider/missions/:missionId/complete`
 
-Déclaration de fin de mission (attend validation client).
+Déclaration de fin de mission par le prestataire.
 
-**Response 200** → `{ "data": { "missionId": "msn_001", "status": "terminee" } }`
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "missionId": "msn_001",
+    "validatedBy": "provider",
+    "bothValidated": false,
+    "status": "terminee",
+    "message": "En attente de la validation client."
+  }
+}
+```
+
+---
+
+### `POST /provider/missions/:missionId/rate`
+
+Notation du client après mission terminée (UC26).
+
+**Request body**
+
+```json
+{
+  "rating": 4,
+  "comment": "Client ponctuel et bien communicatif."
+}
+```
+
+> `rating` : entier entre 1 et 5 inclus.
+
+**Response 201**
+
+```json
+{
+  "success": true,
+  "data": {
+    "ratingId": "rat_002",
+    "targetId": "usr_abc123",
+    "targetRole": "client",
+    "rating": 4
+  }
+}
+```
+
+---
+
+### `POST /provider/missions/:missionId/litige`
+
+Signalement d'un litige par le prestataire (UC12 — symétrique au client).
+
+**Request body**
+
+```json
+{
+  "motifId": "motif_non_paiement",
+  "description": "Le client refuse de valider malgré une prestation correctement réalisée.",
+  "evidenceIds": ["photo_002"]
+}
+```
+
+**Response 201** → `{ "data": { ...Litige } }`
+
+---
+
+### `PATCH /provider/litiges/:litigeId/resolution/accept`
+
+Le prestataire accepte la proposition de résolution.
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "litigeId": "lit_042",
+    "clientAccepted": true,
+    "providerAccepted": true,
+    "status": "resolu",
+    "message": "Les deux parties ont accepté. L'agent peut clôturer."
+  }
+}
+```
+
+---
+
+### `PATCH /provider/litiges/:litigeId/resolution/reject`
+
+Le prestataire refuse la proposition de résolution.
+
+**Request body** : `{ "reason": "Je réclame le paiement total de la prestation." }`
+
+**Response 200** → `{ "data": { "litigeId": "lit_042", "status": "en_traitement" } }`
+
+---
+
+### `GET /provider/conversations`
+
+Liste des conversations du prestataire connecté.
+
+**Query params** : `?page=1&limit=20`
+
+**Response 200** — même structure que `GET /client/conversations` avec `client` à la place de `provider`.
+
+---
+
+### `GET /provider/conversations/:conversationId/messages`
+
+Messages d'une conversation.
+
+**Query params** : `?page=1&limit=30`
+
+**Response 200** — même structure que `GET /client/conversations/:id/messages`.
+
+---
+
+### `POST /provider/conversations/:conversationId/messages`
+
+Envoyer un message dans une conversation.
+
+**Request body** : `{ "content": "...", "imageId": null }`
+
+**Response 201** → `{ "data": { ...Message } }`
 
 ---
 
@@ -1066,7 +1650,7 @@ Historique des gains et paiements.
   "success": true,
   "data": {
     "monthlyTotal": 185000,
-    "missions": [ ...Mission[] ],
+    "missions": [ "...Mission[]" ],
     "payouts": [
       {
         "id": "pay_001",
@@ -1085,7 +1669,7 @@ Historique des gains et paiements.
 
 ## 8. Endpoints — Admin
 
-> Tous ces endpoints nécessitent `Authorization: Bearer <token>` avec `role: "admin"` ou `role: "service_client"` (pour les litiges uniquement).
+> Tous ces endpoints nécessitent `Authorization: Bearer <token>` avec `role: "admin"`.
 
 ### `GET /admin/dashboard`
 
@@ -1098,15 +1682,71 @@ Tableau de bord administrateur complet.
   "success": true,
   "data": {
     "metrics": {
-      "activeDemands":    { "value": 47, "trend": "+12%" },
-      "ongoingMissions":  { "value": 23, "trend": "+5%" },
+      "activeDemands":    { "value": 47,      "trend": "+12%" },
+      "ongoingMissions":  { "value": 23,      "trend": "+5%"  },
       "monthlyRevenue":   { "value": 8400000, "trend": "+31%" },
-      "commissionEarned": { "value": 672000, "trend": "+31%" }
+      "commissionEarned": { "value": 672000,  "trend": "+31%" }
     },
-    "pendingValidations": [ ...ProviderProfile[] ],
-    "activeLitiges": [ ...Litige[] ],
-    "popularCategories": [ ...ServiceCategory[] ],
-    "recentTransactions": [ ...Transaction[] ]
+    "pendingValidations": [ "...ProviderProfile[]" ],
+    "activeLitiges":      [ "...Litige[]" ],
+    "popularCategories":  [ "...ServiceCategory[]" ],
+    "recentTransactions": [ "...Transaction[]" ]
+  }
+}
+```
+
+---
+
+### `GET /admin/stats`
+
+Statistiques complètes avec historique pour graphiques (UC33).
+
+**Query params** : `?from=2026-01-01&to=2026-05-31`
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "demands": {
+      "total": 248,
+      "open": 47,
+      "inProgress": 23,
+      "completed": 168,
+      "cancelled": 10
+    },
+    "missions": {
+      "total": 168,
+      "completed": 155,
+      "inDispute": 8,
+      "completionRate": 92.3
+    },
+    "financials": {
+      "totalRevenue": 8400000,
+      "commissionEarned": 672000,
+      "sequesteredAmount": 575000,
+      "periodBreakdown": [
+        { "month": "2026-05", "revenue": 2100000, "commission": 168000 },
+        { "month": "2026-04", "revenue": 1850000, "commission": 148000 }
+      ]
+    },
+    "topProviders": [
+      {
+        "id": "usr_jcm456",
+        "fullName": "Jean-Claude M.",
+        "completedMissions": 47,
+        "rating": 4.8
+      }
+    ],
+    "popularCategories": [
+      {
+        "id": "cat_plomberie",
+        "label": "Plomberie",
+        "demandCount": 84,
+        "percentageShare": 34
+      }
+    ]
   }
 }
 ```
@@ -1119,7 +1759,7 @@ Liste des prestataires avec filtre et pagination.
 
 **Query params** : `?status=pending_verification&page=1`
 
-> `status` : `"active"` | `"pending_verification"` | `"suspended"`
+> `status` : `"active"` | `"pending_verification"` | `"suspended"` | `"rejected"`
 
 **Response 200** → `{ "data": ProviderProfile[], "meta": { pagination } }`
 
@@ -1127,7 +1767,7 @@ Liste des prestataires avec filtre et pagination.
 
 ### `GET /admin/providers/:providerId`
 
-Dossier complet d'un prestataire (informations + documents fournis).
+Dossier complet d'un prestataire avec documents et instruction de l'agent si disponible.
 
 **Response 200**
 
@@ -1135,7 +1775,7 @@ Dossier complet d'un prestataire (informations + documents fournis).
 {
   "success": true,
   "data": {
-    "provider": { ...ProviderProfile },
+    "provider": { "...ProviderProfile" },
     "documents": [
       {
         "id": "doc_001",
@@ -1146,41 +1786,34 @@ Dossier complet d'un prestataire (informations + documents fournis).
         "fileUrl": "https://cdn.serviloc.cm/docs/doc_001.pdf"
       },
       {
-        "id": "doc_002",
-        "type": "cni",
-        "label": "Pièce d'identité nationale",
-        "reference": "CNI N°12345678 · Exp. 2028",
-        "status": "valide",
-        "fileUrl": "https://cdn.serviloc.cm/docs/doc_002.pdf"
-      },
-      {
         "id": "doc_003",
         "type": "casier_judiciaire",
         "label": "Casier judiciaire < 3 mois",
         "reference": null,
         "status": "manquant",
         "fileUrl": null
-      },
-      {
-        "id": "doc_004",
-        "type": "assurance",
-        "label": "Assurance responsabilité",
-        "reference": "Doc fourni · En cours de vérif.",
-        "status": "valide",
-        "fileUrl": "https://cdn.serviloc.cm/docs/doc_004.pdf"
       }
-    ]
+    ],
+    "agentReview": {
+      "agentName": "Pauline F.",
+      "verdict": "approved",
+      "comment": "Dossier complet. Justificatifs valides.",
+      "reviewedAt": "2026-05-22T09:00:00+01:00"
+    }
   }
 }
 ```
 
 > `document.status` : `"valide"` | `"manquant"` | `"en_verification"` | `"refuse"`
+> `agentReview` est `null` si aucun agent n'a encore instruit le dossier.
 
 ---
 
 ### `POST /admin/providers/:providerId/validate`
 
-Validation d'un dossier prestataire.
+Validation finale d'un dossier prestataire (après instruction de l'agent).
+
+**Request body** : `{ "note": "Validé suite à instruction de l'agent." }` (optionnel)
 
 **Response 200** → `{ "data": { "providerId": "...", "status": "active" } }`
 
@@ -1188,9 +1821,9 @@ Validation d'un dossier prestataire.
 
 ### `POST /admin/providers/:providerId/reject`
 
-Refus d'un dossier prestataire.
+Rejet d'un dossier prestataire avec motif.
 
-**Request body** : `{ "reason": "Casier judiciaire manquant" }`
+**Request body** : `{ "reason": "Casier judiciaire manquant ou invalide." }`
 
 **Response 200** → `{ "data": { "providerId": "...", "status": "rejected" } }`
 
@@ -1216,11 +1849,27 @@ Liste paginée de tous les utilisateurs (clients + prestataires).
 
 ### `PATCH /admin/users/:userId/suspend`
 
-Suspension d'un compte utilisateur.
+Suspension globale d'un compte (UC31 — admin).
 
-**Request body** : `{ "reason": "Comportement frauduleux" }`
+**Request body**
 
-**Response 200** → `{ "data": { "userId": "...", "status": "suspended" } }`
+```json
+{
+  "reason": "Comportement frauduleux répété",
+  "duration": "7d"
+}
+```
+
+> `duration` : `"24h"` | `"7d"` | `"indefinite"`
+
+**Response 200** → `{ "data": { "userId": "...", "status": "suspended", "duration": "7d" } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 403 | `FORBIDDEN` | Tentative de suspendre un admin |
+| 404 | `NOT_FOUND` | Utilisateur introuvable |
 
 ---
 
@@ -1232,11 +1881,75 @@ Réactivation d'un compte suspendu.
 
 ---
 
+### `GET /admin/agents`
+
+Liste des agents service client.
+
+**Query params** : `?status=active&page=1`
+
+**Response 200** → `{ "data": AgentProfile[], "meta": { pagination } }`
+
+---
+
+### `POST /admin/agents`
+
+Création d'un compte agent (seul l'admin peut créer des agents).
+
+**Request body**
+
+```json
+{
+  "firstName": "Pauline",
+  "lastName": "Fotso",
+  "email": "p.fotso@serviloc.cm",
+  "phone": "+237691000111",
+  "department": "Service Client"
+}
+```
+
+> Un mot de passe provisoire est généré automatiquement et envoyé par email à l'agent.
+
+**Response 201** → `{ "data": { ...AgentProfile } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 409 | `ALREADY_EXISTS` | Email déjà utilisé |
+
+---
+
+### `GET /admin/agents/:agentId`
+
+Détail d'un agent avec ses statistiques de traitement.
+
+**Response 200** → `{ "data": { ...AgentProfile } }`
+
+---
+
+### `PATCH /admin/agents/:agentId/suspend`
+
+Suspension d'un compte agent.
+
+**Request body** : `{ "reason": "..." }`
+
+**Response 200** → `{ "data": { "agentId": "...", "status": "suspended" } }`
+
+---
+
+### `DELETE /admin/agents/:agentId`
+
+Suppression définitive d'un compte agent.
+
+**Response 200** → `{ "data": { "agentId": "...", "deleted": true } }`
+
+---
+
 ### `GET /admin/litiges`
 
-Liste paginée de tous les litiges.
+Liste paginée de tous les litiges avec métriques.
 
-**Query params** : `?status=ouvert&page=1`
+**Query params** : `?status=ouvert&page=1&limit=20`
 
 **Response 200**
 
@@ -1250,7 +1963,7 @@ Liste paginée de tous les litiges.
       "resolvedThisMonth": 12,
       "totalBlockedAmount": 287000
     },
-    "litiges": [ ...Litige[] ]
+    "litiges": [ "...Litige[]" ]
   },
   "meta": { "page": 1, "limit": 20, "total": 23 }
 }
@@ -1262,7 +1975,19 @@ Liste paginée de tous les litiges.
 
 Détail complet d'un litige.
 
-**Response 200** → `{ "data": { ...Litige, "client": ClientProfile, "provider": ProviderProfile } }`
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "...Litige",
+    "client":   { "...ClientProfile" },
+    "provider": { "...ProviderProfile" },
+    "agent":    { "...AgentProfile ou null" }
+  }
+}
+```
 
 ---
 
@@ -1272,24 +1997,51 @@ Assignation d'un agent à un litige.
 
 **Request body** : `{ "agentId": "usr_agent01" }`
 
-**Response 200** → `{ "data": { "litigeId": "...", "agentId": "...", "status": "traitement" } }`
+**Response 200** → `{ "data": { "litigeId": "...", "agentId": "...", "status": "assigne" } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 404 | `NOT_FOUND` | Agent inexistant |
+| 409 | `ALREADY_EXISTS` | Litige déjà assigné à cet agent |
 
 ---
 
-### `POST /admin/litiges/:litigeId/resolve`
+### `PUT /admin/litiges/:litigeId/assign`
 
-Résolution d'un litige avec décision finale.
+Réassignation du litige à un autre agent.
 
-**Request body**
+**Request body** : `{ "agentId": "usr_agent02" }`
+
+**Response 200** → `{ "data": { "litigeId": "...", "agentId": "usr_agent02", "status": "assigne" } }`
+
+---
+
+### `GET /admin/litiges/stats`
+
+Statistiques de traitement des litiges.
+
+**Response 200**
 
 ```json
 {
-  "resolution": "remboursement_partiel",
-  "note": "Remboursement de 50% accordé — prestation partiellement réalisée."
+  "success": true,
+  "data": {
+    "totalOpen": 7,
+    "totalResolved": 42,
+    "averageResolutionDays": 3.2,
+    "byAgent": [
+      {
+        "agentId": "usr_agent01",
+        "agentName": "Pauline F.",
+        "resolved": 18,
+        "pending": 4
+      }
+    ]
+  }
 }
 ```
-
-**Response 200** → `{ "data": { ...Litige, "status": "resolu" } }`
 
 ---
 
@@ -1303,25 +2055,406 @@ Liste paginée des transactions.
 
 ---
 
+### `PATCH /admin/settings/commission`
+
+Mise à jour des taux de commission.
+
+**Request body**
+
+```json
+{
+  "standardRate": 8,
+  "urgencyRate": 12
+}
+```
+
+> Les taux sont en pourcentage (%). Valeurs acceptées : entre 0 et 30.
+
+**Response 200** → `{ "data": { "standardRate": 8, "urgencyRate": 12, "updatedAt": "..." } }`
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Taux hors limites (0–30%) |
+
+---
+
 ### `GET /admin/categories`
 
-Liste des catégories avec statistiques de popularité.
+Liste des catégories avec statistiques.
 
 **Response 200** → `{ "data": ServiceCategory[] }`
 
 ---
 
-## 9. Upload de fichiers
+### `POST /admin/categories`
+
+Création d'une catégorie.
+
+**Request body**
+
+```json
+{
+  "label": "Jardinage",
+  "iconKey": "leaf",
+  "color": "#d1fae5"
+}
+```
+
+**Response 201** → `{ "data": { ...ServiceCategory } }`
+
+---
+
+### `PUT /admin/categories/:categoryId`
+
+Mise à jour d'une catégorie.
+
+**Request body** : même structure que `POST /admin/categories`.
+
+**Response 200** → `{ "data": { ...ServiceCategory } }`
+
+---
+
+### `DELETE /admin/categories/:categoryId`
+
+Suppression d'une catégorie.
+
+**Response 200** → `{ "data": { "categoryId": "...", "deleted": true } }`
+
+---
+
+## 9. Endpoints — Agent Service Client
+
+> Tous ces endpoints nécessitent `Authorization: Bearer <token>` avec `role: "agent"`.
+
+---
+
+### `GET /agent/providers`
+
+Liste des dossiers prestataires à instruire (UC30-agent).
+
+**Query params** : `?status=pending&page=1&limit=20`
+
+> `status` : `"pending"` (en attente d'instruction) | `"reviewed"` (déjà instruit, en attente décision admin)
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude Mbarga",
+      "specialty": "Plomberie",
+      "status": "pending_verification",
+      "documentsComplete": false,
+      "missingDocuments": ["casier_judiciaire"],
+      "submittedAt": "2026-05-20T08:00:00+01:00",
+      "reviewStatus": "pending"
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 8, "totalPages": 1 }
+}
+```
+
+---
+
+### `GET /agent/providers/:providerId`
+
+Dossier complet d'un prestataire à instruire.
+
+**Response 200** — même structure que `GET /admin/providers/:providerId` (documents + profil complet).
+
+---
+
+### `POST /agent/providers/:providerId/review`
+
+Dépôt de l'instruction de l'agent sur un dossier prestataire (UC30-agent).
+
+**Request body**
+
+```json
+{
+  "verdict": "approved",
+  "comment": "Dossier complet. Tous les justificatifs sont valides. Casier judiciaire récent (02/2026)."
+}
+```
+
+> `verdict` : `"approved"` | `"rejected"` | `"needs_revision"`
+> `"needs_revision"` → notifie le prestataire de corriger son dossier sans passer par l'admin.
+
+**Response 201**
+
+```json
+{
+  "success": true,
+  "data": {
+    "...ProviderReview",
+    "message": "Instruction enregistrée. L'administrateur a été notifié pour décision finale."
+  }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 404 | `NOT_FOUND` | Prestataire introuvable |
+| 409 | `ALREADY_EXISTS` | Ce prestataire a déjà une décision finale (validé ou rejeté) |
+
+---
+
+### `GET /agent/litiges`
+
+Litiges assignés à l'agent connecté uniquement (UC36).
+
+**Query params** : `?status=en_traitement&page=1&limit=20`
+
+> `status` : `"ouvert"` | `"en_traitement"` | `"resolu"`
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "lit_042",
+      "reference": "LIT-2026-0042",
+      "status": "en_traitement",
+      "motif": "Travaux non conformes au devis",
+      "amount": 45000,
+      "client":   { "id": "usr_abc",    "fullName": "Alice Nguetse" },
+      "provider": { "id": "usr_jcm456", "fullName": "Jean-Claude M." },
+      "createdAt": "2026-05-18T10:00:00+01:00",
+      "assignedAt": "2026-05-18T11:30:00+01:00",
+      "unrepliedMessages": 1
+    }
+  ],
+  "meta": { "page": 1, "limit": 20, "total": 4, "totalPages": 1 }
+}
+```
+
+---
+
+### `GET /agent/litiges/:litigeId`
+
+Détail complet d'un litige assigné (UC36).
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "lit_042",
+    "reference": "LIT-2026-0042",
+    "status": "en_traitement",
+    "motif": "Travaux non conformes au devis",
+    "description": "Le client affirme que la plomberie a été mal réparée...",
+    "amount": 45000,
+    "evidences": [
+      { "type": "photo", "url": "https://cdn.serviloc.cm/evidence/photo_001.jpg" }
+    ],
+    "client":   { "id": "usr_abc",    "fullName": "Alice Nguetse",    "phone": "+237691..." },
+    "provider": { "id": "usr_jcm456", "fullName": "Jean-Claude M.",   "phone": "+237677..." },
+    "resolution": null,
+    "timeline": [
+      { "event": "Litige ouvert",      "at": "2026-05-18T10:00:00+01:00" },
+      { "event": "Assigné à l'agent", "at": "2026-05-18T11:30:00+01:00" }
+    ]
+  }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 403 | `FORBIDDEN` | Ce litige n'est pas assigné à cet agent |
+
+---
+
+### `GET /agent/litiges/:litigeId/history`
+
+Historique du chat entre client et prestataire sur cette demande (UC37).
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "conversationId": "conv_001",
+    "messages": [ "...Message[]" ]
+  }
+}
+```
+
+---
+
+### `GET /agent/litiges/:litigeId/messages`
+
+Échanges entre l'agent et les parties dans le contexte du litige (UC37).
+
+**Query params** : `?page=1&limit=30`
+
+**Response 200** → `{ "data": LitigeMessage[], "meta": { pagination } }`
+
+---
+
+### `POST /agent/litiges/:litigeId/messages`
+
+L'agent envoie un message à l'une des parties (UC37).
+
+**Request body**
+
+```json
+{
+  "content": "Bonjour, j'ai bien pris en charge votre dossier. Pouvez-vous préciser la date exacte des travaux ?",
+  "recipientRole": "client",
+  "attachmentId": null
+}
+```
+
+> `recipientRole` : `"client"` | `"provider"`
+> `attachmentId` : optionnel — ID retourné par `POST /uploads/photos`.
+
+**Response 201** → `{ "data": { ...LitigeMessage } }`
+
+---
+
+### `POST /agent/litiges/:litigeId/resolution`
+
+Proposition d'une résolution par l'agent (UC38).
+
+**Request body**
+
+```json
+{
+  "type": "remboursement_partiel",
+  "refundAmount": 11500,
+  "note": "Remboursement de 50% accordé — prestation partiellement réalisée selon les preuves."
+}
+```
+
+> `type` : `"remboursement_partiel"` | `"remboursement_total"` | `"en_faveur_prestataire"`
+> Si `type = "en_faveur_prestataire"`, `refundAmount` doit être `0`.
+
+**Response 201**
+
+```json
+{
+  "success": true,
+  "data": {
+    "...Resolution",
+    "message": "Proposition envoyée aux deux parties pour acceptation."
+  }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | `refundAmount` supérieur au montant du litige |
+
+---
+
+### `PUT /agent/litiges/:litigeId/resolution`
+
+Modification de la proposition si une partie a refusé.
+
+**Request body** — même structure que `POST /agent/litiges/:id/resolution`.
+
+**Response 200** → `{ "data": { ...Resolution } }`
+
+---
+
+### `POST /agent/litiges/:litigeId/close`
+
+Clôture définitive du litige après acceptation des deux parties (UC38).
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "litigeId": "lit_042",
+    "status": "cloture",
+    "refundAmount": 11500,
+    "message": "Litige clôturé. Remboursement en cours."
+  }
+}
+```
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 409 | `UNPROCESSABLE` | Les deux parties n'ont pas encore accepté la résolution |
+| 503 | `SERVICE_UNAVAILABLE` | Service Paiement indisponible — la clôture sera retentée |
+
+---
+
+### `POST /agent/litiges/:litigeId/suspend-user`
+
+Suspension contextuelle d'une des parties d'un litige (UC31-agent).
+
+> ⚠️ Le `userId` doit obligatoirement être le `clientId` ou le `providerId` du litige. Toute autre valeur retourne `403 FORBIDDEN`.
+
+**Request body**
+
+```json
+{
+  "userId": "usr_abc123",
+  "reason": "Fraude confirmée lors de l'instruction du litige LIT-2026-0042."
+}
+```
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "usr_abc123",
+    "status": "suspended",
+    "duration": "7d",
+    "litigeId": "lit_042",
+    "message": "Utilisateur suspendu pour 7 jours. L'administrateur a été notifié."
+  }
+}
+```
+
+> La durée de suspension est fixée à **7 jours** pour les agents (non modifiable).
+> Seul un admin peut réactiver un compte suspendu par un agent.
+
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 403 | `FORBIDDEN` | `userId` n'est pas partie de ce litige |
+| 404 | `NOT_FOUND` | Litige ou utilisateur introuvable |
+
+---
+
+## 10. Upload de fichiers
+
+> Ces endpoints sont accessibles à tous les rôles authentifiés.
 
 ### `POST /uploads/photos`
 
-Upload d'une ou plusieurs photos (demandes, litiges, profils).
+Upload d'une ou plusieurs photos (demandes, litiges, chat).
 
 **Request** : `multipart/form-data`
 
 ```
-field: photos (fichier binaire, max 5 Mo par fichier, formats: jpg, png, webp)
-field: context (string: "demand" | "litige" | "profile")
+field: photos   (fichier binaire, max 5 Mo par fichier, formats: jpg, png, webp)
+field: context  (string: "demand" | "litige" | "profile" | "chat")
 ```
 
 **Response 201**
@@ -1342,7 +2475,14 @@ field: context (string: "demand" | "litige" | "profile")
 }
 ```
 
-> Le frontend envoie d'abord ce endpoint, reçoit les `id` des photos, puis les inclut dans les appels métier (création de demande, signalement de litige, etc.).
+**Erreurs possibles**
+
+| Code | `error.code` | Détail |
+|------|-------------|--------|
+| 400 | `VALIDATION_ERROR` | Format non supporté ou fichier vide |
+| 413 | `FILE_TOO_LARGE` | Fichier dépasse 5 Mo |
+
+> Le frontend envoie ce endpoint en premier, reçoit les `id`, puis les inclut dans les appels métier.
 
 ---
 
@@ -1353,60 +2493,87 @@ Upload d'un document officiel (dossier prestataire).
 **Request** : `multipart/form-data`
 
 ```
-field: document (fichier PDF ou image, max 10 Mo)
-field: type (string: "carte_professionnelle" | "cni" | "casier_judiciaire" | "assurance")
+field: document  (PDF ou image, max 10 Mo)
+field: type      (string: "carte_professionnelle" | "cni" | "casier_judiciaire" | "assurance")
 ```
 
-**Response 201** → même format que `/uploads/photos`
+**Response 201** — même format que `POST /uploads/photos`.
 
 ---
 
-## 10. Calendrier de livraison backend
+## 11. Calendrier de livraison backend
 
 > Ce tableau est la référence contractuelle. Le frontend utilise les mocks JSON correspondants tant que l'endpoint n'est pas livré.
 
 | Semaine | Endpoints livrés | Statut |
 |---------|-----------------|--------|
 | **S1** | `POST /auth/register`, `POST /auth/verify-otp`, `POST /auth/resend-otp`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout` | ⬜ À livrer |
-| **S1** | `GET /client/categories`, `GET /admin/categories` | ⬜ À livrer |
+| **S1** | `GET /client/categories`, `GET /admin/categories`, `POST /admin/categories`, `PUT /admin/categories/:id`, `DELETE /admin/categories/:id` | ⬜ À livrer |
+| **S1** | Eureka Server + API Gateway opérationnels | ⬜ À livrer |
 | **S2** | `GET /client/me`, `GET /client/dashboard`, `GET /client/demands`, `POST /client/demands` | ⬜ À livrer |
-| **S2** | `GET /provider/me`, `GET /provider/dashboard`, `PATCH /provider/availability`, `GET /provider/demands/available` | ⬜ À livrer |
-| **S2** | `GET /admin/dashboard`, `GET /admin/providers`, `GET /admin/providers/:id` | ⬜ À livrer |
-| **S3** | `POST /client/demands/:id/quote/accept`, `POST /client/demands/:id/quote/reject`, `GET /client/missions/:id`, `POST /client/missions/:id/validate` | ⬜ À livrer |
-| **S3** | `POST /provider/demands/:id/apply`, `POST /provider/demands/:id/quote`, `POST /provider/missions/:id/start`, `PATCH /provider/missions/:id/steps/:stepId`, `POST /provider/missions/:id/complete` | ⬜ À livrer |
-| **S3** | `POST /admin/providers/:id/validate`, `POST /admin/providers/:id/reject`, `GET /admin/users`, `PATCH /admin/users/:id/suspend` | ⬜ À livrer |
-| **S3** | `POST /client/missions/:id/rate`, `POST /client/missions/:id/litige` | ⬜ À livrer |
-| **S3** | `GET /admin/litiges`, `GET /admin/litiges/:id`, `POST /admin/litiges/:id/resolve` | ⬜ À livrer |
-| **S4** | `GET /provider/earnings`, `POST /uploads/photos`, `POST /uploads/documents`, `GET /admin/transactions`, `POST /admin/providers/:id/notify`, `PATCH /admin/users/:id/reactivate` | ⬜ À livrer |
+| **S2** | `GET /provider/me`, `PATCH /provider/profile`, `GET /provider/dashboard`, `PATCH /provider/availability`, `PATCH /provider/schedule`, `GET /provider/demands/available` | ⬜ À livrer |
+| **S2** | `GET /admin/dashboard`, `GET /admin/providers`, `GET /admin/providers/:id`, `GET /admin/users` | ⬜ À livrer |
+| **S2** | `GET /admin/agents`, `POST /admin/agents`, `GET /admin/agents/:id` | ⬜ À livrer |
+| **S2** | `GET /client/providers/search` | ⬜ À livrer |
+| **S3** | `GET /client/demands/:id`, `GET /client/demands/:id/quote`, `POST /client/demands/:id/quote/accept`, `POST /client/demands/:id/quote/reject` | ⬜ À livrer |
+| **S3** | `GET /client/missions/:id`, `POST /client/missions/:id/validate`, `POST /client/missions/:id/rate`, `POST /client/missions/:id/litige` | ⬜ À livrer |
+| **S3** | `POST /provider/demands/:id/apply`, `POST /provider/demands/:id/quote`, `GET /provider/missions`, `GET /provider/missions/:id`, `POST /provider/missions/:id/start`, `PATCH /provider/missions/:id/steps/:stepId`, `POST /provider/missions/:id/complete` | ⬜ À livrer |
+| **S3** | `POST /provider/missions/:id/rate`, `POST /provider/missions/:id/litige` | ⬜ À livrer |
+| **S3** | `POST /admin/providers/:id/validate`, `POST /admin/providers/:id/reject`, `POST /admin/providers/:id/notify` | ⬜ À livrer |
+| **S3** | `PATCH /admin/users/:id/suspend`, `PATCH /admin/users/:id/reactivate` | ⬜ À livrer |
+| **S3** | `GET /admin/litiges`, `GET /admin/litiges/:id`, `POST /admin/litiges/:id/assign`, `PUT /admin/litiges/:id/assign`, `GET /admin/litiges/stats` | ⬜ À livrer |
+| **S3** | `GET /client/conversations`, `POST /client/conversations`, `GET /client/conversations/:id/messages`, `POST /client/conversations/:id/messages` | ⬜ À livrer |
+| **S3** | `GET /provider/conversations`, `GET /provider/conversations/:id/messages`, `POST /provider/conversations/:id/messages` | ⬜ À livrer |
+| **S3** | `GET /agent/providers`, `GET /agent/providers/:id`, `POST /agent/providers/:id/review` | ⬜ À livrer |
+| **S3** | `GET /agent/litiges`, `GET /agent/litiges/:id`, `GET /agent/litiges/:id/history` | ⬜ À livrer |
+| **S3** | `GET /agent/litiges/:id/messages`, `POST /agent/litiges/:id/messages` | ⬜ À livrer |
+| **S4** | `POST /agent/litiges/:id/resolution`, `PUT /agent/litiges/:id/resolution`, `POST /agent/litiges/:id/close`, `POST /agent/litiges/:id/suspend-user` | ⬜ À livrer |
+| **S4** | `PATCH /client/litiges/:id/resolution/accept`, `PATCH /client/litiges/:id/resolution/reject` | ⬜ À livrer |
+| **S4** | `PATCH /provider/litiges/:id/resolution/accept`, `PATCH /provider/litiges/:id/resolution/reject` | ⬜ À livrer |
+| **S4** | `GET /provider/earnings`, `GET /admin/stats`, `GET /admin/transactions`, `PATCH /admin/settings/commission` | ⬜ À livrer |
+| **S4** | `POST /uploads/photos`, `POST /uploads/documents` | ⬜ À livrer |
+| **S4** | `PATCH /admin/agents/:id/suspend`, `DELETE /admin/agents/:id` | ⬜ À livrer |
 
 > **Convention de statut** : ⬜ À livrer · 🔄 En cours · ✅ Livré et testé · ❌ Bloqué (préciser la raison)
 
 ---
 
-## 11. Données mock frontend (fallback)
+## 12. Données mock frontend (fallback)
 
 > Ces fichiers JSON sont utilisés par le frontend quand un endpoint n'est pas encore disponible. Ils doivent correspondre exactement aux schémas définis en section 4.
 
 ```
 src/data/
 ├── auth/
-│   └── mock_user.json           # Un User pour chaque rôle
+│   └── mock_user.json                  # Un User pour chaque rôle (client, provider, admin, agent)
 ├── client/
-│   ├── mock_dashboard.json      # Réponse de GET /client/dashboard
-│   ├── mock_demands.json        # Tableau de 5 ServiceDemand
-│   ├── mock_quote.json          # Un Quote complet
-│   └── mock_mission.json        # Une Mission avec 6 étapes
+│   ├── mock_dashboard.json             # Réponse de GET /client/dashboard
+│   ├── mock_demands.json               # Tableau de 5 ServiceDemand
+│   ├── mock_quote.json                 # Un Quote complet
+│   ├── mock_mission.json               # Une Mission avec 6 étapes
+│   ├── mock_conversations.json         # 3 Conversation
+│   ├── mock_messages.json              # 10 Message pour une conversation
+│   └── mock_providers_search.json      # 6 ProviderSearchResult
 ├── provider/
-│   ├── mock_dashboard.json      # Réponse de GET /provider/dashboard
-│   └── mock_available_demands.json  # 6 AvailableDemand
+│   ├── mock_dashboard.json             # Réponse de GET /provider/dashboard
+│   ├── mock_available_demands.json     # 6 AvailableDemand
+│   └── mock_earnings.json             # Réponse de GET /provider/earnings
 ├── admin/
-│   ├── mock_dashboard.json      # Réponse de GET /admin/dashboard
-│   ├── mock_provider_dossier.json   # ProviderProfile + documents
-│   ├── mock_users.json          # 5 ManagedUser
-│   └── mock_litiges.json        # 4 Litige avec metrics
+│   ├── mock_dashboard.json             # Réponse de GET /admin/dashboard
+│   ├── mock_stats.json                 # Réponse de GET /admin/stats
+│   ├── mock_provider_dossier.json      # ProviderProfile + documents + agentReview
+│   ├── mock_users.json                 # 5 ManagedUser
+│   ├── mock_agents.json                # 3 AgentProfile
+│   └── mock_litiges.json              # 4 Litige avec metrics
+├── agent/
+│   ├── mock_agent_litiges.json         # 4 Litige assignés à l'agent
+│   ├── mock_litige_detail.json         # Litige complet avec timeline
+│   ├── mock_litige_messages.json       # LitigeMessage[] d'un dossier
+│   ├── mock_litige_history.json        # Conversation originale client/prestataire
+│   └── mock_provider_reviews.json      # Dossiers à instruire
 └── shared/
-    ├── mock_categories.json     # 6 ServiceCategory
-    └── mock_litige_motifs.json  # 4 LitigeMotif
+    ├── mock_categories.json            # 6 ServiceCategory
+    └── mock_litige_motifs.json         # 4 LitigeMotif
 ```
 
 **Convention de switch mock/API dans les services :**
@@ -1429,7 +2596,7 @@ export async function getDashboard(): Promise<DashboardData> {
 
 ---
 
-## 12. Règles de coordination
+## 13. Règles de coordination
 
 ### Processus de modification de contrat
 
@@ -1486,9 +2653,9 @@ Ce fichier est versionné dans le repo GitHub à la racine du projet frontend.
 
 Toute modification est tracée dans l'historique Git avec un message de commit explicite :
 ```
-git commit -m "api-contract: ajout endpoint POST /provider/missions/:id/complete [S3]"
+git commit -m "api-contract: v2.0 — ajout section agent, chat, providers/search [S3]"
 ```
 
 ---
 
-*Document ServiLoc — Frontend Team · Backend Team · Mai 2026*
+*Document ServiLoc — Frontend Team · Backend Team · Juin 2026*

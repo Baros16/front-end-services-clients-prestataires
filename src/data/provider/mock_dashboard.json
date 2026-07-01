@@ -1,0 +1,150 @@
+{
+  "success": true,
+  "data": {
+    "profile": {
+      "id": "usr_jcm456",
+      "role": "provider",
+      "firstName": "Jean-Claude",
+      "lastName": "Mbarga",
+      "fullName": "Jean-Claude Mbarga",
+      "phone": "+237699234567",
+      "email": "jcm@email.cm",
+      "avatarInitial": "J",
+      "status": "active",
+      "specialty": "Plomberie",
+      "rating": 4.8,
+      "completedMissions": 47,
+      "isAvailable": true,
+      "hourlyRate": 4000,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 20
+      },
+      "availability": {
+        "monday":    { "start": "08:00", "end": "18:00", "available": true },
+        "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+        "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+        "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+        "friday":    { "start": "08:00", "end": "18:00", "available": true },
+        "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+        "sunday":    { "start": null,    "end": null,    "available": false }
+      },
+      "monthlyEarnings": 185000,
+      "certifications": ["Artisan certifié"],
+      "estCertifie": true,
+      "createdAt": "2025-11-10T08:00:00+01:00"
+    },
+    "metrics": {
+      "missionsThisMonth": 18,
+      "netEarnings": 185000,
+      "averageRating": 4.8,
+      "availableDemandsCount": 11,
+      "trends": {
+        "missions": { "value": "+3",   "direction": "up", "subtext": "+3 vs avril" },
+        "earnings": { "value": "+22%", "direction": "up", "subtext": "+22%" },
+        "rating":   { "value": "+0.1", "direction": "up", "subtext": "+0.1" }
+      }
+    },
+    "recentMissions": [
+      {
+        "id": "msn_001",
+        "demandId": "dem_xyz789",
+        "quoteId": "quote_001",
+        "clientId": "usr_abc123",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Fuite cuisine — Madeleine K.",
+        "status": "en_cours",
+        "totalAmount": 23000,
+        "sequesteredAmount": 23000,
+        "paymentStatus": "sequestre",
+        "startedAt": "2026-05-21T09:32:00+01:00",
+        "estimatedDurationHours": 2,
+        "completedAt": null,
+        "steps": [
+          { "id": "step_001", "label": "Coupure eau principale vérifiée",        "completed": true,  "order": 1 },
+          { "id": "step_002", "label": "Démontage siphon fissuré",               "completed": true,  "order": 2 },
+          { "id": "step_003", "label": "Remplacement joint silicone ×2",         "completed": true,  "order": 3 },
+          { "id": "step_004", "label": "Installation siphon PVC neuf",           "completed": true,  "order": 4 },
+          { "id": "step_005", "label": "Test d'étanchéité (5 min eau courante)", "completed": false, "order": 5 },
+          { "id": "step_006", "label": "Nettoyage zone d'intervention",          "completed": false, "order": 6 }
+        ],
+        "providerLocation": {
+          "lat": 5.4764,
+          "lng": 10.4207,
+          "label": "Jean-Claude est arrivé",
+          "sublabel": "Quartier Commercial, Bafoussam"
+        },
+        "location": {
+          "address": "Bafoussam, Quartier Commercial",
+          "lat": 5.4764,
+          "lng": 10.4207
+        }
+      },
+      {
+        "id": "msn_010",
+        "demandId": "dem_prv010",
+        "quoteId": "quote_010",
+        "clientId": "usr_client02",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Robinet cuisine — Pierre F.",
+        "status": "terminee",
+        "totalAmount": 18000,
+        "sequesteredAmount": 0,
+        "paymentStatus": "libere",
+        "startedAt": "2026-05-19T10:00:00+01:00",
+        "estimatedDurationHours": 1,
+        "completedAt": "2026-05-19T11:30:00+01:00",
+        "steps": [
+          { "id": "step_a1", "label": "Diagnostic robinet défectueux", "completed": true, "order": 1 },
+          { "id": "step_a2", "label": "Remplacement cartouche",        "completed": true, "order": 2 },
+          { "id": "step_a3", "label": "Test fonctionnement",           "completed": true, "order": 3 }
+        ],
+        "providerLocation": null,
+        "location": {
+          "address": "Bafoussam, Djeleng Nord",
+          "lat": 5.4830,
+          "lng": 10.4170
+        }
+      },
+      {
+        "id": "msn_009",
+        "demandId": "dem_prv009",
+        "quoteId": "quote_009",
+        "clientId": "usr_client03",
+        "providerId": "usr_jcm456",
+        "category": "Plomberie",
+        "title": "Tuyau percé — Sylvie T.",
+        "status": "terminee",
+        "totalAmount": 32000,
+        "sequesteredAmount": 0,
+        "paymentStatus": "libere",
+        "startedAt": "2026-05-17T08:30:00+01:00",
+        "estimatedDurationHours": 3,
+        "completedAt": "2026-05-17T12:00:00+01:00",
+        "steps": [
+          { "id": "step_b1", "label": "Localisation fuite",           "completed": true, "order": 1 },
+          { "id": "step_b2", "label": "Remplacement section tuyau",   "completed": true, "order": 2 },
+          { "id": "step_b3", "label": "Test étanchéité 10 min",       "completed": true, "order": 3 },
+          { "id": "step_b4", "label": "Remise en état revêtement sol","completed": true, "order": 4 }
+        ],
+        "providerLocation": null,
+        "location": {
+          "address": "Bafoussam, Cité des Fleurs",
+          "lat": 5.4700,
+          "lng": 10.4250
+        }
+      }
+    ],
+    "availability": {
+      "monday":    { "start": "08:00", "end": "18:00", "available": true },
+      "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+      "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+      "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+      "friday":    { "start": "08:00", "end": "18:00", "available": true },
+      "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+      "sunday":    { "start": null,    "end": null,    "available": false }
+    }
+  }
+}
