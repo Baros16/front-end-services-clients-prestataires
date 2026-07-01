@@ -1,6 +1,7 @@
 // src/components/provider/demandes/CategorySelector.jsx
 import { ServiceCategoryCard } from '../../../commons/ServiceCategoryCard';
 import { Wrench, Zap, Brush, Key, Sparkles, Plus } from '../../../commons/Icons';
+import mockCategories from '../../../../data/shared/mock_categories.json';
 
 const ICON_MAP = {
   wrench: <Wrench   size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,
@@ -12,10 +13,9 @@ const ICON_MAP = {
 };
 
 export default function CategorySelector({ categories, selectedId, onSelect }) {
-  console.log('categories reçues:', categories);
-  console.log('ICON_MAP keys:', Object.keys(ICON_MAP));
+  const list = (categories && categories.length > 0) ? categories : mockCategories.data ?? mockCategories;
 
-  if (!categories || categories.length === 0) {
+  if (!list || list.length === 0) {
     return (
       <div className="text-center py-8 text-[var(--color-sl-400)] text-sm">
         Chargement des catégories…
@@ -28,16 +28,22 @@ export default function CategorySelector({ categories, selectedId, onSelect }) {
       <p className="text-[11px] font-semibold tracking-widest text-[var(--color-sl-500)] uppercase mb-3">
         Catégorie de service
       </p>
-      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-3">
-        {categories.map((cat) => {
-          console.log('cat.iconKey:', cat.iconKey, '→ icône:', ICON_MAP[cat.iconKey]);
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+        {list.map((cat) => {
+          const label = cat.label ?? cat.name ?? '—';
+          const icon  = cat.iconKey
+            ? (ICON_MAP[cat.iconKey] ?? ICON_MAP.plus)
+            : (cat.icon
+                ? <span style={{ fontSize: 20, lineHeight: 1 }}>{cat.icon}</span>
+                : ICON_MAP.plus);
+
           return (
             <ServiceCategoryCard
               key={cat.id}
               category={{
                 id:    cat.id,
-                label: cat.label,
-                icon:  ICON_MAP[cat.iconKey] ?? ICON_MAP.plus,
+                label,
+                icon,
                 color: cat.color,
               }}
               selected={selectedId === cat.id}
