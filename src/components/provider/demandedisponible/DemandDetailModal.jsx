@@ -3,23 +3,17 @@ import { Modal }       from '../../commons/Modal';
 import { Button }      from '../../commons/Button';
 import { StatusBadge } from '../../commons/StatusBadge';
 import { RatingStars } from '../../commons/RatingStars';
-import { MapPin, Clock } from '../../commons/Icons';
+import { MapPin, Clock, Wrench, Zap, Sparkles, Key, Brush } from '../../commons/Icons';
+import { formatBudget } from './formatBudget';
 
 const CATEGORY_DISPLAY = {
-  wrench:  { emoji: '🔧', bgVar: 'var(--color-accent-light)' },
-  bolt:    { emoji: '⚡', bgVar: 'var(--color-warning-light)' },
-  broom:   { emoji: '🧹', bgVar: 'var(--color-success-light)' },
-  key:     { emoji: '🔑', bgVar: 'var(--color-accent-light)' },
-  paint:   { emoji: '🎨', bgVar: '#F3E8FF' },
-  default: { emoji: '🛠️', bgVar: 'var(--color-sl-100)' },
+  wrench:  { Icon: Wrench,   bgVar: 'var(--color-accent-light)' },
+  bolt:    { Icon: Zap,      bgVar: 'var(--color-warning-light)' },
+  broom:   { Icon: Sparkles, bgVar: 'var(--color-success-light)' },
+  key:     { Icon: Key,      bgVar: 'var(--color-accent-light)' },
+  paint:   { Icon: Brush,    bgVar: '#F3E8FF' },
+  default: { Icon: Wrench,   bgVar: 'var(--color-sl-100)' },
 };
-
-function formatBudget(d) {
-  const min = d.budgetMin ?? d.estimatedBudget?.min ?? 0;
-  const max = d.budgetMax ?? d.estimatedBudget?.max ?? 0;
-  const fmt = (v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : v);
-  return `~${fmt(min)}-${fmt(max)} XAF`;
-}
 
 function formatPostedAgo(d) {
   if (d.postedAgo) return d.postedAgo;
@@ -36,7 +30,7 @@ function getLocationText(location) {
 }
 
 export function DemandDetailModal({ open, demand, onClose, onApply, isApplying = false }) {
-  const { emoji, bgVar } =
+  const { Icon, bgVar } =
     CATEGORY_DISPLAY[demand?.category?.iconKey] ?? CATEGORY_DISPLAY.default;
 
   return (
@@ -47,14 +41,11 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
       title={
         <div className="flex items-center gap-2">
           <div
-            className="flex items-center gap-2 px-3 py-1"
-            style={{ background: bgVar, borderRadius: 'var(--radius-sm)' }}
+            className="flex items-center gap-2 px-3 py-1 rounded-[var(--radius-sm)]"
+            style={{ background: bgVar }}
           >
-            <span className="text-xl leading-none">{emoji}</span>
-            <span
-              className="text-sm font-semibold"
-              style={{ color: 'var(--color-sl-900)', fontFamily: 'var(--font-body)' }}
-            >
+            <Icon size={18} strokeWidth={1.8} className="text-[var(--color-sl-700)]" />
+            <span className="text-sm font-semibold text-[var(--color-sl-900)] font-[family-name:var(--font-body)]">
               {demand?.category?.label}
             </span>
           </div>
@@ -85,32 +76,20 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
 
         {/* ── Description complète ── */}
         <div>
-          <p
-            className="text-xs font-semibold uppercase tracking-widest mb-1"
-            style={{ color: 'var(--color-sl-400)' }}
-          >
+          <p className="text-xs font-semibold uppercase tracking-widest mb-1 text-[var(--color-sl-400)]">
             Description
           </p>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: 'var(--color-sl-700)', fontFamily: 'var(--font-body)' }}
-          >
+          <p className="text-sm leading-relaxed text-[var(--color-sl-700)] font-[family-name:var(--font-body)]">
             {demand?.description}
           </p>
         </div>
 
         {/* ── Budget ── */}
-        <div
-          className="flex items-center justify-between px-4 py-3"
-          style={{ background: 'var(--color-sl-50)', borderRadius: 'var(--radius-md)' }}
-        >
-          <span className="text-xs" style={{ color: 'var(--color-sl-400)' }}>
+        <div className="flex items-center justify-between px-4 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)]">
+          <span className="text-xs text-[var(--color-sl-400)]">
             Budget estimé
           </span>
-          <span
-            className="text-base font-semibold"
-            style={{ color: 'var(--color-sl-900)', fontFamily: 'var(--font-display)' }}
-          >
+          <span className="text-base font-semibold text-[var(--color-sl-900)] font-[family-name:var(--font-display)]">
             {demand && formatBudget(demand)}
           </span>
         </div>
@@ -119,65 +98,41 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
         <div className="grid grid-cols-3 gap-3">
 
           {/* Distance */}
-          <div
-            className="flex flex-col items-center gap-1 py-3"
-            style={{
-              background: 'var(--color-sl-50)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-sl-100)',
-            }}
-          >
-            <MapPin size={18} style={{ color: 'var(--color-sl-500)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--color-sl-900)' }}>
+          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
+            <MapPin size={18} className="text-[var(--color-sl-500)]" />
+            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
               {demand?.distanceKm} km
             </span>
-            <span className="text-xs" style={{ color: 'var(--color-sl-400)' }}>Distance</span>
+            <span className="text-xs text-[var(--color-sl-400)]">Distance</span>
           </div>
 
           {/* Note client */}
-          <div
-            className="flex flex-col items-center gap-1 py-3"
-            style={{
-              background: 'var(--color-sl-50)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-sl-100)',
-            }}
-          >
+          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
             <RatingStars value={demand?.clientRating} size="sm" />
-            <span className="text-sm font-semibold" style={{ color: 'var(--color-sl-900)' }}>
+            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
               {demand?.clientRating}
             </span>
-            <span className="text-xs" style={{ color: 'var(--color-sl-400)' }}>Note client</span>
+            <span className="text-xs text-[var(--color-sl-400)]">Note client</span>
           </div>
 
           {/* Temps */}
-          <div
-            className="flex flex-col items-center gap-1 py-3"
-            style={{
-              background: 'var(--color-sl-50)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--color-sl-100)',
-            }}
-          >
-            <Clock size={18} style={{ color: 'var(--color-sl-500)' }} />
-            <span className="text-sm font-semibold" style={{ color: 'var(--color-sl-900)' }}>
+          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
+            <Clock size={18} className="text-[var(--color-sl-500)]" />
+            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
               {demand && formatPostedAgo(demand)}
             </span>
-            <span className="text-xs" style={{ color: 'var(--color-sl-400)' }}>Publié</span>
+            <span className="text-xs text-[var(--color-sl-400)]">Publié</span>
           </div>
         </div>
 
         {/* ── Localisation ── */}
         {getLocationText(demand?.location) && (
           <div>
-            <p
-              className="text-xs font-semibold uppercase tracking-widest mb-1"
-              style={{ color: 'var(--color-sl-400)' }}
-            >
+            <p className="text-xs font-semibold uppercase tracking-widest mb-1 text-[var(--color-sl-400)]">
               Localisation
             </p>
-            <p className="text-sm flex items-center gap-1.5" style={{ color: 'var(--color-sl-700)' }}>
-              <MapPin size={14} style={{ color: 'var(--color-sl-400)' }} />
+            <p className="text-sm flex items-center gap-1.5 text-[var(--color-sl-700)]">
+              <MapPin size={14} className="text-[var(--color-sl-400)]" />
               {getLocationText(demand.location)}
             </p>
           </div>

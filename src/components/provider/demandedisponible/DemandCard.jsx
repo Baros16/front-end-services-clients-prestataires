@@ -14,6 +14,7 @@ import {
   Sparkles,
   ChevronRight,
 } from '../../commons/Icons';
+import { formatBudget } from './formatBudget';
 
 /* ── Mapping catégories → icône lucide + fond ─────────────── */
 const CATEGORY_DISPLAY = {
@@ -24,13 +25,6 @@ const CATEGORY_DISPLAY = {
   paint:   { icon: <Sparkles size={16} />, bgVar: '#F3E8FF' },
   default: { icon: <Wrench   size={16} />, bgVar: 'var(--color-sl-100)' },
 };
-
-function formatBudget(d) {
-  const min = d.budgetMin ?? d.estimatedBudget?.min ?? 0;
-  const max = d.budgetMax ?? d.estimatedBudget?.max ?? 0;
-  const fmt = (v) => (v >= 1000 ? `${Math.round(v / 1000)}k` : v);
-  return `~${fmt(min)}-${fmt(max)} XAF`;
-}
 
 function formatPostedAgo(d) {
   if (d.postedAgo) return d.postedAgo;
