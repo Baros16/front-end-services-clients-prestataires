@@ -1,70 +1,96 @@
 // src/components/service-client/ResolutionPanel.jsx
 import { Card } from "../commons/Card";
+import { Button } from "../commons/Button";
 
 const RESOLUTION_OPTIONS = [
-  { value: 'remboursement_partiel', label: 'Remboursement partiel' },
-  { value: 'annulation_complete', label: 'Annulation complète' },
-  { value: 'dedommagement_avoir', label: 'Dédommagement (avoir)' },
+  { value: "remboursement_partiel", label: "Remboursement partiel" },
+  { value: "annulation_complete", label: "Annulation complete" },
+  { value: "dedommagement_avoir", label: "Dedommagement / avoir" },
 ];
 
 export default function ResolutionPanel({
   selectedResolution,
   refundAmount,
+  maxAmount,
   onResolutionChange,
   onRefundAmountChange,
   onSubmit,
   onClose,
   isSubmitting,
 }) {
+  const isMontantDisabled = selectedResolution === "annulation_complete";
+  const numericAmount = Number(String(refundAmount).replace(/\s/g, "")) || 0;
+  const isAmountTooHigh = maxAmount != null && numericAmount > maxAmount;
+
+  const canSubmit =
+    !!selectedResolution &&
+    !isSubmitting &&
+    (isMontantDisabled || (refundAmount !== "" && !isAmountTooHigh));
+
+  const handleResolutionChange = (value) => {
+    onResolutionChange(value);
+    if (value === "annulation_complete") {
+      onRefundAmountChange("0");
+    }
+  };
+
   return (
-    <Card title="Proposition de résolution">
+    <Card title="Proposer une resolution">
       <div className="space-y-2 mb-4">
-        {RESOLUTION_OPTIONS.map((opt) => {
-          const isSelected = selectedResolution === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onResolutionChange(opt.value)}
-              className={`w-full text-left px-3 py-2 rounded border text-sm font-medium transition-colors ${
-                isSelected
-                  ? 'border-brand bg-brand-xlight text-brand'
-                  : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
+        {RESOLUTION_OPTIONS.map((opt) => (
+          <Button
+            key={opt.value}
+            variant="ghost"
+            size="md"
+            fullWidth
+            onClick={() => handleResolutionChange(opt.value)}
+            className={`justify-start !bg-white !text-gray-900 ${
+              selectedResolution === opt.value
+                ? '!border-2 !border-black font-bold'
+                : '!border !border-gray-200'
+            }`}
+          >
+            {opt.label}
+          </Button>
+        ))}
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-1">Montant remboursé (XAF)</label>
+        <label className="block text-xs text-sl-500 uppercase tracking-[0.06em] mb-1">
+          Montant rembourse (XAF)
+        </label>
         <input
           type="text"
           value={refundAmount}
           onChange={(e) => onRefundAmountChange(e.target.value)}
           placeholder="Ex: 10 000"
-          className="w-full border rounded px-2 py-1"
+          disabled={isMontantDisabled}
+          className="w-full border border-sl-200 rounded-[var(--radius-md)] px-3 py-2 text-sm outline-none focus:border-brand disabled:bg-sl-100 disabled:text-sl-400"
         />
+        {isAmountTooHigh && (
+          <p className="text-xs text-danger mt-1">
+            Le montant ne peut pas depasser {maxAmount.toLocaleString("fr-FR")} XAF.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          fullWidth
           onClick={onSubmit}
-          disabled={isSubmitting}
-          className="bg-brand text-white py-2 rounded font-semibold hover:bg-brand-light transition-colors disabled:opacity-50"
+          disabled={!canSubmit}
+          className="!bg-black hover:!bg-gray-900 disabled:!bg-gray-400"
         >
-          {isSubmitting ? 'Envoi...' : 'Soumettre la résolution →'}
-        </button>
-        <button
-          type="button"
+          {isSubmitting ? "Envoi..." : "Soumettre la resolution"}
+        </Button>
+        <Button
+          variant="ghost"
+          fullWidth
           onClick={onClose}
-          className="py-2 border border-gray-200 rounded font-semibold hover:bg-gray-50 transition-colors"
         >
-          Clôturer le litige
-        </button>
+          Cloтurer le litige
+        </Button>
       </div>
     </Card>
   );

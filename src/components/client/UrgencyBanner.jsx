@@ -1,6 +1,6 @@
 // src/components/client/UrgencyBanner.jsx
-import { useState, useEffect } from 'react';
-import CountdownTimer from './CountdownTimer';
+import { useState, useEffect } from "react";
+import CountdownTimer from "./CountdownTimer";
 
 export default function UrgencyBanner({ category, description, location, countdownSeconds }) {
   const [secondsLeft, setSecondsLeft] = useState(countdownSeconds);
@@ -14,11 +14,14 @@ export default function UrgencyBanner({ category, description, location, countdo
   }, [secondsLeft]);
 
   return (
-    <div className="bg-red-600 text-white rounded-lg p-4 flex items-center justify-between">
+    <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
       <div>
-        <p className="font-bold text-lg">{category}</p>
-        <p className="text-sm">{description}</p>
-        <p className="text-xs mt-1">📍 {location} — Recherche en cours...</p>
+        <p className="font-bold text-red-600 text-lg">
+          🔧 {category} — {description}
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          📍 {location} · Recherche en cours...
+        </p>
       </div>
       <CountdownTimer seconds={secondsLeft} />
     </div>

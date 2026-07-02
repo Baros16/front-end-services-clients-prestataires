@@ -9,8 +9,8 @@ export const mockLitigeDetail = {
   attachments: [
     {
       id: "att_001",
-      name: "photo_eau_evier.jpg",
-      url: "https://cdn.serviloc.cm/litiges/photo_eau_evier.jpg",
+      name: "photo_sous_evier.jpg",
+      url: "https://cdn.serviloc.cm/litiges/photo_sous_evier.jpg",
     },
     {
       id: "att_002",
@@ -23,7 +23,7 @@ export const mockLitigeDetail = {
     materials: 10000,
     total: 25000,
   },
-  status: "EN_COURS",
+  status: "ouvert",
 };
 
 export const mockParties = {
@@ -38,7 +38,7 @@ export const mockParties = {
     id: "usr_prov456",
     name: "Jean-Claude T.",
     avatarInitial: "J",
-    rating: 4.4,
+    rating: 4.8,
     role: "provider",
   },
 };

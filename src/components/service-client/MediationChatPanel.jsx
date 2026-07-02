@@ -1,6 +1,7 @@
 // src/components/service-client/MediationChatPanel.jsx
 import { useState } from 'react';
 import { Card } from '../commons/Card';
+import { Button } from '../commons/Button';
 
 export default function MediationChatPanel({
   clientMessages,
@@ -23,42 +24,60 @@ export default function MediationChatPanel({
   };
 
   return (
-    <Card title="Contact avec les parties" className="flex flex-col h-full" noPadding>
-      <div className="flex flex-col h-full p-5">
-        <div className="flex gap-2 mb-3">
-          <button
-            type="button"
+    <Card title="Contact avec les parties" noPadding>
+      <div className="flex flex-col p-5 gap-3" style={{ minHeight: '480px' }}>
+        <div className="flex gap-2">
+          <Button
+            variant={activeParty === 'client' ? 'primary' : 'ghost'}
+            size="sm"
             onClick={() => onPartyChange('client')}
-            className={`px-3 py-1 rounded ${activeParty === 'client' ? 'bg-brand text-white' : 'bg-gray-100'}`}
+            className={`flex-1 ${activeParty === 'client' ? '!bg-black hover:!bg-gray-900' : ''}`}
           >
-            Client {clientName ? `(${clientName})` : ''}
-          </button>
-          <button
-            type="button"
+            <span className="flex flex-col items-center leading-tight">
+              <span>💬 Client</span>
+              <span className="text-xs opacity-80">({clientName})</span>
+            </span>
+          </Button>
+          <Button
+            variant={activeParty === 'provider' ? 'primary' : 'ghost'}
+            size="sm"
             onClick={() => onPartyChange('provider')}
-            className={`px-3 py-1 rounded ${activeParty === 'provider' ? 'bg-brand text-white' : 'bg-gray-100'}`}
+            className={`flex-1 ${activeParty === 'provider' ? '!bg-black hover:!bg-gray-900' : ''}`}
           >
-            Prestataire {providerName ? `(${providerName})` : ''}
-          </button>
+            <span className="flex flex-col items-center leading-tight">
+              <span>💬 Prestataire</span>
+              <span className="text-xs opacity-80">({providerName})</span>
+            </span>
+          </Button>
         </div>
 
-        <div className="flex-1 overflow-y-auto mb-3 space-y-2">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`p-2 rounded max-w-[80%] ${
-                msg.senderId === agentId ? 'bg-brand text-white ml-auto' : 'bg-gray-100'
-              }`}
-            >
-              <p className="text-xs font-semibold mb-1">{msg.senderName}</p>
-              <p className="text-sm">{msg.content}</p>
-              {msg.attachmentUrl && (
-                <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" className="text-xs text-brand underline">
-                  Voir la pièce jointe
-                </a>
-              )}
-            </div>
-          ))}
+        <div className="flex-1 overflow-y-auto space-y-3">
+          {messages.map((msg) => {
+            const isAgent = msg.senderId === agentId;
+            return (
+              <div
+                key={msg.id}
+                className={`p-3 rounded-lg max-w-[85%] ${
+                  isAgent
+                    ? 'bg-black text-white ml-auto'
+                    : 'bg-[#eeeeee] text-gray-800'
+                }`}
+              >
+                <p className={`text-xs font-semibold mb-1 ${isAgent ? 'text-white opacity-75' : 'text-sl-500'}`}>
+                  {msg.senderName}
+                </p>
+                <p className="text-sm">{msg.content}</p>
+                {msg.attachmentUrl && (
+                  <span
+                    onClick={() => window.open(msg.attachmentUrl, '_blank')}
+                    className={`text-xs underline mt-1 block cursor-pointer ${isAgent ? 'text-white opacity-75' : 'text-brand'}`}
+                  >
+                    Voir la pièce jointe
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <form onSubmit={handleSubmit} className="flex gap-2">
@@ -66,12 +85,12 @@ export default function MediationChatPanel({
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Écrire un message..."
-            className="flex-1 border rounded px-2 py-1"
+            placeholder="Votre message à la partie..."
+            className="flex-1 border border-sl-200 rounded-[var(--radius-md)] px-3 py-2 text-sm outline-none focus:border-brand"
           />
-          <button type="submit" className="bg-brand text-white px-3 py-1 rounded hover:bg-brand-light transition-colors">
+          <Button type="submit" size="md" className="!bg-black hover:!bg-gray-900">
             Envoyer
-          </button>
+          </Button>
         </form>
       </div>
     </Card>

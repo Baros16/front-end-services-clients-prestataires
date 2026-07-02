@@ -31,7 +31,7 @@ export function PageHeader({ title, subtitle, badge, actions, className = "" }) 
             {title}
           </h1>
           {badge && (
-            <StatusBadge variant={badge.variant} />
+            <StatusBadge variant={badge.variant} label={badge.label} />
           )}
         </div>
         {subtitle && (

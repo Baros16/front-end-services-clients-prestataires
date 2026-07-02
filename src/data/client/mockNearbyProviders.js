@@ -40,7 +40,7 @@ export const mockNearbyProviders = [
 
 export const mockUrgencyContext = {
   category: "Plomberie",
-  description: "Fuite d'eau importante dans la cuisine",
-  location: "Bafoussam, Quartier Tamdja",
+  description: "Fuite d'eau urgente",
+  location: "Bafoussam, Quartier Commercial",
   countdownSeconds: 900,
 };

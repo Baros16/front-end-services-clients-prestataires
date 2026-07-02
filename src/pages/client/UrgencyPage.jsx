@@ -1,36 +1,54 @@
 // src/pages/client/UrgencyPage.jsx
-import UrgencyBanner from '../../components/client/UrgencyBanner';
-import NearbyProviderCard from '../../components/client/NearbyProviderCard';
-import { mockNearbyProviders, mockUrgencyContext } from '../../data/client/mockNearbyProviders';
+import { useNavigate } from "react-router-dom";
+import { PageHeader } from "../../components/commons/PageHeader";
+import { StatusBadge } from "../../components/commons/StatusBadge";
+import UrgencyBanner from "../../components/client/UrgencyBanner";
+import NearbyProviderCard from "../../components/client/NearbyProviderCard";
+import providersData from "../../data/client/mock_providers_search.json";
+import { mockUrgencyContext } from "../../data/client/mockNearbyProviders";
+
 export default function UrgencyPage() {
+  const providers = providersData.data;
+  const navigate = useNavigate();
+
   const handleContact = (providerId) => {
-    console.log('Contact du prestataire :', providerId);
+    navigate(`/client/urgence/contact?providerId=${providerId}`);
   };
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Mode Urgence</h1>
-        <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-          URGENCE ACTIVE
-        </span>
-      </div>
-
-      <UrgencyBanner
-        category={mockUrgencyContext.category}
-        description={mockUrgencyContext.description}
-        location={mockUrgencyContext.location}
-        countdownSeconds={mockUrgencyContext.countdownSeconds}
+    <div>
+      <PageHeader
+        title="Mode urgence"
+        subtitle="Trouvez un prestataire immediatement"
+        actions={
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-300 text-red-600 text-xs font-bold uppercase">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            Urgence active
+          </span>
+        }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mockNearbyProviders.map((provider) => (
-          <NearbyProviderCard
-            key={provider.id}
-            provider={provider}
-            onContact={handleContact}
-          />
-        ))}
+      <div className="p-6 space-y-6">
+        <UrgencyBanner
+          category={mockUrgencyContext.category}
+          description={mockUrgencyContext.description}
+          location={mockUrgencyContext.location}
+          countdownSeconds={mockUrgencyContext.countdownSeconds}
+        />
+
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.08em]">
+          Prestataires disponibles a proximite
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {providers.map((provider) => (
+            <NearbyProviderCard
+              key={provider.id}
+              provider={provider}
+              onContact={handleContact}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

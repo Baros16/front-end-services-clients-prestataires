@@ -1,58 +1,57 @@
 // src/components/service-client/LitigeDetailsPanel.jsx
-import { createElement } from 'react';
 import { Card } from '../commons/Card';
-
-function AttachmentLink({ att }) {
-  return createElement(
-    'a',
-    {
-      href: att.url,
-      target: '_blank',
-      rel: 'noreferrer',
-      className: 'inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded text-sm text-brand hover:bg-gray-50 transition-colors',
-    },
-    createElement('span', null, '📷'),
-    createElement('span', { className: 'truncate max-w-[90px]', title: att.name }, ' ' + att.name)
-  );
-}
+import { Badge } from '../commons/Badge';
+import { formatMotif, formatMotifUpper } from '../../utils/formateurs';
 
 export default function LitigeDetailsPanel({ litige }) {
   if (!litige) return null;
 
   return (
     <Card title="Détails du litige">
-      <p className="text-sm text-gray-500 mb-1">Référence : {litige.reference}</p>
-      <p className="text-sm text-gray-500 mb-3">Statut : {litige.status}</p>
+      <p className="text-xs text-sl-500 mb-1">Motif sélectionné</p>
+      <div className="mb-4">
+        <Badge label={formatMotifUpper(litige.motif)} variant="danger" />
+      </div>
 
-      <p className="font-semibold mb-1">Motif :</p>
-      <p className="mb-3">{litige.motif}</p>
-
-      <p className="font-semibold mb-1">Description du client :</p>
-      <blockquote className="bg-gray-100 rounded-lg rounded-tl-none p-3 text-sm not-italic mb-3">
-        {litige.clientDescription}
-      </blockquote>
+      <p className="text-xs text-sl-500 mb-1">Description du client</p>
+      <div className="bg-[#eeeeee] rounded-lg p-3 text-sm text-gray-700 mb-4">
+        "{litige.clientDescription}"
+      </div>
 
       {litige.attachments && litige.attachments.length > 0 && (
-        <div className="mb-3">
-          <p className="font-semibold mb-1">Pièces jointes :</p>
+        <div className="mb-4">
+          <p className="text-xs text-sl-500 mb-2">Pièces jointes</p>
           <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto">
-            {litige.attachments.map(function (att) {
-              return <AttachmentLink key={att.id} att={att} />;
-            })}
+            {litige.attachments.map((att) => (
+              <span
+                key={att.id}
+                onClick={() => window.open(att.url, '_blank')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-sl-100 rounded-full text-xs text-sl-700 whitespace-nowrap cursor-pointer hover:bg-sl-200 transition-colors"
+              >
+                📷 {att.name}
+              </span>
+            ))}
           </div>
         </div>
       )}
 
       {litige.originalQuote && (
         <div>
-          <p className="font-semibold mb-1">Devis original :</p>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr><td>Main d'œuvre</td><td className="text-right">{litige.originalQuote.labour} FCFA</td></tr>
-              <tr><td>Matériaux</td><td className="text-right">{litige.originalQuote.materials} FCFA</td></tr>
-              <tr className="font-bold"><td>Total</td><td className="text-right">{litige.originalQuote.total} FCFA</td></tr>
-            </tbody>
-          </table>
+          <p className="text-xs text-sl-500 mb-2 uppercase tracking-[0.06em]">Devis original</p>
+          <div className="divide-y divide-sl-100 text-sm">
+            <div className="flex justify-between py-2">
+              <span className="text-sl-600">Main d'œuvre</span>
+              <span className="font-medium">{litige.originalQuote.labour.toLocaleString('fr-FR')} XAF</span>
+            </div>
+            <div className="flex justify-between py-2">
+              <span className="text-sl-600">Matériaux</span>
+              <span className="font-medium">{litige.originalQuote.materials.toLocaleString('fr-FR')} XAF</span>
+            </div>
+            <div className="flex justify-between py-2 font-bold">
+              <span>Total payé</span>
+              <span>{litige.originalQuote.total.toLocaleString('fr-FR')} XAF</span>
+            </div>
+          </div>
         </div>
       )}
     </Card>
