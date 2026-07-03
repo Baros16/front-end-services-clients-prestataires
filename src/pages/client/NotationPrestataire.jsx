@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getMission, rateMission } from "../../services/clentService";
+import { getMission, rateMission } from "../../services/clientService";
 import mockProviderDashboard from "../../data/provider/mock_dashboard.json";
 import {
   PageHeader,

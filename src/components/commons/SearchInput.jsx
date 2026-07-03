@@ -1,5 +1,6 @@
 // src/components/SearchInput.jsx
 import { useState } from "react";
+import { Search } from "./Icons";
 
 /**
  * SearchInput
@@ -30,7 +31,7 @@ export function SearchInput({
     >
       {/* Icône loupe */}
       <span className="absolute left-3 text-sl-400 text-[14px] pointer-events-none select-none">
-        🔍
+        <Search size={14}/>
       </span>
 
       {/* Input */}
