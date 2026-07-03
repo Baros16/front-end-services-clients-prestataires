@@ -9,7 +9,7 @@ import { ChevronLeft }      from './Icons';
 // ── Thèmes par rôle ───────────────────────────────────────────────────────────
 const ROLE_THEMES = {
   client: {
-    wrapper:      'bg-white border-r border-sl-200',
+    wrapper:      'bg-[var(--color-sidebar-client)] border-r border-sl-200',
     logo:         'text-brand',
     itemBase:     'text-sl-500 hover:bg-sl-50 hover:text-sl-900',
     itemActive:   'bg-brand-xlight text-brand font-semibold',
@@ -21,7 +21,7 @@ const ROLE_THEMES = {
     chevronColor: '#64748B',
   },
   provider: {
-    wrapper:      'bg-brand',
+    wrapper:      'bg-[var(--color-sidebar-provider)]',
     logo:         'text-white',
     itemBase:     'text-white/60 hover:bg-white/10 hover:text-white',
     itemActive:   'bg-white/15 text-white font-semibold',
@@ -33,7 +33,7 @@ const ROLE_THEMES = {
     chevronColor: '#FFFFFF99',
   },
   admin: {
-    wrapper:      'bg-sl-900',
+    wrapper:      'bg-[var(--color-sidebar-admin)]',
     logo:         'text-white',
     itemBase:     'text-sl-400 hover:bg-white/5 hover:text-white',
     itemActive:   'bg-white/10 text-white font-semibold',

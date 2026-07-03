@@ -1,14 +1,4 @@
-// src/components/ServiceCategoryCard.jsx
-
-/**
- * ServiceCategoryCard
- * Tuile catégorie de service avec icône + libellé.
- * Utilisée dans la grille client dashboard et le formulaire nouvelle demande.
- *
- * category : { id, label, icon: ReactNode, color: string (bg Tailwind ou hex) }
- * selected : bordure brand active + légère élévation
- * sizes    : sm | md
- */
+// src/components/common/ServiceCategoryCard.jsx
 
 const SIZES = {
   sm: {
@@ -31,38 +21,41 @@ export function ServiceCategoryCard({
   className = "",
 }) {
   const s = SIZES[size];
+  const color = category.color ?? 'var(--color-sl-300)';
 
   return (
     <button
+      type="button"
       onClick={() => onClick?.(category.id)}
-      className={`
-        flex flex-col items-center cursor-pointer border transition-all duration-150
-        bg-white font-[family-name:var(--font-body)]
-        ${s.wrapper}
-        ${
-          selected
-            ? "border-brand shadow-[0_0_0_2px_var(--color-brand)] shadow-[var(--shadow-md)]"
-            : "border-sl-200 hover:border-sl-300 hover:shadow-[var(--shadow-card)]"
-        }
-        ${className}
-      `}
+      className={[
+        'flex flex-col items-center cursor-pointer border-2 transition-all duration-200',
+        'ease-[cubic-bezier(0.32,0.72,0,1)] font-[family-name:var(--font-body)]',
+        'active:scale-[0.97] focus-visible:outline-none',
+        s.wrapper,
+        selected
+          ? 'shadow-[var(--shadow-card)]'
+          : 'border-transparent hover:shadow-[var(--shadow-card)]',
+        className,
+      ].join(' ')}
+      style={{
+        // Fond complet de la card : couleur catégorie à 10% d'opacité
+        backgroundColor: selected ? `${color}18` : `${color}0D`,
+        // Bordure dynamique selon sélection
+        borderColor: selected ? color : 'transparent',
+      }}
     >
-      {/* Icône colorée */}
+      {/* Icône — fond catégorie à 25% */}
       <div
-        className={`
-          ${s.icon} flex items-center justify-center shrink-0
-        `}
-        style={{ background: category.color ?? "var(--color-sl-100)" }}
+        className={`${s.icon} flex items-center justify-center shrink-0`}
+        style={{ backgroundColor: `${color}40` }}
       >
         {category.icon}
       </div>
 
-      {/* Label */}
+      {/* Label — couleur catégorie si sélectionné */}
       <span
-        className={`
-          ${s.label} font-medium text-center leading-tight
-          ${selected ? "text-brand font-semibold" : "text-sl-700"}
-        `}
+        className={`${s.label} font-medium text-center leading-tight transition-colors duration-200`}
+        style={{ color: selected ? color : 'var(--color-sl-700)' }}
       >
         {category.label}
       </span>

@@ -2,8 +2,8 @@ import { Card, Button } from '../../commons';
 
 
 const METHODS = [
-  { id: 'orange_money', label: 'Orange Money',     dot: '#FF6600' },
-  { id: 'mtn_momo',     label: 'MTN Mobile Money', dot: '#FFCB00' },
+  { id: 'orange_money', label: 'Orange Money',     dot: 'var(--color-orange-money)' },
+  { id: 'mtn_momo',     label: 'MTN Mobile Money', dot: 'var(--color-mtn-momo' },
 ];
 
 export default function PaymentMethodSelector({ value, onChange }) {
