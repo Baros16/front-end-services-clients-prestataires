@@ -16,7 +16,7 @@ import { MissionStepList }       from '@/components/client/missions/MissionStepL
 import { SequestredAmountCard }  from '@/components/client/missions/SequestredAmountCard';
 import { LitigeAlertPanel }      from '@/components/client/missions/LitigeAlertPanel';
 
-import { getMission } from '@/services/clentService';
+import { getMission } from '../../services/clientService';
 
 export default function SuiviMission() {
   const navigate = useNavigate();
