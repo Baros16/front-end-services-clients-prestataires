@@ -1,5 +1,5 @@
-// src/components/client/mission/SequestredAmountCard.jsx
-import { AmountDisplay, ProgressBar } from '@/components/commons';
+// src/components/client/missions/SequestredAmountCard.jsx
+import { Card, AmountDisplay, ProgressBar } from '../../commons';
 
 export function SequestredAmountCard({ totalAmount, steps = [] }) {
   const completed = steps.filter((s) => s.completed).length;
@@ -8,44 +8,31 @@ export function SequestredAmountCard({ totalAmount, steps = [] }) {
     : 0;
 
   return (
-    <div
-      className="rounded-[var(--radius-lg)] p-4 flex flex-col gap-3"
-      style={{ backgroundColor: 'var(--color-sl-50)' }}
-    >
-      <span
-        className="text-xs font-body tracking-widest uppercase"
-        style={{ color: 'var(--color-sl-500)' }}
-      >
-        Séquestre
-      </span>
+    <Card title="Séquestre">
+      <div className="flex flex-col gap-3">
+        <AmountDisplay
+          amount={totalAmount}
+          size="lg"
+          variant="default"
+        />
 
-      <AmountDisplay
-        amount={totalAmount}
-        size="lg"
-        variant="default"
-      />
+        <span className="text-[12px] font-[family-name:var(--font-body)] text-sl-500">
+          Libéré après double validation
+        </span>
+        <div className="h-2 bg-sl-100 rounded-full overflow-hidden">
+        <div
+         className="h-full rounded-full bg-info transition-[width] duration-500 ease-out"
+          style={{ width: `${percent}%` }}
+          />
+        </div>
 
-      <span
-        className="text-xs font-body"
-        style={{ color: 'var(--color-sl-500)' }}
-      >
-        Libéré après double validation
-      </span>
 
-      <ProgressBar
-        value={percent}
-        max={100}
-        color="var(--color-brand)"
-        showLabel
-        size="sm"
-      />
 
-      <span
-        className="text-xs font-body"
-        style={{ color: 'var(--color-sl-500)' }}
-      >
-        {percent}% de la mission accomplie
-      </span>
-    </div>
+        <span className="text-[12px] font-[family-name:var(--font-body)] text-sl-500">
+          {percent}% de la mission accomplie
+        </span>
+        
+      </div>
+    </Card>
   );
 }

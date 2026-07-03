@@ -1,5 +1,6 @@
-// src/components/client/mission/MissionProgressHeader.jsx
-import { formatTime } from '@/utils/formatters';
+// src/components/client/missions/MissionProgressHeader.jsx
+import { useState, useEffect } from 'react';
+import { formatTime } from '../../../utils/formatters';
 
 function calcElapsed(startedAt) {
   const diffMs = Date.now() - new Date(startedAt).getTime();
@@ -12,26 +13,33 @@ function calcElapsed(startedAt) {
 }
 
 export function MissionProgressHeader({ startedAt, estimatedDurationHours }) {
+  const [elapsed, setElapsed] = useState(calcElapsed(startedAt));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed(calcElapsed(startedAt));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startedAt]);
+
   const metrics = [
-    { label: 'DÉMARRÉ À',      value: formatTime(startedAt) },
-    { label: 'DURÉE ÉCOULÉE',  value: calcElapsed(startedAt) },
-    { label: 'DURÉE ESTIMÉE',  value: `${estimatedDurationHours}h` },
+    { label: 'DÉMARRÉ À',     value: formatTime(startedAt) },
+    { label: 'DURÉE ÉCOULÉE', value: elapsed },
+    { label: 'DURÉE ESTIMÉE', value: `${estimatedDurationHours}h` },
   ];
 
+  
   return (
-    <div className="grid grid-cols-3 divide-x divide-[var(--color-sl-200)]">
+    <div className="grid grid-cols-3 gap-2">
       {metrics.map(({ label, value }) => (
-        <div key={label} className="flex flex-col items-center py-4 px-2 gap-1">
-          <span
-            className="text-xs font-body tracking-wide uppercase"
-            style={{ color: 'var(--color-sl-500)' }}
+        <div
+          key={label}
+          className="flex flex-col items-center py-4 px-2 gap-1 bg-sl-100 rounded-md"
           >
+          <span className="text-[11px] font-[family-name:var(--font-body)] tracking-[0.1em] uppercase text-sl-500">
             {label}
           </span>
-          <span
-            className="text-2xl font-display font-semibold tracking-tight"
-            style={{ color: 'var(--color-sl-900)' }}
-          >
+          <span className="text-[24px] font-[family-name:var(--font-display)] font-semibold tracking-tight text-sl-900">
             {value}
           </span>
         </div>

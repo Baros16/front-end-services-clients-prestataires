@@ -1,28 +1,32 @@
-
 // src/pages/client/SuiviMission.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  PageHeader, StatusBadge, Card,
-  MapEmbed, UserAvatarCircle, Button,
-  AlertBanner, SkeletonLoader,
-} from "@/components/commons";
+  PageHeader,
+  StatusBadge,
+  Card,
+  MapEmbed,
+  UserAvatarCircle,
+  Button,
+  AlertBanner,
+  SkeletonLoader,
+} from '../../components/commons';
 
-import { MessageCircle } from "@/components/commons/Icons";
+import { MessageCircle } from '../../components/commons/Icons';
 
-import { MissionProgressHeader } from '@/components/client/missions/MissionProgressHeader';
-import { MissionStepList }       from '@/components/client/missions/MissionStepList';
-import { SequestredAmountCard }  from '@/components/client/missions/SequestredAmountCard';
-import { LitigeAlertPanel }      from '@/components/client/missions/LitigeAlertPanel';
+import { MissionProgressHeader } from '../../components/client/missions/MissionProgressHeader';
+import { MissionStepList }       from '../../components/client/missions/MissionStepList';
+import { SequestredAmountCard }  from '../../components/client/missions/SequestredAmountCard';
+import { LitigeAlertPanel }      from '../../components/client/missions/LitigeAlertPanel';
 
 import { getMission } from '../../services/clientService';
 
 export default function SuiviMission() {
   const navigate = useNavigate();
-  const [mission, setMission]   = useState(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [mission, setMission] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
   useEffect(() => {
     getMission('msn_001')
@@ -36,7 +40,7 @@ export default function SuiviMission() {
     return (
       <div className="p-6 flex flex-col gap-4">
         <SkeletonLoader variant="metric" count={3} />
-        <SkeletonLoader variant="card"   count={2} />
+        <SkeletonLoader variant="card" count={2} />
       </div>
     );
   }
@@ -45,25 +49,25 @@ export default function SuiviMission() {
   if (error) {
     return (
       <div className="p-6">
-        <AlertBanner variant="error" message={error} />
+        <AlertBanner type="danger" message={error} />
       </div>
     );
   }
 
-  const completedCount = mission.steps.filter((s) => s.completed).length;
-
+  // Données prestataire depuis mock
+  const providerInitial = mission.providerAvatarInitial ?? '?';
+  const providerName = mission.providerName ?? 'Prestataire';
   // ── État données ─────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-6 p-6 min-h-[100dvh]"
-      style={{ backgroundColor: 'var(--color-sl-50)' }}
-    >
+    <div className="flex flex-col gap-6 p-6 min-h-[100dvh] bg-sl-50">
+
       {/* En-tête */}
       <PageHeader
         title="Suivi de mission"
-        subtitle={`${mission.category} · Jean-Claude Mbarga`}
+        subtitle={`${mission.category} · ${providerName}`}
         actions={
-          <StatusBadge label="EN COURS" variant="en_cours" withDot />
-        }dev
+          <StatusBadge variant="en_cours" withDot />
+        }
       />
 
       {/* Grille 2 colonnes */}
@@ -72,25 +76,26 @@ export default function SuiviMission() {
         {/* ── Colonne gauche ── */}
         <div className="flex flex-col gap-6">
 
-          {/* Card Avancement */}
-          <Card title="Avancement">
-            <MissionProgressHeader
-              startedAt={mission.startedAt}
-              estimatedDurationHours={mission.estimatedDurationHours}
+        <Card title="Avancement">
+          <div className="flex flex-col gap-4">
+           <MissionProgressHeader
+             startedAt={mission.startedAt}
+             estimatedDurationHours={mission.estimatedDurationHours}
             />
-          </Card>
-
-          {/* Card Étapes */}
-          <Card title="La Mission">
-            <MissionStepList steps={mission.steps} />
-          </Card>
-
-          {/* Carte localisation */}
+            <div className="border-t border-sl-100 pt-4">
+             <span className="text-[11px] font-[family-name:var(--font-body)] font-bold tracking-[0.1em] uppercase text-sl-500 mb-3 block">
+               ETAPES DE LA MISSION
+              </span>
+              <MissionStepList steps={mission.steps} />
+           </div>
+          </div>
+        </Card>
+          {/* Card Localisation */}
           <Card title="Localisation temps réel">
             <MapEmbed
               address={mission.providerLocation.sublabel}
               label={mission.providerLocation.label}
-              height={200}
+              height="200px"
             />
           </Card>
         </div>
@@ -100,31 +105,28 @@ export default function SuiviMission() {
 
           {/* Card Prestataire */}
           <Card title="Prestataire">
-            <div className="flex flex-col items-center gap-3">
-              <UserAvatarCircle
-                initial="J"
-                size="lg"
-                color="var(--color-brand)"
-              />
-              <div className="text-center">
-                <p
-                  className="font-body font-semibold text-sm"
-                  style={{ color: 'var(--color-sl-900)' }}
-                >
-                  Jean-Claude Mbarga
-                </p>
-                <p
-                  className="text-xs font-body"
-                  style={{ color: 'var(--color-success)' }}
-                >
-                Sur place
-                </p>
-              </div>
-              <Button
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <UserAvatarCircle
+                  initial={providerInitial}
+                  size="md"
+                  bgClass="bg-brand"
+                />
+                <div className="flex flex-col">
+                  <span className="text-[14px] font-semibold font-[family-name:var(--font-body)] text-sl-900">
+                    {providerName}
+                  </span>
+                  <span className="flex items-center gap-1 text-[12px] font-[family-name:var(--font-body)] text-success">
+                    <span className="w-2 h-2 rounded-full bg-success sl-animate-pulse-dot" />
+                    Sur place
+                  </span>
+
+                </div>
+              </div><Button
                 variant="secondary"
                 size="sm"
                 onClick={() => navigate('/client/chat')}
-                className="w-full active:scale-95"
+                className="w-full"
               >
                 <MessageCircle size={14} />
                 Envoyer un message
