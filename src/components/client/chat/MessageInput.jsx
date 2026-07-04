@@ -1,25 +1,8 @@
 // src/components/client/chat/MessageInput.jsx
 
-import { useState } from 'react';
-
-function IconPaperclip() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57
-               A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-    </svg>
-  );
-}
-
-function IconSend() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
-    </svg>
-  );
-}
+import { useState }          from 'react';
+import { Paperclip, Send }   from '../../commons';
+import { Button }            from '../../commons';
 
 export function MessageInput({ onSend, disabled }) {
   const [text, setText] = useState('');
@@ -66,24 +49,14 @@ export function MessageInput({ onSend, disabled }) {
         className="w-10 h-10 rounded-xl flex items-center justify-center
                    transition-all duration-150 active:scale-95 hover:bg-slate-100"
         style={{ color: 'var(--color-sl-400)' }}
-        title="Joindre une image">
-        <IconPaperclip />
+        title="Joindre une image"
+      >
+        <Paperclip size={18} />
       </button>
 
-      <button
-        onClick={handleSend}
-        disabled={!canSend}
-        className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold
-                   transition-all duration-150 active:scale-95
-                   disabled:opacity-40 disabled:cursor-not-allowed"
-        style={{
-          background: canSend ? 'var(--color-sl-900)' : 'var(--color-sl-300)',
-          color:      '#ffffff',
-          fontFamily: 'var(--font-body)',
-        }}>
-        Envoyer
-        <IconSend />
-      </button>
+      <Button onClick={handleSend} disabled={!canSend}>
+        Send<Send size={14} />
+      </Button>
     </div>
   );
 }

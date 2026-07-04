@@ -1,15 +1,12 @@
 // src/services/adminService.js
-
-import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import mock_dashboard from "../data/admin/mock_dashboard.json";
-import { mockProviderDossier } from "../data/admin/mockProviderDossier.js";
-import { mockManagedUsers } from "../data/admin/mockUsers.js";
-import { mockLitiges } from "../data/admin/mockLitiges.js";
+import apiClient from "./apiClient.js";
 
-const BASE = "/admin";
+import mock_dashboard      from "../data/admin/mock_dashboard.json";
+import mockProviderDossier from "../data/admin/mock_provider_dossier.json";
+import mockManagedUsers    from "../data/admin/mock_users.json";
+import mockLitiges         from "../data/admin/mock_litiges.json";
 
-// ─── Mapper : payload brut API → shape normalisée pour les composants ──────
 function toDashboard(raw) {
   return {
     metrics: {
@@ -30,7 +27,6 @@ function toDashboard(raw) {
       reference: l.reference,
       motif:     l.motif.title,
       amount:    l.amount,
-      // "en_traitement" → "traitement" | "en_cours" → "en_cours" (déjà valide)
       status:    l.status.replace(/^en_/, ""),
     })),
     popularCategories: raw.popularCategories.map((c) => ({
@@ -45,28 +41,22 @@ function toDashboard(raw) {
       service:      t.category,
       amount:       t.amount,
       commission:   t.commission,
-      status:       t.status, // "sequestre" | "libere" — déjà des StatusVariant valides
+      status:       t.status,
     })),
   };
 }
 
-// ─── Exports ──────────────────────────────────────────────────────────────
+// ─── Dashboard ──────────────────────────────────────────────────────────────
 
-/**
- * BUG CORRIGÉ : toDashboard() était défini mais jamais appliqué.
- * Sans ce fix, la page recevait le payload brut (clés API) au lieu
- * des clés normalisées attendues par les composants.
- */
 export async function getAdminDashboard() {
-  const raw = await getMock({ data: mock_dashboard.data }, () =>
-    axios.get(`${BASE}/dashboard`)
+  const raw = await getMock(
+    mock_dashboard,
+    () => apiClient.get(`/admin/dashboard`),
   );
   return toDashboard(raw);
 }
 
 export async function getPendingProviders(params = {}) {
-  // BUG NOTE : l'ancienne version référençait `mockAdminDashboard` (inexistant).
-  // Corrigé : on tire les pendingValidations directement depuis mock_dashboard.
   const mockList = mock_dashboard.data.pendingValidations.map((p) => ({
     id:            p.id,
     name:          p.fullName,
@@ -76,59 +66,77 @@ export async function getPendingProviders(params = {}) {
   }));
   return getMockList(
     { data: mockList, meta: { page: 1, limit: 20, total: mockList.length, totalPages: 1 } },
-    () => axios.get(`${BASE}/providers`, { params: { status: "pending", ...params } })
+    () => apiClient.get(`/admin/providers`, { params: { status: "pending", ...params } }),
   );
 }
 
-export async function getProviderDossier(providerId) {
-  return getMock(mockProviderDossier, () =>
-    axios.get(`${BASE}/providers/${providerId}`)
-  );
-}
+// ─── Validation Prestataire (ex validationService.js) ───────────────────────
 
-export async function validateProvider(providerId) {
+export async function getDossier(providerId) {
   return getMock(
-    { success: true, data: { providerId, status: "active" } },
-    () => axios.post(`${BASE}/providers/${providerId}/validate`)
+    mockProviderDossier,
+    () => apiClient.get(`/admin/providers/${providerId}/dossier`),
   );
 }
 
-export async function rejectProvider(providerId, reason) {
+export async function validerPrestataire(providerId) {
   return getMock(
-    { success: true, data: { providerId, status: "rejected" } },
-    () => axios.post(`${BASE}/providers/${providerId}/reject`, { reason })
+    { data: { success: true, message: 'Prestataire validé avec succès.' } },
+    () => apiClient.post(`/admin/providers/${providerId}/validate`),
   );
 }
+
+export async function refuserDossier(providerId, motif = '') {
+  return getMock(
+    { data: { success: true, message: 'Dossier refusé.' } },
+    () => apiClient.post(`/admin/providers/${providerId}/reject`, { motif }),
+  );
+}
+
+export async function envoyerRappelSMS(providerId) {
+  return getMock(
+    { data: { success: true, message: 'SMS de rappel envoyé.' } },
+    () => apiClient.post(`/admin/providers/${providerId}/notify-sms`),
+  );
+}
+
+// ─── Gestion utilisateurs ────────────────────────────────────────────────────
+// ⚠️ Écran existant mais ne consomme pas encore ces fonctions — à corriger.
 
 export async function getManagedUsers(params = {}) {
-  return getMockList(mockManagedUsers, () =>
-    axios.get(`${BASE}/users`, { params })
+  return getMockList(
+    mockManagedUsers,
+    () => apiClient.get(`/admin/users`, { params }),
   );
 }
 
 export async function suspendUser(userId, reason) {
   return getMock(
-    { success: true, data: { userId, status: "suspended" } },
-    () => axios.patch(`${BASE}/users/${userId}/suspend`, { reason })
+    { data: { success: true, data: { userId, status: "suspended" } } },
+    () => apiClient.patch(`/admin/users/${userId}/suspend`, { reason }),
   );
 }
 
 export async function reactivateUser(userId) {
   return getMock(
-    { success: true, data: { userId, status: "active" } },
-    () => axios.patch(`${BASE}/users/${userId}/reactivate`)
+    { data: { success: true, data: { userId, status: "active" } } },
+    () => apiClient.patch(`/admin/users/${userId}/reactivate`),
   );
 }
 
+// ─── Litiges ──────────────────────────────────────────────────────────────
+// Shape mock_litiges.json: { data: { metrics, litiges } } — objet, pas un tableau.
+
 export async function getLitiges(params = {}) {
-  return getMock(mockLitiges, () =>
-    axios.get(`${BASE}/litiges`, { params })
+  return getMock(
+    mockLitiges,
+    () => apiClient.get(`/admin/litiges`, { params }),
   );
 }
 
 export async function resolveLitige(litigeId, payload) {
   return getMock(
-    { success: true, data: { litigeId, status: "resolu", ...payload } },
-    () => axios.post(`${BASE}/litiges/${litigeId}/resolve`, payload)
+    { data: { success: true, litigeId, status: "resolu", ...payload } },
+    () => apiClient.post(`/admin/litiges/${litigeId}/resolve`, payload),
   );
 }

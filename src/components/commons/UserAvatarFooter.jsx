@@ -9,6 +9,7 @@ export function UserAvatarFooter({
   initial,
   name,
   subtitle,
+  collapse = false,
   avatarColor = "bg-sl-300",
   className = "",
 }) {
@@ -25,14 +26,16 @@ export function UserAvatarFooter({
         size="md"
         bgClass={avatarColor}
       />
-      <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-semibold text-sl-900 truncate leading-tight m-0">
-          {name}
-        </p>
-        <p className="text-[11px] text-sl-400 truncate mt-[1px] m-0">
-          {subtitle}
-        </p>
-      </div>
+      {!collapse &&(
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-semibold text-sl-900 truncate leading-tight m-0">
+            {name}
+          </p>
+          <p className="text-[11px] text-sl-400 truncate mt-[1px] m-0">
+            {subtitle}
+          </p>
+        </div>
+      )};
     </div>
   );
 }

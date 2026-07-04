@@ -17,7 +17,8 @@
 export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 export { X, Menu, Search, SlidersHorizontal }                from 'lucide-react';
 export { Plus, Minus, Check, Copy }                          from 'lucide-react';
-export { LogOut, Settings, Bell }                            from 'lucide-react';
+export { LogOut, Settings, Bell, LogIn }                            from 'lucide-react';
+export { House, Home, LayoutDashboard, ChartPie, BarChart3, BriefcaseBusiness, Gavel, MessageSquare} from 'lucide-react';
 
 // ─── Communication ────────────────────────────────────────────
 export { Phone, MessageCircle, Send, Mail }                  from 'lucide-react';
@@ -28,7 +29,7 @@ export { User, Users, UserCheck, UserX }                     from 'lucide-react'
 export { Shield, ShieldCheck }                               from 'lucide-react';
 
 // ─── Services & missions ──────────────────────────────────────
-export { Wrench, Zap, Brush, Key, Sparkles }                 from 'lucide-react';
+export { Wrench, Zap, Brush, Key, Sparkles, PaintRoller,Hammer, Scale }                 from 'lucide-react';
 export { MapPin, Navigation, Clock, Calendar }               from 'lucide-react';
 export { CheckCircle, XCircle, AlertCircle, Info }           from 'lucide-react';
 export { PlayCircle, StopCircle, Flag }                      from 'lucide-react';
@@ -39,7 +40,7 @@ export { Wallet, CreditCard, Banknote, Receipt }             from 'lucide-react'
 export { Star, StarOff }                                     from 'lucide-react';
 
 // ─── Fichiers & documents ─────────────────────────────────────
-export { FileText, File, FilePlus, FileCheck, FileX }        from 'lucide-react';
+export { FileText, File, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
 export { Upload, Download, Trash2, Edit, Eye }               from 'lucide-react';
 
 // ─── Feedback & états ─────────────────────────────────────────

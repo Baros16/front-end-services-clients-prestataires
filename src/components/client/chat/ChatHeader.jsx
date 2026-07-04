@@ -1,20 +1,7 @@
 // src/components/client/chat/ChatHeader.jsx
 
-import { StatusBadge, SkeletonLoader } from '../../commons';
-
-function IconPhone() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
-               A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67
-               A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0
-               .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6
-               l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7
-               A2 2 0 0 1 22 16.92z"/>
-    </svg>
-  );
-}
+import { Phone }               from '../../commons';
+import { StatusBadge, Card, SkeletonLoader, Button } from '../..//commons';
 
 export function ChatHeader({ provider, loading }) {
   if (loading || !provider) {
@@ -47,8 +34,8 @@ export function ChatHeader({ provider, loading }) {
             {provider.avatarInitial}
           </div>
           {provider.isOnline && (
-            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2
-                             border-white sl-animate-pulse-dot"
+            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full
+                             border-2 border-white sl-animate-pulse-dot"
               style={{ background: 'var(--color-success)' }} />
           )}
         </div>
@@ -71,13 +58,7 @@ export function ChatHeader({ provider, loading }) {
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="flex items-center gap-2 px-4 py-2 rounded-full text-sm border
-                           transition-all duration-150 active:scale-95"
-          style={{ border: '1px solid var(--color-sl-300)', color: 'var(--color-sl-600)',
-                   fontFamily: 'var(--font-body)', background: 'transparent' }}>
-          <IconPhone />
-          Appeler
-        </button>
+        <Button label="Appeler" onClick={() => {}}> Appeler<Phone size={14} /></Button>
         <StatusBadge label="Mission en cours" variant="en_cours" />
       </div>
     </div>
