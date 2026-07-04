@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   getAdminDashboard,
-  validateProvider,
-  rejectProvider,
+  validerPrestataire,
+  refuserDossier,
 } from "../../services/adminService";
 
 /**
@@ -48,7 +48,7 @@ export function useAdminDashboard() {
    * Valide un prestataire et le retire optimistement de la liste.
    */
   const handleApprove = useCallback(async (providerId) => {
-    await validateProvider(providerId);
+    await validerPrestataire(providerId);
     setData((prev) => ({
       ...prev,
       pendingProviders: prev.pendingProviders.filter((p) => p.id !== providerId),
@@ -59,7 +59,7 @@ export function useAdminDashboard() {
    * Rejette un dossier et le retire optimistement de la liste.
    */
   const handleReject = useCallback(async (providerId) => {
-    await rejectProvider(providerId);
+    await refuserDossier(providerId);
     setData((prev) => ({
       ...prev,
       pendingProviders: prev.pendingProviders.filter((p) => p.id !== providerId),

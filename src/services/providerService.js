@@ -1,27 +1,27 @@
-// src/services/providerService.js
-
-import axios from "axios";
 import { getMock, getMockList } from "./mockSwitch.js";
-import  mock_dashboard  from "../data/provider/mock_dashboard.json";
-import  mock_avilable_demands  from "../data/provider/mock_available_demands.json";
-
-const BASE = "/provider";
+import apiClient from "./apiClient.js";
+import mock_dashboard from "../data/provider/mock_dashboard.json";
+import mock_avilable_demands from "../data/provider/mock_available_demands.json";
 
 export async function getProviderDashboard() {
-  return getMock(mock_dashboard, () => axios.get(`${BASE}/dashboard`));
+  return getMock(
+    mock_dashboard,
+    () => apiClient.get(`/provider/dashboard`).then(r => r.data.data),
+  );
 }
 
 export async function getAvailableDemands(params = {}) {
   // params : { page, limit, category }
-  return getMockList(mock_avilable_demands, () =>
-    axios.get(`${BASE}/demands/available`, { params })
+  return getMockList(
+    mock_avilable_demands,
+    () => apiClient.get(`/provider/demands/available`, { params }).then(r => r.data.data),
   );
 }
 
 export async function applyToDemand(demandId) {
   return getMock(
     { success: true, data: { demandId, status: "applied" } },
-    () => axios.post(`${BASE}/demands/${demandId}/apply`)
+    () => apiClient.post(`/provider/demands/${demandId}/apply`).then(r => r.data.data),
   );
 }
 
@@ -29,30 +29,29 @@ export async function submitQuote(demandId, payload) {
   // payload : { laborDescription, laborAmount, materials[], estimatedDurationHours, validityDays }
   return getMock(
     { success: true, data: { demandId, ...payload } },
-    () => axios.post(`${BASE}/demands/${demandId}/quote`, payload)
+    () => apiClient.post(`/provider/demands/${demandId}/quote`, payload).then(r => r.data.data),
   );
 }
 
 export async function startMission(missionId) {
   return getMock(
     { success: true, data: { missionId, status: "en_cours" } },
-    () => axios.post(`${BASE}/missions/${missionId}/start`)
+    () => apiClient.post(`/provider/missions/${missionId}/start`).then(r => r.data.data),
   );
 }
 
 export async function updateStep(missionId, stepId, completed) {
   return getMock(
     { success: true, data: { missionId, stepId, completed } },
-    () =>
-      axios.patch(`${BASE}/missions/${missionId}/steps/${stepId}`, {
-        completed,
-      })
+    () => apiClient
+      .patch(`/provider/missions/${missionId}/steps/${stepId}`, { completed })
+      .then(r => r.data.data),
   );
 }
 
 export async function completeMission(missionId) {
   return getMock(
     { success: true, data: { missionId, status: "terminee" } },
-    () => axios.post(`${BASE}/missions/${missionId}/complete`)
+    () => apiClient.post(`/provider/missions/${missionId}/complete`).then(r => r.data.data),
   );
 }
