@@ -2,29 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { PageHeader, StatCard, DataTable, StatusBadge, Button, AlertBanner, AmountDisplay, EmptyState, SkeletonLoader, } from "../../components/commons";
-import  mockLitiges from "../../data/admin/mock_litiges.json";
-import { formatDate, formatXAF, shortenName } from "../../utils/formatters";
+import  { getLitiges } from "../../services/adminService";
 import mockUsers from "../../data/admin/mock_users.json";
 import mockAgents from "../../data/admin/mock_agents.json";
+import { formatDate, formatXAF, shortenName } from "../../utils/formatters";
 import { ArrowRight } from "lucide-react";
 
-// — Helpers de résolution de noms (locaux à cette page) —
-function resolveUserName(userId) {
-const user = mockUsers.data.find((u) => u.id === userId);
-if (user) return user.fullName;
-return userId.replace("usr_", "").replace(/_/g, "");
-}
-
-function resolveAgentName(agentId) {
-
-if (!agentId) return "Non assigné";
-const agent = mockAgents.data.find((a) => a.id === agentId);
-if (agent) return agent.fullName;
-return agentId.replace("usr_", "").replace(/_/g, "");
-} 
 //Mapping status mock -> StatusVariant attendu par StatusBadge
 function toStatusVariant(status) {
-if (status === "en_traitement" || status === "assigne") return "traitement";
+if (status === "en_traitement" || status === "assigne") return "traitement"; 
 if (status === "resolu" || status === "cloture") return "resolu";
 return "ouvert";
 }
@@ -35,6 +21,19 @@ if (status === "cloture") return "CLÔTURÉ";
 return "OUVERT";
 }
 
+function resolveUserName(userId) {
+const user = mockUsers.data.find((u) => u.id === userId);
+if (user) return user.fullName;
+return userId;
+} 
+
+function resolveAgentName(agentId) {
+if (!agentId) return "Non assigné";
+const agent = mockAgents.data.find((a) => a.id === agentId);
+if (agent) return agent.fullName;
+return agentId;
+}
+
 export default function LitigesAdmin() {
 const [litiges, setLitiges] = useState([]);
 const [metrics, setMetrics] = useState(null);
@@ -42,9 +41,18 @@ const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
 
 useEffect(() => {
-    setLitiges(mockLitiges.data.litiges);
-    setMetrics(mockLitiges.data.metrics);
-    setLoading(false);
+    const fetchLitiges = async() => {
+        try{
+            const res = await getLitiges();
+            setLitiges(res.litiges);
+            setMetrics(res.metrics);
+        } catch (err) {
+            setError(err?.message ?? "Impossible de charger les litiges.");    
+        } finally {
+          setLoading(false);
+        }
+    };      
+    fetchLitiges(); 
 }, []); 
 
 function handleAssign(litigeId) {
@@ -60,9 +68,7 @@ const columns = [
 key: "reference",
 header: "Réf.",
 render: (row) => (
-     <span className="font-bold">
-        #L-{parseInt(row.reference.split("-")[2], 10).toString().padStart(3, "0")}
-        </span>
+     <span className="font-bold">{row.reference}</span>
 ) 
 },{
 key: "createdAt",
@@ -110,7 +116,7 @@ size="sm"
 key: "agent",
 header: "Agent",
 render: (row) => (
-<span className="text-sl-500">{row.agentId ? shortenName(resolveAgentName(row.agentId)) : "Non assigné"}
+<span className="text-sl-500">{row.status == "ouvert" ? "Non assigné" : row.agentId ? shortenName(resolveAgentName(row.agentId)) : "Non assigné"}
 </span>
 ),
 },
@@ -118,7 +124,7 @@ render: (row) => (
 key: "action",
 header: "",
 render: (row) =>
-row.status !== "resolu" && row.status !== "cloture" ? (
+row.status == "ouvert" ? (
 <Button
 size="sm"
 variant="secondary"
@@ -176,7 +182,7 @@ Exporter
 <EmptyState
 icon="AlertTriangle"
 title="Aucun litige"
-description="Il n'y a actuellement aucun litige à afficher."
+description=""
 />
 ) : (
 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">    
