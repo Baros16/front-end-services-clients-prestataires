@@ -903,6 +903,7 @@ informations public d'un utilisateur
 ```
 
 **utilisateur Response 200**
+
 ```json
 {
     "success": true,
