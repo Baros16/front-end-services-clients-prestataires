@@ -557,9 +557,10 @@ Le frontend appelle `/auth/refresh` automatiquement quand l'API retourne `401 UN
 
 ---
 
-## 5. Endpoints — Auth
+## 5. Endpoints — Auth et user
 
 > Ces endpoints sont accessibles sans token. `POST /auth/login` accepte tous les rôles.
+
 
 ### `POST /auth/register`
 
@@ -826,6 +827,102 @@ Réinitialisation du mot de passe avec le code OTP reçu.
 | 404 | `USER_NOT_FOUND` | Email introuvable |
 | 400 | `VALIDATION_ERROR` | Mot de passe trop court |
 
+
+### `GET /user/{id}`
+informations public d'un utilisateur
+
+**prestataire Response 200**
+
+```json
+{
+    "success": true,
+    "data": {
+        "id": "2f19902b-0770-49b9-9974-a92dbb44a77c",
+        "role": "provider",
+        "firstName": "Jean-Claude",
+        "lastName": "Mbarga",
+        "fullName": "Jean-Claude Mbarga",
+        "phone": "+237699234567",
+        "email": "jcm@serviloc.cm",
+        "avatarInitial": "J",
+        "status": "active",
+        "specialty": "Plomberie",
+        "rating": 0.0,
+        "completedMissions": 0,
+        "isAvailable": true,
+        "hourlyRate": 4000.0,
+        "serviceZone": {
+            "city": "Bafoussam",
+            "radiusKm": 20.0
+        },
+        "availability": {
+            "monday": {
+                "start": "08:00",
+                "end": "18:00",
+                "available": true
+            },
+            "tuesday": {
+                "start": "08:00",
+                "end": "18:00",
+                "available": true
+            },
+            "wednesday": {
+                "start": "08:00",
+                "end": "18:00",
+                "available": true
+            },
+            "thursday": {
+                "start": "08:00",
+                "end": "18:00",
+                "available": true
+            },
+            "friday": {
+                "start": "08:00",
+                "end": "18:00",
+                "available": true
+            },
+            "saturday": {
+                "start": "08:00",
+                "end": "13:00",
+                "available": true
+            },
+            "sunday": {
+                "start": null,
+                "end": null,
+                "available": false
+            }
+        },
+        "certifications": [
+            "Artisan certifi\u00e9"
+        ],
+        "estCertifie": true,
+        "createdAt": "2026-06-12T12:39:10+01:00"
+    },
+    "meta": null
+}
+```
+
+**utilisateur Response 200**
+```json
+{
+    "success": true,
+    "data": {
+        "id": "b2adb724-8bd7-46b3-b527-b564f5c05a59",
+        "role": "client",
+        "firstName": "Yannick",
+        "lastName": "Ulrich",
+        "fullName": "Yannick Ulrich",
+        "phone": "+237612345678",
+        "email": "yannick2@serviloc.cm",
+        "avatarInitial": "Y",
+        "status": "active",
+        "completedMissions": 0,
+        "location": null,
+        "createdAt": "2026-06-08T21:15:28+01:00"
+    },
+    "meta": null
+}
+```
 ---
 
 ## 6. Endpoints — Client
