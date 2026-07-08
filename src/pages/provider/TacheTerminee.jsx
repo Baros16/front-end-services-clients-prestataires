@@ -1,42 +1,59 @@
-import { useState } from "react";
-import { Card } from "../../components/commons/Card";
-import { Button } from "../../components/commons/Button";
-import { StatusBadge } from "../../components/commons/StatusBadge";
-import { AmountDisplay } from "../../components/commons/AmountDisplay";
-import { Avatar } from "../../components/commons/Avatar";
-import { ProgressBar } from "../../components/commons/ProgressBar";
-import { AlertBanner } from "../../components/commons/AlertBanner";
-import mockData from "../../data/provider/mock_dashboard.json";
-
-const mission = mockData.data.recentMissions[0];
-const stepsTotal     = mission.steps.length;
-const stepsCompleted = mission.steps.filter((s) => s.completed).length;
-const progression    = Math.round((stepsCompleted / stepsTotal) * 100);
+import { useState, useEffect } from "react";
+import {
+  Card,
+  Button,
+  StatusBadge,
+  AmountDisplay,
+  Avatar,
+  ProgressBar,
+  AlertBanner,
+  CheckCircle,
+  PartyPopper,
+  Check,
+  Lock,
+} from "../../components/commons";
+import { getProviderDashboard, completeMission } from "../../services/providerService";
+import { formatXAF } from "../../utils/formatters";
 
 export default function TacheTerminee() {
-  const [steps,   setSteps]   = useState(mission.steps);
-  const [loading, setLoading] = useState(false);
-  const [done,    setDone]    = useState(false);
+  const [mission,  setMission]  = useState(null);
+  const [steps,    setSteps]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [finishing,setFinishing]= useState(false);
+  const [done,     setDone]     = useState(false);
+
+  useEffect(() => {
+    getProviderDashboard()
+      .then((d) => {
+        const m = d.recentMissions[0];
+        setMission(m);
+        setSteps(m.steps);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const completed = steps.filter((s) => s.completed).length;
   const total     = steps.length;
-  const progress  = Math.round((completed / total) * 100);
   const toutFait  = completed === total;
 
   const toggleStep = (id) =>
     setSteps(steps.map((s) => s.id === id ? { ...s, completed: !s.completed } : s));
 
-  const handleTerminer = async () => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setDone(true);
-    setLoading(false);
+  const handleTerminer = () => {
+    setFinishing(true);
+    completeMission(mission.id)
+      .then(() => setDone(true))
+      .catch(console.error)
+      .finally(() => setFinishing(false));
   };
+
+  if (loading || !mission) return null;
 
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center gap-5 py-24">
-        <span className="text-[56px]">🎉</span>
+        <PartyPopper size={52} strokeWidth={1.5} style={{ color: "var(--color-brand)" }} />
         <h2 className="font-[family-name:var(--font-display)] text-[22px] font-bold text-sl-900 m-0">
           Mission terminée !
         </h2>
@@ -49,37 +66,28 @@ export default function TacheTerminee() {
   }
 
   return (
-    <div className="flex flex-col gap-0">
+    <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-white">
+      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
             Tâche terminée
           </h1>
-          <p className="text-[13px] text-sl-500 m-0 mt-1">
-            {mission.title}
-          </p>
+          <p className="text-[13px] text-sl-500 m-0 mt-1">{mission.title}</p>
         </div>
         <StatusBadge variant="en_cours" withDot />
       </div>
 
-      <div className="grid grid-cols-[1fr_320px] gap-6 p-6 bg-sl-50 min-h-screen items-start">
+      <div className="grid grid-cols-[1fr_320px] gap-6 p-6 items-start">
 
         <div className="flex flex-col gap-4">
 
           <Card title="Étapes de la mission">
-            <div className="flex flex-col gap-1 mb-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[13px] text-sl-600 font-medium">
-                  {completed} / {total} étapes complétées
-                </span>
-                <span className="text-[13px] font-bold text-brand">{progress}%</span>
-              </div>
-              <ProgressBar value={progress} />
+            <div className="mb-4">
+              <ProgressBar value={completed} max={total} label={`${completed} / ${total} étapes complétées`} />
             </div>
-
             <div className="flex flex-col gap-2">
-              {steps.sort((a, b) => a.order - b.order).map((step) => (
+              {[...steps].sort((a, b) => a.order - b.order).map((step) => (
                 <div
                   key={step.id}
                   onClick={() => toggleStep(step.id)}
@@ -87,18 +95,14 @@ export default function TacheTerminee() {
                     ${step.completed ? "bg-success-light" : "bg-sl-50 hover:bg-sl-100"}`}
                 >
                   <div className={`w-5 h-5 min-w-[20px] rounded-md flex items-center justify-center transition-all duration-150
-                    ${step.completed ? "bg-success" : "border-[2px] border-sl-300 bg-white"}`}
-                  >
-                    {step.completed && (
-                      <span className="text-white text-[11px] font-bold leading-none">✓</span>
-                    )}
+                    ${step.completed ? "bg-success" : "border-[2px] border-sl-300 bg-sl-0"}`}>
+                    {step.completed && <Check size={12} style={{ color: "white" }} />}
                   </div>
-                  <span className={`text-[13px] font-medium transition-all duration-150
-                    ${step.completed ? "text-success line-through" : "text-sl-700"}`}
-                  >
+                  <span className={`text-[13px] font-medium flex-1 transition-all duration-150
+                    ${step.completed ? "text-success line-through" : "text-sl-700"}`}>
                     {step.label}
                   </span>
-                  <span className="ml-auto text-[11px] text-sl-300">#{step.order}</span>
+                  <span className="text-[11px] text-sl-300">#{step.order}</span>
                 </div>
               ))}
             </div>
@@ -106,7 +110,7 @@ export default function TacheTerminee() {
 
           {!toutFait && (
             <AlertBanner
-              variant="warning"
+              type="warning"
               title="Étapes incomplètes"
               message="Cochez toutes les étapes avant de déclarer la mission terminée."
             />
@@ -116,10 +120,11 @@ export default function TacheTerminee() {
             variant="primary"
             size="lg"
             onClick={handleTerminer}
-            disabled={!toutFait || loading}
+            disabled={!toutFait || finishing}
             className="w-full justify-center"
           >
-            {loading ? "Traitement en cours..." : "✅ Déclarer la mission terminée"}
+            <CheckCircle size={16} />
+            {finishing ? "Traitement en cours..." : "Déclarer la mission terminée"}
           </Button>
         </div>
 
@@ -137,20 +142,14 @@ export default function TacheTerminee() {
 
           <Card title="Paiement séquestré">
             <div className="flex flex-col gap-1">
-              <AmountDisplay
-                amount={mission.sequesteredAmount}
-                size="lg"
-                variant="positive"
-              />
-              <p className="text-[12px] text-sl-400 m-0">
-                Libéré après validation du client
-              </p>
+              <AmountDisplay amount={mission.sequesteredAmount} size="lg" variant="positive" />
+              <p className="text-[12px] text-sl-400 m-0">Libéré après validation du client</p>
             </div>
           </Card>
 
           <AlertBanner
-            variant="info"
-            title="🔒 Séquestre actif"
+            type="info"
+            title={<span className="flex items-center gap-1"><Lock size={14} /> Séquestre actif</span>}
             message="Le montant sera libéré automatiquement 48h après validation, ou immédiatement si le client confirme."
           />
 
