@@ -16,11 +16,11 @@ import { getProviderDashboard, completeMission } from "../../services/providerSe
 import { formatXAF } from "../../utils/formatters";
 
 export default function TacheTerminee() {
-  const [mission,  setMission]  = useState(null);
-  const [steps,    setSteps]    = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [finishing,setFinishing]= useState(false);
-  const [done,     setDone]     = useState(false);
+  const [mission,   setMission]   = useState(null);
+  const [steps,     setSteps]     = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [finishing, setFinishing] = useState(false);
+  const [done,      setDone]      = useState(false);
 
   useEffect(() => {
     getProviderDashboard()
@@ -35,7 +35,7 @@ export default function TacheTerminee() {
 
   const completed = steps.filter((s) => s.completed).length;
   const total     = steps.length;
-  const toutFait  = completed === total;
+  const toutFait  = total > 0 && completed === total;
 
   const toggleStep = (id) =>
     setSteps(steps.map((s) => s.id === id ? { ...s, completed: !s.completed } : s));
@@ -68,14 +68,14 @@ export default function TacheTerminee() {
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
+      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-white">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
             Tâche terminée
           </h1>
           <p className="text-[13px] text-sl-500 m-0 mt-1">{mission.title}</p>
         </div>
-        <StatusBadge variant="en_cours" withDot />
+        <StatusBadge variant="en_cours" />
       </div>
 
       <div className="grid grid-cols-[1fr_320px] gap-6 p-6 items-start">
@@ -95,7 +95,7 @@ export default function TacheTerminee() {
                     ${step.completed ? "bg-success-light" : "bg-sl-50 hover:bg-sl-100"}`}
                 >
                   <div className={`w-5 h-5 min-w-[20px] rounded-md flex items-center justify-center transition-all duration-150
-                    ${step.completed ? "bg-success" : "border-[2px] border-sl-300 bg-sl-0"}`}>
+                    ${step.completed ? "bg-success" : "border-[2px] border-sl-300 bg-white"}`}>
                     {step.completed && <Check size={12} style={{ color: "white" }} />}
                   </div>
                   <span className={`text-[13px] font-medium flex-1 transition-all duration-150
@@ -149,7 +149,7 @@ export default function TacheTerminee() {
 
           <AlertBanner
             type="info"
-            title={<span className="flex items-center gap-1"><Lock size={14} /> Séquestre actif</span>}
+            title="Séquestre actif"
             message="Le montant sera libéré automatiquement 48h après validation, ou immédiatement si le client confirme."
           />
 
