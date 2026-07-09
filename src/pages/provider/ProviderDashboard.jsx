@@ -9,11 +9,11 @@ import {
   AmountDisplay,
   Avatar,
   EmptyState,
-  AvailabilityToggle,
   Inbox,
+  Spinner,
 } from "../../components/commons";
+import { AvailabilityToggle } from "../../components/provider/AvailabilityToggle";
 import { getProviderDashboard } from "../../services/providerService";
-import { formatDateFull } from "../../utils/formatters";
 
 const DISPONIBILITE = [
   { key: "monday",   label: "Lundi – Vendredi" },
@@ -30,20 +30,39 @@ const FILTRES = [
 
 export default function ProviderDashboard() {
   const navigate = useNavigate();
-  const [data,   setData]   = useState(null);
-  const [filtre, setFiltre] = useState("tous");
-  const [dispo,  setDispo]  = useState(false);
+  const [data,    setData]    = useState(null);
+  const [erreur,  setErreur]  = useState(null);
+  const [filtre,  setFiltre]  = useState("tous");
+  const [dispo,   setDispo]   = useState(false);
 
   useEffect(() => {
     getProviderDashboard()
       .then((d) => {
         setData(d);
-        setDispo(d.profile.isAvailable);
+        setDispo(d.profile?.isAvailable ?? false);
       })
-      .catch(console.error);
+      .catch((e) => {
+        console.error("[ProviderDashboard] Erreur chargement:", e);
+        setErreur(e?.message ?? "Erreur inconnue");
+      });
   }, []);
 
-  if (!data) return null;
+  if (erreur) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-24">
+        <p className="text-danger font-bold text-[16px]">Erreur de chargement</p>
+        <p className="text-sl-500 text-[13px]">{erreur}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   const { profile, metrics, recentMissions, availability } = data;
 
@@ -54,7 +73,7 @@ export default function ProviderDashboard() {
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
+      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-white">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
             Tableau de bord
