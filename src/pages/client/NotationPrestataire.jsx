@@ -144,8 +144,7 @@ export default function NotationPrestataire() {
               Mission terminée !
             </h2>
             <p className="text-sl-600">
-              {mission?.category}
-              {mission?.location?.address}
+              {mission?.category}  ·  {mission?.location?.address}
             </p>
             <div className="bg-success-light/80 border border-success/30 rounded-lg px-6 py-3 mt-1 mx-6 w-full">
               <p className="text-sm text-success-dark">Paiement libéré</p>
