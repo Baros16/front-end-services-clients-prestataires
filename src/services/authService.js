@@ -83,7 +83,7 @@ export async function login(email, password) {
     () => axios.post(`${BASE}/login`, { email, password })
   );
 
-  persistSession(response.data);
+  persistSession(response);
   return response;
 }
 
@@ -107,7 +107,7 @@ export async function refreshToken() {
     () => axios.post(`${BASE}/refresh`, { refreshToken: storedRefreshToken })
   );
 
-  persistSession(response.data);
+  persistSession(response);
   return response;
 }
 
@@ -135,5 +135,12 @@ export async function logout() {
   return getMock(
     { success: true, data: { message: "Déconnexion réussie" }, meta: null },
     () => axios.post(`${BASE}/logout`, { refreshToken: storedRefreshToken })
+  );
+}
+export async function getUserById(userId) {
+  const mockEntry = mockPublicUsers[userId] ?? Object.values(mockPublicUsers)[0];
+  return getMock(
+    { data: mockEntry },
+    () => apiClient.get(`/user/${userId}`)
   );
 }
