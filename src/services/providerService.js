@@ -1,4 +1,3 @@
-// src/services/providerService.js
 import { getMock, getMockList } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
 import mock_dashboard from "../data/provider/mock_dashboard.json";
@@ -56,63 +55,9 @@ export async function completeMission(missionId) {
     () => apiClient.post(`/provider/missions/${missionId}/complete`).then(r => r.data.data),
   );
 }
-
-// ─── Nouveau — API_CONTRACT v2.1 (S2/S4, livré et testé) ───────────────────
-
-/**
- * Mise à jour du profil professionnel (spécialité, tarif, zone de service).
- * v2.1 : payload enrichi avec latitude / longitude / serviceZoneCity / radiusKm.
- */
-export async function updateProfile(payload) {
-  // payload : { specialty, hourlyRate, serviceZoneCity, latitude, longitude,
-  //             radiusKm, estCertifie, certifications[], documentIds[] }
-  return getMock(
-    {
-      success: true,
-      data: { providerId: "usr_2f19902b", message: "Profil mis à jour avec succès" },
-    },
-    () => apiClient.patch(`/provider/profile`, payload).then(r => r.data.data),
-  );
-}
-
-/**
- * Bascule disponible / indisponible.
- */
 export async function updateAvailability(isAvailable) {
   return getMock(
-    {
-      success: true,
-      data: { providerId: "usr_2f19902b", isAvailable, message: "Disponibilité mise à jour" },
-    },
+    { success: true, data: { isAvailable } },
     () => apiClient.patch(`/provider/availability`, { isAvailable }).then(r => r.data.data),
-  );
-}
-
-/**
- * Mise à jour des horaires hebdomadaires.
- * ⚠️ v2.1 : body À PLAT (les jours à la racine) — plus de clé `schedule` qui enveloppe.
- */
-export async function updateSchedule(schedule) {
-  // schedule : { monday: { start, end, available }, tuesday: {...}, ..., sunday: {...} }
-  return getMock(
-    {
-      success: true,
-      data: { providerId: "usr_2f19902b", message: "Horaires mis à jour avec succès" },
-    },
-    () => apiClient.patch(`/provider/schedule`, schedule).then(r => r.data.data),
-  );
-}
-
-/**
- * Historique des gains du prestataire.
- * ⚠️ v2.1 : réponse simplifiée — { monthlyTotal, payouts[] }. PAS de missions[]
- * pour l'instant (implémentation backend future). Écran 21 (M5) : ne pas
- * construire de section "missions liées" tant que ce n'est pas livré.
- */
-export async function getEarnings(params = {}) {
-  // params : { page, month } — ex. month: "2026-05"
-  return getMock(
-    mock_earnings.data,
-    () => apiClient.get(`/provider/earnings`, { params }).then(r => r.data.data),
   );
 }

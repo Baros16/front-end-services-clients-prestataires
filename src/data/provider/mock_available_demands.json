@@ -4,7 +4,7 @@
     {
       "id": "dem_xyz789",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
-      "description": "Fuite sous l'évier de la cuisine, eau qui s'écoule en permanence",
+      "description": "FuiteS sous l'évier de la cuisine, eau qui s'écoule en permanence",
       "isUrgent": false,
       "status": "ouverte",
       "estimatedBudget": { "min": 20000, "max": 30000 },
