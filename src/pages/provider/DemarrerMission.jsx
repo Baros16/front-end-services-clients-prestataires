@@ -16,15 +16,15 @@ import {
   Lock,
   MapPin,
 } from "../../components/commons";
+import { PreDepartChecklist } from "../../components/provider/PreDepartChecklist";
 import { getProviderDashboard, startMission } from "../../services/providerService";
 import { formatXAF } from "../../utils/formatters";
-import PreDepartChecklist from "../../components/provider/PreDepartChecklist";
 
 const CHECKLIST = [
-  { id: "materiaux", label: "Matériaux préparés",               checked: true  },
-  { id: "outils",    label: "Outils chargés dans le véhicule",  checked: true  },
-  { id: "adresse",   label: "Adresse client confirmée",          checked: false },
-  { id: "telephone", label: "Téléphone chargé",                  checked: false },
+  { id: "materiaux", label: "Matériaux préparés",              checked: true  },
+  { id: "outils",    label: "Outils chargés dans le véhicule", checked: true  },
+  { id: "adresse",   label: "Adresse client confirmée",         checked: false },
+  { id: "telephone", label: "Téléphone chargé",                 checked: false },
 ];
 
 export default function DemarrerMission() {
@@ -47,7 +47,7 @@ export default function DemarrerMission() {
   const toggle = (id) =>
     setChecklist(checklist.map((i) => i.id === id ? { ...i, checked: !i.checked } : i));
 
-  const handleDemarrer = async () => {
+  const handleDemarrer = () => {
     setStarting(true);
     startMission(mission.id)
       .then(() => setDone(true))
@@ -72,7 +72,7 @@ export default function DemarrerMission() {
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
+      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-white">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
             Missions en attente
@@ -117,7 +117,7 @@ export default function DemarrerMission() {
                 </span>
                 <MapEmbed
                   address={mission.location.address}
-                  label={<span className="flex items-center gap-1"><MapPin size={14} /> Adresse : {mission.location.address}</span>}
+                  label={mission.location.address}
                   height="200px"
                 />
               </div>
@@ -182,7 +182,7 @@ export default function DemarrerMission() {
 
           <AlertBanner
             type="info"
-            title={<span className="flex items-center gap-1"><Lock size={14} /> Rappel séquestre</span>}
+            title="Rappel séquestre"
             message={`${formatXAF(mission.sequesteredAmount)} séquestrés. Libération après double validation.`}
           />
 
