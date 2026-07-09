@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Button,AlertBanner } from "../../components/commons";
+import { Button } from "../../components/commons/Button";
+import { AlertBanner } from "../../components/commons/AlertBanner";
 import { OTPDigitInput } from "../../components/auth/OTPDigitInput";
+import { Mail } from "../../components/commons/Icons";
 import { verifyOtp, resendOtp } from "../../services/authService";
-import {Mail} from "../../components/commons";
 
 export default function OTPVerificationPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const userId =
-    searchParams.get("userId") || sessionStorage.getItem("pendingUserId");
+  const email = searchParams.get("email") || sessionStorage.getItem("pendingEmail");
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [countdown, setCountdown] = useState(45);
   const [canResend, setCanResend] = useState(false);
 
@@ -29,44 +30,34 @@ export default function OTPVerificationPage() {
   }, [countdown]);
 
   useEffect(() => {
-    const isComplete = digits.every((d) => d !== "");
+    const isComplete = digits.every(d => d !== "");
     if (isComplete && !isSubmitting) {
       handleSubmit();
     }
   }, [digits]);
 
   const handleSubmit = async () => {
-    if (!userId) {
-      setError("Session expirée. Veuillez vous réinscrire.");
+    if (!email) {
+      setError("Email manquant. Veuillez recommencer l'inscription.");
       return;
     }
 
     setIsSubmitting(true);
     setError("");
+    setSuccess("");
 
     try {
-      const response = await verifyOtp(userId, otpCode);
-
-      localStorage.setItem("serviloc_access", response.accessToken);
-      localStorage.setItem("serviloc_refresh", response.refreshToken);
-      localStorage.setItem(
-        "sl_mock_user",
-        JSON.stringify({ role: response.user.role.toUpperCase() }),
-      );
-      const role = response.user?.role;
-      if (role === "CLIENT") {
-        navigate("/client/dashboard");
-      } else if (role === "PROVIDER") {
-        navigate("/provider/dashboard");
-      } else {
-        navigate("/");
-      }
+      const response = await verifyOtp(email, otpCode);
+      const message = response?.data?.message ?? response?.message ?? "Compte activé avec succès !";
+      setSuccess(message);
+      
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 2000);
     } catch (err) {
       const errorCode = err.code;
       if (errorCode === "INVALID_OTP") {
-        setError(
-          `Code incorrect — ${err.attemptsRemaining || 2} tentative(s) restante(s)`,
-        );
+        setError(`Code incorrect — ${err.attemptsRemaining || 2} tentative(s) restante(s)`);
         setDigits(["", "", "", "", "", ""]);
       } else if (errorCode === "OTP_EXPIRED") {
         setError("Code expiré. Cliquez sur 'Renvoyer'.");
@@ -81,20 +72,22 @@ export default function OTPVerificationPage() {
   };
 
   const handleResend = async () => {
-    if (!userId) {
-      setError("Session expirée. Veuillez vous réinscrire.");
+    if (!email) {
+      setError("Email manquant. Veuillez recommencer l'inscription.");
       return;
     }
 
     setCanResend(false);
     setCountdown(45);
     setError("");
+    setSuccess("");
     setDigits(["", "", "", "", "", ""]);
 
     try {
-      await resendOtp(userId);
+      // ✅ Nouvelle signature : resendOtp(email)
+      await resendOtp(email);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Impossible de renvoyer le code. Réessayez.");
       setCanResend(true);
     }
   };
@@ -127,6 +120,12 @@ export default function OTPVerificationPage() {
         {error && (
           <div className="mt-4">
             <AlertBanner type="danger" message={error} />
+          </div>
+        )}
+
+        {success && (
+          <div className="mt-4">
+            <AlertBanner type="success" message={success} />
           </div>
         )}
 

@@ -34,28 +34,29 @@ export default function LoginPage() {
     setError("");
     setIsSubmitting(true);
 
-    try {
-      const response = await login(email, password);
+   
+  try {
+    const response = await login(email, password);
 
-      localStorage.setItem("serviloc_access", response.accessToken);
-      localStorage.setItem("serviloc_refresh", response.refreshToken);
-      localStorage.setItem(
-        "sl_mock_user",
-        JSON.stringify({ role: response.user.role.toUpperCase() }),
-      );
-
-      const role = response.user.role;
-
-      if (role === "CLIENT") navigate(`/client/dashboard`);
-      else if (role === "PROVIDER") navigate("/provider/dashboard");
-      else if (role === "ADMIN") navigate("/admin/dashboard");
-      else navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
+    // Login gère déjà le stockage via persistSession()
+    const user = response.data.user;
+    
+    // Redirection selon le rôle
+    if (user.role === "client") {
+      navigate("/client/dashboard");
+    } else if (user.role === "provider") {
+      navigate("/provider/dashboard");
+    } else if (user.role === "admin" || user.role === "agent") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/");
     }
-  };
+  } catch (err) {
+    setError(err.message || "Identifiants incorrects");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

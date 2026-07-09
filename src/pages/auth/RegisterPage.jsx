@@ -70,28 +70,29 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const payload = {
-        role,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        email: formData.email,
-        password: formData.password,
-        confirmPassword: formData.confirmPassword,
-      };
+    const payload = {
+      role,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      email: formData.email,
+      password: formData.password,
+    };
 
-      const response = await register(payload);
+    const response = await register(payload);
 
-      sessionStorage.setItem("pendingUserId", response.userId);
-      sessionStorage.setItem("pendingPhone", formData.phone);
+    // Stockage de l'email (verifyOtp attend email maintenant)
+    sessionStorage.setItem("pendingEmail", payload.email);
+    sessionStorage.setItem("pendingPhone", formData.phone);
 
-      navigate(`/auth/otp?userId=${response.userId}`);
-    } catch (err) {
-      setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    // Redirection vers OTP avec email en paramètre
+    navigate(`/auth/otp?email=${encodeURIComponent(payload.email)}`);
+  } catch (err) {
+    setError(err.message || "Une erreur est survenue.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
