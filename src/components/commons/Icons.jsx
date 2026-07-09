@@ -22,7 +22,7 @@ export { House, Home, LayoutDashboard, ChartPie, BarChart3, BriefcaseBusiness, G
 
 // ─── Communication ────────────────────────────────────────────
 export { Phone, MessageCircle, Send, Mail }                  from 'lucide-react';
-export { Paperclip, Image }                                  from 'lucide-react';
+export { Paperclip, Image , Inbox}                                  from 'lucide-react';
 
 // ─── Utilisateurs & identité ──────────────────────────────────
 export { User, Users, UserCheck, UserX }                     from 'lucide-react';
