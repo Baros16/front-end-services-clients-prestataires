@@ -25,13 +25,10 @@ export default function SignalerLitige() {
   const [envoye,      setEnvoye]      = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      getProviderDashboard(),
-      getLitigeMotifs(),
-    ])
+    Promise.all([getProviderDashboard(), getLitigeMotifs()])
       .then(([dashboard, motifsData]) => {
         setMission(dashboard.recentMissions[0]);
-        setMotifs(motifsData);
+        setMotifs(Array.isArray(motifsData) ? motifsData : []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -70,7 +67,7 @@ export default function SignalerLitige() {
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
+      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-white">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
             Signaler un litige
@@ -94,7 +91,7 @@ export default function SignalerLitige() {
                 className={`flex flex-col gap-[2px] p-4 rounded-[var(--radius-md)] cursor-pointer border-[1.5px] transition-all duration-150
                   ${motifId === motif.id
                     ? "border-brand bg-brand-xlight"
-                    : "border-sl-200 bg-sl-0 hover:border-sl-300"}`}
+                    : "border-sl-200 bg-white hover:border-sl-300"}`}
               >
                 <span className={`text-[14px] font-semibold ${motifId === motif.id ? "text-brand" : "text-sl-900"}`}>
                   {motif.title}
