@@ -72,11 +72,23 @@ export async function getPendingProviders(params = {}) {
 
 // ─── Validation Prestataire (ex validationService.js) ───────────────────────
 
+export async function getDossiers() {
+  const raw = await getMock(
+    mockProviderDossier,
+    () => apiClient.get(`/admin/providers`, { params: { status: 'pending_verification' } }),
+  );
+  return Array.isArray(raw) ? raw : [raw];
+}
+
 export async function getDossier(providerId) {
-  return getMock(
+  const raw = await getMock(
     mockProviderDossier,
     () => apiClient.get(`/admin/providers/${providerId}/dossier`),
   );
+  if (Array.isArray(raw)) {
+    return raw.find(d => d.provider.id === providerId) ?? raw[0];
+  }
+  return raw;
 }
 
 export async function validerPrestataire(providerId) {
@@ -138,5 +150,12 @@ export async function resolveLitige(litigeId, payload) {
   return getMock(
     { data: { success: true, litigeId, status: "resolu", ...payload } },
     () => apiClient.post(`/admin/litiges/${litigeId}/resolve`, payload),
+  );
+}
+
+export async function assignLitige(litigeId, agentId) {
+  return getMock(
+    { data: { success: true, litigeId, agentId, status: "assigne" } },
+    () => apiClient.post(`/admin/litiges/${litigeId}/assign`, { agentId }),
   );
 }
