@@ -1,9 +1,8 @@
 
 import { getMock } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
-import { mockCategories } from "../data/shared/mockCategories.js";
-import { mockLitigeMotifs } from "../data/shared/mockLitigeMotifs.js";
-
+import { mockCategories } from "../data/shared/mock_categories.js";
+import { mockLitigeMotifs } from "../data/shared/mock_litige_motifs.js";
 export async function getCategories() {
   return getMock(
     mockCategories,

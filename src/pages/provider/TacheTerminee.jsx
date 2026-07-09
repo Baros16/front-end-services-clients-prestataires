@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Button,
@@ -9,29 +10,47 @@ import {
   AlertBanner,
   CheckCircle,
   PartyPopper,
-  Check,
   Lock,
+  SkeletonLoader,
+  EmptyState,
+  FileX,
+  PageHeader,
 } from "../../components/commons";
+import ClientCard from "../../components/provider/ClientCard";
 import { getProviderDashboard, completeMission } from "../../services/providerService";
-import { formatXAF } from "../../utils/formatters";
-
+import PreDepartChecklist from "../../components/provider/PreDepartChecklist";
+import SuccessScreen from "../../components/provider/SuccessScreen";
 export default function TacheTerminee() {
+<<<<<<< Updated upstream
   const [mission,  setMission]  = useState(null);
   const [steps,    setSteps]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [finishing,setFinishing]= useState(false);
   const [done,     setDone]     = useState(false);
+=======
+  const navigate = useNavigate();
+  const [mission,   setMission]   = useState(null);
+  const [steps,     setSteps]     = useState([]);
+  const [loading,   setLoading]   = useState(true);
+  const [error, setError] = useState(null);
+  const [finishing, setFinishing] = useState(false);
+  const [done,      setDone]      = useState(false);
+>>>>>>> Stashed changes
 
   useEffect(() => {
-    getProviderDashboard()
-      .then((d) => {
-        const m = d.recentMissions[0];
-        setMission(m);
-        setSteps(m.steps);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  getProviderDashboard()
+    .then((d) => {
+      const m = d.recentMissions?.[0] || null;
+
+      setMission(m);
+      setSteps(m?.steps || []);
+    })
+    .catch((err) => {
+      console.error(err);
+      setError("Impossible de charger les informations de la mission.");
+    })
+    .finally(() => setLoading(false));
+}, []);
 
   const completed = steps.filter((s) => s.completed).length;
   const total     = steps.length;
@@ -48,26 +67,55 @@ export default function TacheTerminee() {
       .finally(() => setFinishing(false));
   };
 
-  if (loading || !mission) return null;
+  if (loading) {
+  return <SkeletonLoader variant="card" count={2} />;
+}
 
-  if (done) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-5 py-24">
-        <PartyPopper size={52} strokeWidth={1.5} style={{ color: "var(--color-brand)" }} />
-        <h2 className="font-[family-name:var(--font-display)] text-[22px] font-bold text-sl-900 m-0">
-          Mission terminée !
-        </h2>
-        <p className="text-[14px] text-sl-500 text-center max-w-sm m-0">
-          Le paiement séquestré sera libéré après validation du client.
-        </p>
-        <AmountDisplay amount={mission.sequesteredAmount} size="xl" variant="positive" />
-      </div>
-    );
-  }
+if (error) {
+  return (
+    <AlertBanner
+      type="danger"
+      title="Erreur"
+      message={error}
+    />
+  );
+}
 
+if (!mission) {
+  return (
+    <EmptyState
+      icon={<FileX size={40} />}
+      title="Aucune mission"
+      subtitle="Aucune mission terminable n'est disponible."
+    />
+  );
+}
+
+if (done) {
+  return (
+    <SuccessScreen
+      icon={
+        <PartyPopper
+          size={52}
+          strokeWidth={1.5}
+          style={{ color: "var(--color-brand)" }}
+        />
+      }
+      title="Mission terminée !"
+      message="Le paiement séquestré sera libéré après validation du client."
+    >
+      <AmountDisplay
+        amount={mission.sequesteredAmount}
+        size="xl"
+        variant="positive"
+      />
+    </SuccessScreen>
+  );
+}
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
+<<<<<<< Updated upstream
       <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
@@ -77,11 +125,19 @@ export default function TacheTerminee() {
         </div>
         <StatusBadge variant="en_cours" withDot />
       </div>
+=======
+      <PageHeader
+  title="Tâche terminée"
+  subtitle={mission.title}
+  badge={<StatusBadge variant="en_cours" />}
+/>
+>>>>>>> Stashed changes
 
       <div className="grid grid-cols-[1fr_320px] gap-6 p-6 items-start">
 
         <div className="flex flex-col gap-4">
 
+<<<<<<< Updated upstream
           <Card title="Étapes de la mission">
             <div className="mb-4">
               <ProgressBar value={completed} max={total} label={`${completed} / ${total} étapes complétées`} />
@@ -107,7 +163,30 @@ export default function TacheTerminee() {
               ))}
             </div>
           </Card>
+=======
+<Card title="Étapes de la mission">
+  <div className="mb-4">
+    <ProgressBar
+      value={completed}
+      max={total}
+      label={`${completed} / ${total} étapes complétées`}
+    />
+  </div>
+>>>>>>> Stashed changes
 
+  <PreDepartChecklist
+  items={
+    [...steps]
+      .sort((a, b) => a.order - b.order)
+      .map((step) => ({
+        id: step.id,
+        label: step.label,
+        checked: step.completed,
+      }))
+  }
+  onToggle={toggleStep}
+/>
+</Card>
           {!toutFait && (
             <AlertBanner
               type="warning"
@@ -130,15 +209,10 @@ export default function TacheTerminee() {
 
         <div className="flex flex-col gap-4">
 
-          <Card title="Client">
-            <div className="flex items-center gap-3">
-              <Avatar initial="M" size="lg" />
-              <div>
-                <p className="text-[14px] font-bold text-sl-900 m-0">Madeleine Kamdem</p>
-                <p className="text-[12px] text-sl-400 m-0 mt-[2px]">Client vérifié</p>
-              </div>
-            </div>
-          </Card>
+        <ClientCard
+  showContact
+  onContact={() => navigate("/provider/chat")}
+/>
 
           <Card title="Paiement séquestré">
             <div className="flex flex-col gap-1">

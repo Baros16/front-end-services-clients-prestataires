@@ -47,3 +47,4 @@ export { SkeletonLoader }    from "./SkeletonLoader";
 
 // Ajouter à src/components/common/index.js
 export * from './Icons';
+export {  AvailabilityToggle } from "./AvailabilityToggle";

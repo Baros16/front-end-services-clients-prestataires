@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import {
   Card,
   Button,
+   EmptyState,
+  FileX,
   Input,
+  SkeletonLoader,
   PhotoUploader,
   AmountDisplay,
   AlertBanner,
   Send,
+  PageHeader,
 } from "../../components/commons";
 import { getProviderDashboard } from "../../services/providerService";
 import { getLitigeMotifs } from "../../services/sharedService";
-
 export default function SignalerLitige() {
   const navigate = useNavigate();
   const [mission,     setMission]     = useState(null);
@@ -23,63 +26,111 @@ export default function SignalerLitige() {
   const [loading,     setLoading]     = useState(true);
   const [submitting,  setSubmitting]  = useState(false);
   const [envoye,      setEnvoye]      = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    Promise.all([
-      getProviderDashboard(),
-      getLitigeMotifs(),
-    ])
-      .then(([dashboard, motifsData]) => {
-        setMission(dashboard.recentMissions[0]);
-        setMotifs(motifsData);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchData = async () => {
+    try {
+      const [dashboard, motifsData] = await Promise.all([
+        getProviderDashboard(),
+        getLitigeMotifs(),
+      ]);
+
+      setMission(dashboard.recentMissions?.[0] || null);
+      setMotifs(motifsData);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de charger les informations.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
 
   const handleAdd    = (file) =>
     setPhotos([...photos, { id: "p-" + Date.now(), url: URL.createObjectURL(file), name: file.name }]);
   const handleRemove = (id) => setPhotos(photos.filter((p) => p.id !== id));
 
-  const handleSoumettre = async () => {
-    if (!motifId) { setErreur("Veuillez sélectionner un motif."); return; }
-    if (description.trim().length < 10) { setErreur("La description doit contenir au moins 10 caractères."); return; }
-    setErreur(null);
-    setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setEnvoye(true);
-    setSubmitting(false);
-  };
-
-  if (loading || !mission) return null;
-
-  if (envoye) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24">
-        <Send size={52} strokeWidth={1.5} style={{ color: "var(--color-brand)" }} />
-        <h2 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
-          Litige signalé
-        </h2>
-        <p className="text-[14px] text-sl-500 text-center max-w-sm m-0">
-          Votre signalement a été transmis. Notre équipe vous répondra sous 24h.
-        </p>
-      </div>
-    );
+ const handleSoumettre = async () => {
+  if (!motifId) {
+    setErreur("Veuillez sélectionner un motif.");
+    return;
   }
+
+  if (description.trim().length < 10) {
+    setErreur("La description doit contenir au moins 10 caractères.");
+    return;
+  }
+
+  setErreur(null);
+  setSubmitting(true);
+
+  try {
+    await SignalerLitige({
+      missionId: mission.id,
+      motifId,
+      description,
+      photos,
+    });
+
+    setEnvoye(true);
+  } catch (err) {
+    console.error(err);
+    setErreur("Erreur lors de l'envoi. Réessayez.");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+  if (loading) {
+  return <SkeletonLoader variant="card" count={2} />;
+}
+
+if (error) {
+  return (
+    <AlertBanner
+      type="danger"
+      title="Erreur"
+      message={error}
+    />
+  );
+}
+
+if (!mission) {
+  return (
+    <EmptyState
+      icon={<FileX size={40} />}
+      title="Aucune mission"
+      subtitle="Aucune mission à signaler."
+    />
+  );
+}
+
+ if (envoye) {
+  return (
+    <SuccessScreen
+      icon={
+        <Send
+          size={52}
+          strokeWidth={1.5}
+          style={{ color: "var(--color-brand)" }}
+        />
+      }
+      title="Litige signalé"
+      message="Votre signalement a été transmis. Notre équipe vous répondra sous 24h."
+    />
+  );
+}
 
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
-        <div>
-          <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
-            Signaler un litige
-          </h1>
-          <p className="text-[13px] text-sl-500 m-0 mt-1">
-            Mission {mission.category} · Madeleine Kamdem
-          </p>
-        </div>
-      </div>
+     <PageHeader
+  title="Signaler un litige"
+  subtitle={`Mission ${mission.category} · Madeleine Kamdem`}
+/>
 
       <div className="flex flex-col gap-5 p-6 max-w-2xl">
 

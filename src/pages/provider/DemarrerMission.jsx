@@ -8,6 +8,9 @@ import {
   Avatar,
   RatingStars,
   MapEmbed,
+  SkeletonLoader,
+  EmptyState,
+  FileX,
   AlertBanner,
   CheckCircle,
   PlayCircle,
@@ -15,10 +18,13 @@ import {
   AlertTriangle,
   Lock,
   MapPin,
+  PageHeader,
 } from "../../components/commons";
 import { getProviderDashboard, startMission } from "../../services/providerService";
-import { formatXAF } from "../../utils/formatters";
 import PreDepartChecklist from "../../components/provider/PreDepartChecklist";
+import ClientCard from "../../components/provider/ClientCard";
+import SequestreInfo from "../../components/provider/SequestreInfo";
+import SuccessScreen from "../../components/provider/SuccessScreen";
 
 const CHECKLIST = [
   { id: "materiaux", label: "Matériaux préparés",               checked: true  },
@@ -34,33 +40,74 @@ export default function DemarrerMission() {
   const [loading,   setLoading]   = useState(true);
   const [starting,  setStarting]  = useState(false);
   const [done,      setDone]      = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getProviderDashboard()
-      .then((d) => setMission(d.recentMissions[0]))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const fetchMission = async () => {
+    try {
+      const d = await getProviderDashboard();
+      setMission(d.recentMissions?.[0] || null);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de charger les informations de la mission.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchMission();
+}, []);
 
   const toutCoche = checklist.every((i) => i.checked);
 
   const toggle = (id) =>
     setChecklist(checklist.map((i) => i.id === id ? { ...i, checked: !i.checked } : i));
 
-  const handleDemarrer = async () => {
-    setStarting(true);
-    startMission(mission.id)
-      .then(() => setDone(true))
-      .catch(console.error)
-      .finally(() => setStarting(false));
-  };
+const handleDemarrer = async () => {
+  setStarting(true);
 
-  if (loading || !mission) return null;
+  try {
+    await startMission(mission.id);
+    setDone(true);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setStarting(false);
+  }
+};
+
+  if (loading) {
+  return <SkeletonLoader variant="card" count={2} />;
+}
+
+if (error) {
+  return (
+    <AlertBanner
+      type="danger"
+      title="Erreur"
+      message={error}
+    />
+  );
+}
+
+if (!mission) {
+  return (
+    <EmptyState
+      icon={<FileX size={40} />}
+      title="Aucune mission"
+      subtitle="Aucune mission disponible."
+    />
+  );
+}
 
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24">
-        <CheckCircle size={52} strokeWidth={1.5} style={{ color: "var(--color-success)" }} />
+        <CheckCircle
+  size={52}
+  strokeWidth={1.5}
+  className="text-[var(--color-success)]"
+/>
         <h2 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
           Mission démarrée !
         </h2>
@@ -72,15 +119,11 @@ export default function DemarrerMission() {
   return (
     <div className="flex flex-col gap-0 min-h-screen bg-sl-50">
 
-      <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-sl-200 bg-sl-0">
-        <div>
-          <h1 className="font-[family-name:var(--font-display)] text-[20px] font-bold text-sl-900 m-0">
-            Missions en attente
-          </h1>
-          <p className="text-[13px] text-sl-500 m-0 mt-1">Missions payées, prêtes à démarrer</p>
-        </div>
-        <StatusBadge variant="disponible" />
-      </div>
+      <PageHeader
+  title="Missions en attente"
+  subtitle="Missions payées, prêtes à démarrer"
+  badge={<StatusBadge variant="disponible" />}
+/>
 
       <div className="grid grid-cols-[1fr_340px] gap-6 p-6 items-start">
 
@@ -89,12 +132,17 @@ export default function DemarrerMission() {
           <Card>
             <div className="flex flex-col gap-4">
               <div className="flex items-start justify-between gap-3 flex-wrap">
-                <div>
-                  <p className="text-[12px] text-sl-400 m-0">Mission confirmée · Paiement reçu</p>
-                  <h2 className="font-[family-name:var(--font-display)] text-[18px] font-bold text-sl-900 m-0 mt-1">
-                    {mission.title}
-                  </h2>
-                </div>
+                <SuccessScreen
+  icon={
+    <CheckCircle
+      size={52}
+      strokeWidth={1.5}
+      style={{ color: "var(--color-success)" }}
+    />
+  }
+  title="Mission démarrée !"
+  message="Le client a été notifié. Bonne intervention !"
+/>
                 <StatusBadge variant="paye_sequestre" />
               </div>
 
@@ -154,37 +202,16 @@ export default function DemarrerMission() {
 
         <div className="flex flex-col gap-4">
 
-          <Card title="Client">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <Avatar initial="M" size="lg" />
-                <div>
-                  <p className="text-[14px] font-bold text-sl-900 m-0">Madeleine Kamdem</p>
-                  <RatingStars value={4.2} size="sm" />
-                  <p className="text-[12px] text-sl-400 m-0 mt-[2px]">3 missions · Client vérifié</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-center"
-                onClick={() => navigate("/provider/chat")}
-              >
-                <MessageCircle size={16} />
-                Contacter le client
-              </Button>
-            </div>
-          </Card>
+          <ClientCard
+  showContact
+  onContact={() => navigate("/provider/chat")}
+/>
 
           <Card title="Checklist avant départ">
             <PreDepartChecklist items={checklist} onToggle={toggle} />
           </Card>
 
-          <AlertBanner
-            type="info"
-            title={<span className="flex items-center gap-1"><Lock size={14} /> Rappel séquestre</span>}
-            message={`${formatXAF(mission.sequesteredAmount)} séquestrés. Libération après double validation.`}
-          />
+          <SequestreInfo amount={mission.sequesteredAmount} />
 
         </div>
       </div>
