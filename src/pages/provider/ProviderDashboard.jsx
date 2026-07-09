@@ -10,7 +10,6 @@ import {
   Avatar,
   EmptyState,
   Inbox,
-  Spinner,
 } from "../../components/commons";
 import { AvailabilityToggle } from "../../components/provider/AvailabilityToggle";
 import { getProviderDashboard } from "../../services/providerService";
@@ -30,39 +29,20 @@ const FILTRES = [
 
 export default function ProviderDashboard() {
   const navigate = useNavigate();
-  const [data,    setData]    = useState(null);
-  const [erreur,  setErreur]  = useState(null);
-  const [filtre,  setFiltre]  = useState("tous");
-  const [dispo,   setDispo]   = useState(false);
+  const [data,   setData]   = useState(null);
+  const [filtre, setFiltre] = useState("tous");
+  const [dispo,  setDispo]  = useState(false);
 
   useEffect(() => {
     getProviderDashboard()
       .then((d) => {
         setData(d);
-        setDispo(d.profile?.isAvailable ?? false);
+        setDispo(d.profile.isAvailable);
       })
-      .catch((e) => {
-        console.error("[ProviderDashboard] Erreur chargement:", e);
-        setErreur(e?.message ?? "Erreur inconnue");
-      });
+      .catch(console.error);
   }, []);
 
-  if (erreur) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24">
-        <p className="text-danger font-bold text-[16px]">Erreur de chargement</p>
-        <p className="text-sl-500 text-[13px]">{erreur}</p>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
+  if (!data) return null;
 
   const { profile, metrics, recentMissions, availability } = data;
 
