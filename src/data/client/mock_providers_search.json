@@ -3,11 +3,11 @@
   "data": [
     {
       "id": "usr_jcm456",
-      "fullName": "Jean-Claude M.",
+      "fullName": "Jean-Claude Mbarga",
       "avatarInitial": "J",
-      "specialty": "Plombier",
+      "specialty": "Plomberie",
       "rating": 4.8,
-      "hourlyRate": 3500,
+      "hourlyRate": 4000,
       "distanceKm": 0.8,
       "isAvailable": true,
       "completedMissions": 47,
@@ -17,13 +17,13 @@
       }
     },
     {
-      "id": "usr_pfo002",
-      "fullName": "Pierre Fomba",
-      "avatarInitial": "P",
-      "specialty": "Plombier",
+      "id": "usr_plo002",
+      "fullName": "Rodrigue Tchinda",
+      "avatarInitial": "R",
+      "specialty": "Plomberie",
       "rating": 4.5,
-      "hourlyRate": 3000,
-      "distanceKm": 1.2,
+      "hourlyRate": 3500,
+      "distanceKm": 1.4,
       "isAvailable": true,
       "completedMissions": 32,
       "serviceZone": {
@@ -32,25 +32,70 @@
       }
     },
     {
-      "id": "usr_gnu003",
-      "fullName": "Gaetan Nguema",
-      "avatarInitial": "G",
-      "specialty": "Plombier",
+      "id": "usr_plo003",
+      "fullName": "Serge Kengni",
+      "avatarInitial": "S",
+      "specialty": "Plomberie",
       "rating": 4.2,
-      "hourlyRate": 2800,
-      "distanceKm": 2.5,
+      "hourlyRate": 3000,
+      "distanceKm": 2.1,
       "isAvailable": false,
       "completedMissions": 18,
       "serviceZone": {
         "city": "Bafoussam",
         "radiusKm": 10
       }
+    },
+    {
+      "id": "usr_plo004",
+      "fullName": "Armand Nana",
+      "avatarInitial": "A",
+      "specialty": "Plomberie",
+      "rating": 4.6,
+      "hourlyRate": 4500,
+      "distanceKm": 3.0,
+      "isAvailable": true,
+      "completedMissions": 61,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 25
+      }
+    },
+    {
+      "id": "usr_plo005",
+      "fullName": "Felicien Wandji",
+      "avatarInitial": "F",
+      "specialty": "Plomberie",
+      "rating": 3.9,
+      "hourlyRate": 2500,
+      "distanceKm": 4.5,
+      "isAvailable": true,
+      "completedMissions": 9,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 10
+      }
+    },
+    {
+      "id": "usr_plo006",
+      "fullName": "Maurice Djomeni",
+      "avatarInitial": "M",
+      "specialty": "Plomberie",
+      "rating": 4.9,
+      "hourlyRate": 5000,
+      "distanceKm": 6.2,
+      "isAvailable": true,
+      "completedMissions": 85,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 30
+      }
     }
   ],
   "meta": {
     "page": 1,
     "limit": 20,
-    "total": 3,
+    "total": 6,
     "totalPages": 1
   }
 }

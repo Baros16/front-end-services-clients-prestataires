@@ -1,92 +1,112 @@
 // src/pages/admin/TraitementLitigeSC.jsx
-import { useState } from 'react';
-import { PageHeader } from '../../components/commons/PageHeader';
-import LitigeDetailsPanel from '../../components/service-client/LitigeDetailsPanel';
-import MediationChatPanel from '../../components/service-client/MediationChatPanel';
-import PartiesConcerneesPanel from '../../components/service-client/PartiesConcerneesPanel';
-import ResolutionPanel from '../../components/service-client/ResolutionPanel';
-import { formatMotif } from '../../utils/formateurs';
-import { StatusBadge } from '../../components/commons/StatusBadge';
+import { useState, useEffect } from "react";
+import { PageHeader, StatusBadge, SkeletonLoader, AlertBanner, EmptyState } from "../../components/commons";
+import LitigeDetailsPanel from "../../components/service-client/LitigeDetailsPanel";
+import MediationChatPanel from "../../components/service-client/MediationChatPanel";
+import PartiesConcerneesPanel from "../../components/service-client/PartiesConcerneesPanel";
+import ResolutionPanel from "../../components/service-client/ResolutionPanel";
+import { submitResolution, closeLitige } from "../../services/agentService";
+import { formatMotif } from "../../utils/formatters";
 import {
   mockLitigeDetail,
   mockParties,
   mockClientMessages,
   mockProviderMessages,
-} from '../../data/service-client/mockLitigeDetail';
+} from "../../data/service-client/mockLitigeDetail";
 
-const CURRENT_AGENT_ID = 'usr_agent01';
+const CURRENT_AGENT_ID = "usr_agent01";
 
 export default function TraitementLitigeSC() {
-  const litige = mockLitigeDetail;
-  const parties = mockParties;
+  const [litige] = useState(mockLitigeDetail);
+  const [parties] = useState(mockParties);
+  const [loading] = useState(false);
+  const [error] = useState(null);
 
-  const [status, setStatus] = useState('ouvert');
-  const [activeParty, setActiveParty] = useState('client');
+  const [status, setStatus] = useState("ouvert");
+  const [activeParty, setActiveParty] = useState("client");
   const [clientMessages, setClientMessages] = useState(mockClientMessages);
   const [providerMessages, setProviderMessages] = useState(mockProviderMessages);
   const [selectedResolution, setSelectedResolution] = useState(null);
-  const [refundAmount, setRefundAmount] = useState('');
+  const [refundAmount, setRefundAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  const isLitigeClosed = status === 'resolu' || status === 'cloture';
+  const isLitigeClosed = status === "resolu" || status === "cloture";
 
   const handleSend = (message) => {
     const newMessage = {
       id: `lmsg_${Date.now()}`,
       litigeId: litige.id,
       senderId: CURRENT_AGENT_ID,
-      senderRole: 'agent',
-      senderName: 'Pauline F.',
+      senderRole: "agent",
+      senderName: "Pauline F.",
       content: message,
       attachmentUrl: null,
       sentAt: new Date().toISOString(),
     };
-    if (activeParty === 'client') {
+    if (activeParty === "client") {
       setClientMessages((prev) => [...prev, newMessage]);
     } else {
       setProviderMessages((prev) => [...prev, newMessage]);
     }
   };
 
-  const handleSubmitResolution = () => {
+  const handleSubmitResolution = async () => {
     setFeedback(null);
     setIsSubmitting(true);
-    // TODO: remplacer par POST /agent/litiges/:id/resolution
-    setTimeout(() => {
+    try {
+      await submitResolution(litige.id, {
+        type: selectedResolution,
+        refundAmount: Number(refundAmount),
+      });
+      setStatus("resolu");
+      setFeedback({ type: "success", message: "Proposition envoyee aux deux parties pour acceptation." });
+    } catch (err) {
+      setFeedback({ type: "error", message: "Une erreur est survenue." });
+    } finally {
       setIsSubmitting(false);
-      setStatus('resolu');
-      setFeedback({ type: 'success', message: 'Proposition envoyée aux deux parties pour acceptation.' });
-    }, 800);
+    }
   };
 
-  const handleCloseLitige = () => {
-    const confirmed = window.confirm('Voulez-vous vraiment clôturer ce litige ? Cette action est définitive.');
+  const handleCloseLitige = async () => {
+    const confirmed = window.confirm("Voulez-vous vraiment cloтurer ce litige ? Cette action est definitive.");
     if (!confirmed) return;
-    // TODO: remplacer par POST /agent/litiges/:litigeId/close
-    setStatus('cloture');
-    setFeedback({ type: 'success', message: 'Litige clôturé.' });
+    try {
+      await closeLitige(litige.id);
+      setStatus("cloture");
+      setFeedback({ type: "success", message: "Litige cloture." });
+    } catch (err) {
+      setFeedback({ type: "error", message: "Une erreur est survenue." });
+    }
   };
+
+  if (loading) return <SkeletonLoader variant="card" count={3} />;
+  if (error) return <AlertBanner variant="error" message={error} />;
+  if (!litige) return <EmptyState title="Litige introuvable" description="Ce litige n'existe pas." />;
 
   return (
     <div>
       <PageHeader
         title={`Litige #${litige.reference}`}
-        subtitle={`${formatMotif(litige.motif)} · ${litige.originalQuote.total.toLocaleString('fr-FR')} XAF séquestrés`}
-        actions={<StatusBadge variant={status === 'ouvert' ? 'ouvert' : status === 'resolu' ? 'resolu' : 'annulee'} />}
+        subtitle={`${litige.originalQuote.total.toLocaleString("fr-FR")} XAF sequestres`}
+        actions={
+          <StatusBadge
+            variant={status === "ouvert" ? "ouvert" : status === "resolu" ? "resolu" : "annulee"}
+          />
+        }
       />
 
       {feedback && (
         <div className={`mx-4 mt-4 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium ${
-          feedback.type === 'success'
-            ? 'bg-success-light text-success border border-success'
-            : 'bg-danger-light text-danger border border-danger'
+          feedback.type === "success"
+            ? "bg-success-light text-success border border-success"
+            : "bg-danger-light text-danger border border-danger"
         }`}>
           {feedback.message}
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-4 p-4 min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         <LitigeDetailsPanel litige={litige} />
 
         <MediationChatPanel
@@ -105,7 +125,7 @@ export default function TraitementLitigeSC() {
 
           {isLitigeClosed ? (
             <div className="border border-sl-200 rounded-[var(--radius-lg)] p-4 bg-sl-50 text-sm text-sl-500">
-              Ce litige est {status === 'resolu' ? 'résolu' : 'clôturé'}. Aucune action supplémentaire n'est possible.
+              Ce litige est {status === "resolu" ? "resolu" : "cloture"}. Aucune action supplementaire n'est possible.
             </div>
           ) : (
             <ResolutionPanel

@@ -1,5 +1,6 @@
 // src/components/client/UrgencyBanner.jsx
 import { useState, useEffect } from "react";
+import { Wrench, MapPin } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
 
 export default function UrgencyBanner({ category, description, location, countdownSeconds }) {
@@ -14,13 +15,15 @@ export default function UrgencyBanner({ category, description, location, countdo
   }, [secondsLeft]);
 
   return (
-    <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
+    <div className="bg-danger-light border border-danger rounded-[var(--radius-lg)] p-4 flex items-center justify-between">
       <div>
-        <p className="font-bold text-red-600 text-lg">
-          🔧 {category} — {description}
+        <p className="font-bold text-danger text-lg flex items-center gap-2">
+          <Wrench size={16} />
+          {category} — {description}
         </p>
-        <p className="text-sm text-gray-500 mt-1">
-          📍 {location} · Recherche en cours...
+        <p className="text-sm text-sl-500 mt-1 flex items-center gap-1">
+          <MapPin size={16} />
+          {location} · Recherche en cours...
         </p>
       </div>
       <CountdownTimer seconds={secondsLeft} />

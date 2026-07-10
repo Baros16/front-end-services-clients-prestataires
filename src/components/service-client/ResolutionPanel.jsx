@@ -1,6 +1,5 @@
 // src/components/service-client/ResolutionPanel.jsx
-import { Card } from "../commons/Card";
-import { Button } from "../commons/Button";
+import { Card, Button } from "../commons";
 
 const RESOLUTION_OPTIONS = [
   { value: "remboursement_partiel", label: "Remboursement partiel" },
@@ -29,9 +28,7 @@ export default function ResolutionPanel({
 
   const handleResolutionChange = (value) => {
     onResolutionChange(value);
-    if (value === "annulation_complete") {
-      onRefundAmountChange("0");
-    }
+    if (value === "annulation_complete") onRefundAmountChange("0");
   };
 
   return (
@@ -44,10 +41,10 @@ export default function ResolutionPanel({
             size="md"
             fullWidth
             onClick={() => handleResolutionChange(opt.value)}
-            className={`justify-start !bg-white !text-gray-900 ${
+            className={`justify-start bg-white text-sl-900 ${
               selectedResolution === opt.value
-                ? '!border-2 !border-black font-bold'
-                : '!border !border-gray-200'
+                ? "border-2 border-sl-900 font-bold"
+                : "border border-sl-200"
             }`}
           >
             {opt.label}
@@ -80,15 +77,11 @@ export default function ResolutionPanel({
           fullWidth
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="!bg-black hover:!bg-gray-900 disabled:!bg-gray-400"
+          className="bg-sl-900 hover:bg-sl-800 disabled:opacity-50"
         >
           {isSubmitting ? "Envoi..." : "Soumettre la resolution"}
         </Button>
-        <Button
-          variant="ghost"
-          fullWidth
-          onClick={onClose}
-        >
+        <Button variant="ghost" fullWidth onClick={onClose}>
           Cloтurer le litige
         </Button>
       </div>

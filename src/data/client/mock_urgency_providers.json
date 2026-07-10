@@ -1,0 +1,56 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "usr_jcm456",
+      "fullName": "Jean-Claude M.",
+      "avatarInitial": "J",
+      "specialty": "Plombier",
+      "rating": 4.8,
+      "hourlyRate": 3500,
+      "distanceKm": 0.8,
+      "isAvailable": true,
+      "completedMissions": 47,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 20
+      }
+    },
+    {
+      "id": "usr_pfo002",
+      "fullName": "Pierre Fomba",
+      "avatarInitial": "P",
+      "specialty": "Plombier",
+      "rating": 4.5,
+      "hourlyRate": 3000,
+      "distanceKm": 1.2,
+      "isAvailable": true,
+      "completedMissions": 32,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 15
+      }
+    },
+    {
+      "id": "usr_gnu003",
+      "fullName": "Gaetan Nguema",
+      "avatarInitial": "G",
+      "specialty": "Plombier",
+      "rating": 4.2,
+      "hourlyRate": 2800,
+      "distanceKm": 2.5,
+      "isAvailable": false,
+      "completedMissions": 18,
+      "serviceZone": {
+        "city": "Bafoussam",
+        "radiusKm": 10
+      }
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 3,
+    "totalPages": 1
+  }
+}

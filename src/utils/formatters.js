@@ -1,10 +1,5 @@
-// src/utils/formateurs.js
+// src/utils/formatters.js
 
-/**
- * Transforme un identifiant MAJUSCULES_SNAKE_CASE
- * en texte lisible avec seulement la première lettre en majuscule.
- * Ex: "PRESTATION_INCOMPLETE" -> "Prestation incomplete"
- */
 export function formatMotif(motif) {
   if (!motif) return '';
   const lower = motif.toLowerCase().replace(/_/g, ' ');

@@ -135,7 +135,6 @@ export function AppRouter() {
             <Route index                          element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"               element={<ClientDashboard />} />
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
-            <Route path="urgence" element={<UrgencyPage />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="chat"                    element={<ChatPage />} />          
@@ -144,7 +143,7 @@ export function AppRouter() {
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="litige/:missionId"       element={<LitigeClient />} />       
-            <Route path="urgence"                 element={<UrgencePage />} />        
+            <Route path="urgence"                 element={<UrgencyPage />} />        
             <Route path="urgence/contact"         element={<UrgenceContact />} />
           </Route>
 
