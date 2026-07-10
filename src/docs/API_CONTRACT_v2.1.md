@@ -213,10 +213,10 @@ Le frontend appelle `/auth/refresh` automatiquement quand l'API retourne `401 UN
   "status": "active",
   "totalSpent": 55000,
   "completedMissions": 3,
-  "pendingPayment": {
-    "amount": 25000,
-    "missionLabel": "Mission Plomberie en cours"
-  },
+  "pendingPayments": [
+  { "amount": 22000, "missionLabel": "Mission en cours" },
+  { "amount": 10000, "missionLabel": "Mission en cours" }
+]
   "location": {
     "city": "Bafoussam",
     "district": "Quartier Commercial"
