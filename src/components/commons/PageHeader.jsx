@@ -1,14 +1,7 @@
 // src/components/PageHeader.jsx
 import { StatusBadge } from "./StatusBadge";
 
-/**
- * PageHeader
- * Barre de titre en haut du contenu principal.
- * title    : requis
- * subtitle : optionnel
- * badge    : { label, variant } — StatusBadge à droite du titre
- * actions  : ReactNode — slot boutons à droite
- */
+
 export function PageHeader({ title, subtitle, badge, actions, className = "" }) {
   return (
     <div
