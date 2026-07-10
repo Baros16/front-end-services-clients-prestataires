@@ -34,12 +34,12 @@ const ScLoginPage        = lazy(() => import("../pages/auth/ScLoginPage"));
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
+const UrgencyPage         = lazy(() => import("../pages/client/UrgencyPage"));
 const SuiviMission       = lazy(() => import("../pages/client/SuiviMission"));
 const NotationPrestataire = lazy(() => import("../pages/client/NotationPrestataire"));
 const ChatPage            = lazy(() => import("../pages/client/ChatPage"));        
 const DevisClient         = lazy(() => import("../pages/client/DevisClient")); 
 const LitigeClient        = lazy(() => import("../pages/client/LitigeClient"));
-const UrgencePage         = lazy(() => import("../pages/client/UrgencePage"));    
 const UrgenceContact      = lazy(() => import("../pages/client/UrgenceContact")); 
 
 // ─── Lazy imports — Provider ─────────────────────────────────────────────────
@@ -141,7 +141,7 @@ export function AppRouter() {
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="litige/:missionId"       element={<LitigeClient />} />       
-            <Route path="urgence"                 element={<UrgencePage />} />        
+            <Route path="urgence"                 element={<UrgencyPage />} />        
             <Route path="urgence/contact"         element={<UrgenceContact />} />
           </Route>
 

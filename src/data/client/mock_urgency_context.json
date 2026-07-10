@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": {
+    "category": "Plomberie",
+    "description": "Fuite d'eau urgente",
+    "location": "Bafoussam, Quartier Commercial",
+    "countdownSeconds": 900
+  }
+}

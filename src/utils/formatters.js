@@ -1,9 +1,12 @@
-export function formatTime(isoString) {
-  return new Date(isoString).toLocaleTimeString('fr-CM', {
-    hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Douala',
-  });
+// src/utils/formatters.js
+
+export function formatMotif(motif) {
+  if (!motif) return '';
+  const lower = motif.toLowerCase().replace(/_/g, ' ');
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
 }
-export function formatXAF(amount) {
-if (amount == null) return "— XAF";
-return new Intl.NumberFormat("fr-FR").format(amount) + " XAF";
-} 
+
+export function formatMotifUpper(motif) {
+  if (!motif) return '';
+  return motif.replace(/_/g, ' ');
+}
