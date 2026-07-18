@@ -3,6 +3,7 @@ import { getMock, getMockList } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
 import mock_dashboard from "../data/provider/mock_dashboard.json";
 import mock_avilable_demands from "../data/provider/mock_available_demands.json";
+import mock_earnings from "../data/provider/mock_earnings.json";
 
 export async function getProviderDashboard() {
   return getMock(

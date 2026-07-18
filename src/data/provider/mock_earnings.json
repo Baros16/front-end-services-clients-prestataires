@@ -1,43 +1,72 @@
 {
   "success": true,
   "data": {
-    "monthlyTotal": 185000,
+    "metrics": {
+      "missionsThisMonth": 18,
+      "missionsThisMonthTrend": "+3 vs avril",
+      "netGains": 185000,
+      "netGainsTrend": "+22%",
+      "averageRating": 4.8,
+      "averageRatingTrend": "+0.1",
+      "totalCumulated": 1240000
+    },
+    "monthlyGains": [
+      { "month": "Janvier", "amount": 95000,  "maxAmount": 185000 },
+      { "month": "Février", "amount": 112000, "maxAmount": 185000 },
+      { "month": "Mars",    "amount": 148000, "maxAmount": 185000 },
+      { "month": "Avril",   "amount": 152000, "maxAmount": 185000 },
+      { "month": "Mai",     "amount": 185000, "maxAmount": 185000 }
+    ],
     "payouts": [
       {
         "id": "pyt_018",
-        "transactionId": "txn_msn010",
+        "clientName": "Madeleine K.",
+        "clientInitial": "M",
+        "category": "Plomberie",
+        "rating": 5,
         "amount": 22500,
-        "commissionAmount": 2500,
         "status": "completed",
-        "externalRef": "OM-2026052114",
-        "createdAt": "2026-05-21T14:00:00+01:00"
+        "date": "2026-05-21T14:00:00+01:00"
       },
       {
         "id": "pyt_017",
-        "transactionId": "txn_msn009",
-        "amount": 31000,
-        "commissionAmount": 3200,
+        "clientName": "Sylvie N.",
+        "clientInitial": "S",
+        "category": "Électricité",
+        "rating": 4,
+        "amount": 18000,
         "status": "completed",
-        "externalRef": "MOMO-2026051916",
-        "createdAt": "2026-05-19T16:30:00+01:00"
+        "date": "2026-05-18T16:30:00+01:00"
       },
       {
         "id": "pyt_016",
-        "transactionId": "txn_msn008",
-        "amount": 11500,
-        "commissionAmount": 1200,
+        "clientName": "Robert T.",
+        "clientInitial": "R",
+        "category": "Ménage",
+        "rating": 5,
+        "amount": 12000,
         "status": "completed",
-        "externalRef": "OM-2026051710",
-        "createdAt": "2026-05-17T10:00:00+01:00"
+        "date": "2026-05-15T10:00:00+01:00"
       },
       {
         "id": "pyt_015",
-        "transactionId": "txn_msn007",
-        "amount": 9500,
-        "commissionAmount": 950,
-        "status": "pending",
-        "externalRef": "MOMO-2026051412",
-        "createdAt": "2026-05-14T12:00:00+01:00"
+        "clientName": "Hélène M.",
+        "clientInitial": "H",
+        "category": "Plomberie",
+        "rating": 3,
+        "amount": 31500,
+        "status": "completed",
+        "date": "2026-05-12T12:00:00+01:00"
+      },
+      {
+        "id": "pyt_014",
+        "clientName": "Clara B.",
+        "clientInitial": "C",
+        "category": "Serrurerie",
+        "rating": 5,
+        "amount": 14000,
+        "status": "completed",
+        "date": "2026-05-10T09:00:00+01:00"
       }
     ]
   },

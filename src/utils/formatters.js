@@ -7,3 +7,10 @@ export function formatXAF(amount) {
 if (amount == null) return "— XAF";
 return new Intl.NumberFormat("fr-FR").format(amount) + " XAF";
 } 
+export function formatDate(isoString) {
+  return new Date(isoString).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'Africa/Douala',
+  });
+}

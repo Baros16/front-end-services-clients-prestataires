@@ -124,18 +124,3 @@ export async function createLitige(missionId, payload) {
     () => apiClient.post(`/client/missions/${missionId}/litige`, payload),
   );
 }
-export async function rateMission(missionId, payload) {
-  // payload : { rating: 1-5, comment }
-  return getMock(
-    { success: true, data: { missionId, ...payload } },
-    () => axios.post(`${BASE}/missions/${missionId}/rate`, payload)
-  );
-}
-
-export async function createLitige(missionId, payload) {
-  // payload : { motifId, description, evidencePhotoIds }
-  return getMock(
-    { success: true, data: { missionId, status: "ouvert" } },
-    () => axios.post(`${BASE}/missions/${missionId}/litige`, payload)
-  );
-}
