@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../../components/commons/Input";
-import { Button } from "../../components/commons/Button";
-import { AlertBanner } from "../../components/commons/AlertBanner";
+import { Button, Input, AlertBanner } from "../../components/commons";
 import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
 import { register } from "../../services/authService.js";
+import { Eye, EyeOff } from "../../components/commons";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -15,7 +14,10 @@ export default function RegisterPage() {
     phone: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [role, setRole] = useState("client");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -30,35 +32,37 @@ export default function RegisterPage() {
       !formData.lastName ||
       !formData.phone ||
       !formData.email ||
-      !formData.password
+      !formData.password ||
+      !formData.confirmPassword
     ) {
       setError("Tous les champs sont obligatoires");
       return;
     }
 
-    // Vérification email
     const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       setError("Email invalide. Format attendu nom@gmail.com");
       return;
     }
 
-    // Vérification téléphone (+237 suivi de 9 chiffres)
     const phoneRegex = /^\+237[0-9]{9}$/;
     if (!phoneRegex.test(formData.phone)) {
       setError("Téléphone invalide. Format attendu: +237XXXXXXXXX");
       return;
     }
 
-    // Vérification mot de passe (minimum 6 caractères)
     if (formData.password.length < 6) {
       setError("Le mot de passe doit contenir au moins 6 caractères");
       return;
     }
 
-    // Vérification prénom et nom (minimum 2 caractères)
     if (formData.firstName.length < 4 || formData.lastName.length < 4) {
       setError("Le prénom et le nom doivent contenir au moins 4 caractères");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
 
@@ -66,27 +70,29 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      const payload = {
-        role,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        email: formData.email,
-        password: formData.password,
-      };
+    const payload = {
+      role,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      email: formData.email,
+      password: formData.password,
+    };
 
-      const response = await register(payload);
+    const response = await register(payload);
 
-      sessionStorage.setItem("pendingUserId", response.userId);
-      sessionStorage.setItem("pendingPhone", formData.phone);
+    // Stockage de l'email (verifyOtp attend email maintenant)
+    sessionStorage.setItem("pendingEmail", payload.email);
+    sessionStorage.setItem("pendingPhone", formData.phone);
 
-      navigate(`/auth/otp?userId=${response.userId}`);
-    } catch (err) {
-      setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    // Redirection vers OTP avec email en paramètre
+    navigate(`/auth/otp?email=${encodeURIComponent(payload.email)}`);
+  } catch (err) {
+    setError(err.message || "Une erreur est survenue.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -131,10 +137,28 @@ export default function RegisterPage() {
           />
           <Input
             label="Mot de passe"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={formData.password}
             onChange={(value) => handleChange("password", value)}
+            rightIcon={
+              <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
+            required
+          />
+          <Input
+            label="Confirmation mot de passe"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={formData.confirmPassword}
+            onChange={(value) => handleChange("confirmPassword", value)}
+            rightIcon={
+              <button type="button" onClick={() => setShowConfirmPassword((prev) => !prev)}>
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
             required
           />
         </div>

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
-import { Input } from "../../components/commons/Input";
-import { Button } from "../../components/commons/Button";
-import { AlertBanner } from "../../components/commons/AlertBanner";
+import { Input,Button,AlertBanner } from "../../components/commons";
 import { login } from "../../services/authService";
+import { Eye, EyeOff } from "../../components/commons";
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,27 +34,29 @@ export default function LoginPage() {
     setError("");
     setIsSubmitting(true);
 
-    try {
-      const response = await login(email, password);
+   
+  try {
+    const response = await login(email, password);
 
-      localStorage.setItem("serviloc_access", response.accessToken);
-      localStorage.setItem("serviloc_refresh", response.refreshToken);
-      localStorage.setItem(
-        "sl_mock_user",
-        JSON.stringify({ role: response.user.role.toUpperCase() }),
-      );
-
-      const role = response.user.role;
-
-      if (role === "client") navigate(`/client/dashboard`);
-      else if (role === "provider") navigate("/provider/dashboard");
-      else navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
+    // Login gère déjà le stockage via persistSession()
+    const user = response.data.user;
+    
+    // Redirection selon le rôle
+    if (user.role === "client") {
+      navigate("/client/dashboard");
+    } else if (user.role === "provider") {
+      navigate("/provider/dashboard");
+    } else if (user.role === "admin" || user.role === "agent") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/");
     }
-  };
+  } catch (err) {
+    setError(err.message || "Identifiants incorrects");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -73,11 +75,16 @@ export default function LoginPage() {
           />
           <Input
             label="Mot de passe"
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             value={password}
             onChange={setPassword}
             required
+            rightIcon={
+              <button onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
           />
         </div>
 
@@ -95,12 +102,20 @@ export default function LoginPage() {
         >
           {isSubmitting ? "Connexion en cours..." : "Se connecter"}
         </Button>
+          <div className="text-right mt-2">
+            <button
+              onClick={() => navigate("/auth/forgot-password")}
+              className="text-sm text-sl-500 hover: text-brand hover:underline transition-colors"
+            >
+              Mot de passe oublie ?
+            </button>
+          </div>
 
         <div className="text-center mt-4">
           <span className="text-gray-500">Pas inscrit ? </span>
           <button
             onClick={() => navigate("/auth/register")}
-            className="text-black underline font-medium"
+            className="text-brand underline font-medium hover:opacity-80"
           >
             Créer un compte
           </button>

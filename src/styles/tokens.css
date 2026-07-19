@@ -26,6 +26,44 @@
   --color-warning:       #D97706;
   --color-warning-light: #FEF3C7;
 
+  /* ── Catégories de service ───────────────────────────────── */
+  --color-cat-plomberie:   #2563eb;
+  --color-cat-electricite: #d97706;
+  --color-cat-nettoyage:   #16a34a;
+  --color-cat-serrurerie:  #7c3aed;
+  --color-cat-peinture:    #db2777;
+  --color-cat-autre:       #9ca3af;
+
+
+/* ── Opérateurs de paiement mobile ──────────────────────────── */
+--color-orange-money:      #FF6600;
+--color-orange-money-light:#FFF0E6;
+--color-mtn-momo:          #FFCB00;
+--color-mtn-momo-light:    #FFFBE6;
+
+/* ── Mode urgence ────────────────────────────────────────────── */
+--color-urgent:            #EF4444;
+--color-urgent-light:      #FEE2E2;
+
+/* ── Affichage montants XAF ──────────────────────────────────── */
+--color-xaf:               #92400E;
+--color-xaf-light:         #FEF3C7;
+
+/* ── Sidebar par rôle ────────────────────────────────────────── */
+--color-sidebar-admin:     #0F172A;
+--color-sidebar-client:    #1B4332;
+--color-sidebar-provider:  #1E3A5F;
+--color-sidebar-sc:        #3B1F5E;
+
+  /* ── Surfaces ─────────────────────────────────────────────── */
+  --color-surface:         #ffffff;
+  --color-surface-subtle:  #fafafa;
+
+  /* ── Sémantique états ─────────────────────────────────────── */
+  --color-error-light:     #fff1f2;
+  --color-warning-light:   #fffbeb;
+  --color-info-border:     #bfdbfe;
+
   /* ── Neutral scale ── */
   --color-sl-50:  #F8FAFC;
   --color-sl-100: #F1F5F9;
@@ -88,6 +126,7 @@ body {
 /* ── Utility classes ── */
 .sl-animate-fade-in    { animation: sl-fade-in 0.2s ease both; }
 .sl-animate-scale-in   { animation: sl-scale-in 0.15s ease both; }
+.sl-fill-both { animation-fill-mode: both; }
 .sl-animate-spin       { animation: sl-spin 0.7s linear infinite; }
 .sl-animate-pulse-dot  { animation: sl-pulse-dot 1.5s ease-in-out infinite; }
 .sl-animate-shimmer {

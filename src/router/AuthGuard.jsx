@@ -1,31 +1,44 @@
 // src/router/AuthGuard.jsx
 import { Navigate, useLocation } from "react-router-dom";
 
-/**
- * AuthGuard
- * Protège une route selon le rôle requis.
- *
- * Fonctionnement :
- *  S1/S2 → lit un mock token dans localStorage (clé "sl_mock_user")
- *  S3    → M1 remplace getMockUser() par une vraie vérification JWT
- *
- * allowedRoles : string[] — ex: ["CLIENT"] ou ["ADMIN", "SERVICE_CLIENT"]
- */
+// ─── Clés localStorage (alignées avec apiClient.js / authService.js) ───────
+const ACCESS_KEY = "serviloc_access";
+const REFRESH_KEY = "serviloc_refresh";
+const USER_KEY = "serviloc_user";
 
-// ─── Lecture du token ────────────────────────────────────────────────────────
-// S1/S2 : mock token stocké manuellement pour tester la navigation
-// S3    : remplacer cette fonction par une vraie vérification JWT
+// ─── Décodage du token réel (API_CONTRACT v2.1) ─────────────────────────────
+// Payload JWT : { userId, role: "CLIENT"|"PROVIDER"|"ADMIN"|"AGENT", type, sub: <email>, iss, iat, exp }
+// ⚠️ `role` ici est en MAJUSCULES (convention de routing). C'est différent du
+// `role` en minuscules qu'on trouve dans les objets `User` renvoyés par l'API —
+// ne jamais comparer les deux directement sans normaliser la casse.
+function decodeToken(token) {
+  const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  return JSON.parse(atob(base64));
+}
+
 function getCurrentUser() {
   try {
-    const raw = localStorage.getItem("sl_mock_user");
-    if (!raw) return null;
-    return JSON.parse(raw);
-    // S3 — décommenter et remplacer le bloc ci-dessus par :
-    // const token = localStorage.getItem("sl_token");
-    // if (!token) return null;
-    // const payload = JSON.parse(atob(token.split(".")[1]));
-    // if (payload.exp * 1000 < Date.now()) return null;  // token expiré
-    // return { role: payload.role, id: payload.sub, name: payload.name };
+    const token = localStorage.getItem(ACCESS_KEY);
+    if (!token) return null;
+
+    const payload = decodeToken(token);
+    if (!payload.exp || payload.exp * 1000 < Date.now()) {
+      // Token expiré → on nettoie pour éviter un état incohérent
+      localStorage.removeItem(ACCESS_KEY);
+      localStorage.removeItem(REFRESH_KEY);
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
+
+    const storedUser = JSON.parse(localStorage.getItem(USER_KEY) ?? "null");
+
+    return {
+      ...storedUser,
+      id: payload.userId,
+      role: payload.role, // toujours la version MAJUSCULE du token (routing)
+      name: storedUser?.fullName ?? storedUser?.firstName ?? "Utilisateur",
+      email: storedUser?.email ?? payload.sub,
+    };
   } catch {
     return null;
   }
@@ -33,10 +46,10 @@ function getCurrentUser() {
 
 // ─── Redirections par rôle ───────────────────────────────────────────────────
 const ROLE_HOME = {
-  CLIENT:         "/client/dashboard",
-  PROVIDER:       "/provider/dashboard",
-  ADMIN:          "/admin/dashboard",
-  SERVICE_CLIENT: "/admin/dashboard",
+  CLIENT:   "/client/dashboard",
+  PROVIDER: "/provider/dashboard",
+  ADMIN:    "/admin/dashboard",
+  AGENT:    "/admin/dashboard", // ⚠️ était "SERVICE_CLIENT" — corrigé pour matcher le rôle réel du backend (v2.1). À ajuster si l'espace Service Client obtient sa propre route d'accueil.
 };
 
 // ─── Composant ───────────────────────────────────────────────────────────────
@@ -44,11 +57,11 @@ export function AuthGuard({ allowedRoles, children }) {
   const location = useLocation();
   const user = getCurrentUser();
 
-  // Pas de token → login
+  // Pas de token / token expiré → login
   if (!user) {
     return (
       <Navigate
-        to="/auth/register"
+        to="/auth/login"
         state={{ from: location }}   // pour rediriger après login
         replace
       />
@@ -57,38 +70,69 @@ export function AuthGuard({ allowedRoles, children }) {
 
   // Rôle non autorisé → renvoyer vers le bon espace
   if (!allowedRoles.includes(user.role)) {
-    const home = ROLE_HOME[user.role] ?? "/auth/register";
+    const home = ROLE_HOME[user.role] ?? "/auth/login";
     return <Navigate to={home} replace />;
   }
 
   return children;
 }
 
-// ─── Helpers pour les tests S1/S2 ───────────────────────────────────────────
-// Appeler depuis la console navigateur pour simuler une connexion :
-//   setMockUser("CLIENT")      → connecte en tant que client
-//   setMockUser("PROVIDER")    → connecte en tant que prestataire
-//   setMockUser("ADMIN")       → connecte en tant qu'admin
-//   clearMockUser()            → déconnecte
+// ─── Helpers de dev — S3/S4 ──────────────────────────────────────────────────
+// Génèrent un vrai token (structure JWT) + un profil, pour que getCurrentUser()
+// ci-dessus fonctionne EXACTEMENT comme avec un vrai backend, sans code séparé.
+//   setMockUser("CLIENT")   setMockUser("PROVIDER")
+//   setMockUser("ADMIN")    setMockUser("AGENT")
+//   clearMockUser()
+function base64UrlEncode(obj) {
+  return btoa(JSON.stringify(obj))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+function buildDevToken(userId, role) {
+  const header = { alg: "none", typ: "JWT" };
+  const payload = {
+    userId,
+    role,
+    type: "access",
+    sub: `${role.toLowerCase()}@dev.local`,
+    iss: "serviloc-dev",
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 8 * 3600, // session de dev : 8h
+  };
+  return `${base64UrlEncode(header)}.${base64UrlEncode(payload)}.dev-signature`;
+}
 
 export function setMockUser(role, name = "Test User") {
+  const userId = `dev-${role.toLowerCase()}`;
+  localStorage.setItem(ACCESS_KEY, buildDevToken(userId, role));
   localStorage.setItem(
-    "sl_mock_user",
-    JSON.stringify({ role, name, id: `mock-${role.toLowerCase()}` })
+    USER_KEY,
+    JSON.stringify({
+      id: userId,
+      role: role.toLowerCase(),
+      firstName: name,
+      lastName: "",
+      fullName: name,
+      email: `${role.toLowerCase()}@dev.local`,
+      avatarInitial: name.charAt(0).toUpperCase(),
+    })
   );
   window.location.reload();
 }
 
 export function clearMockUser() {
-  localStorage.removeItem("sl_mock_user");
+  localStorage.removeItem(ACCESS_KEY);
+  localStorage.removeItem(REFRESH_KEY);
+  localStorage.removeItem(USER_KEY);
   window.location.href = "/auth/login";
 }
 
-// Exposer dans window pour les tests console (S1/S2 uniquement)
-  window.__sl = { setMockUser, clearMockUser };
-  console.info(
-    "%c[ServiLoc Mock] " +
-    "Connecte-toi via : __sl.setMockUser('CLIENT') | __sl.setMockUser('PROVIDER') | __sl.setMockUser('ADMIN')",
-    "color:#1B4332;font-weight:bold"
-  );
-
+// Exposer dans window pour les tests console
+window.__sl = { setMockUser, clearMockUser };
+console.info(
+  "%c[ServiLoc Dev] " +
+  "Connecte-toi via : __sl.setMockUser('CLIENT') | __sl.setMockUser('PROVIDER') | __sl.setMockUser('ADMIN') | __sl.setMockUser('AGENT')",
+  "color:#1B4332;font-weight:bold"
+);
