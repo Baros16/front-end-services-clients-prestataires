@@ -144,9 +144,9 @@ async function apiPostMessage(convId, content, imageId = null, role) {
 
 export async function getConversations() {
   return getMock(
-    sortDesc(mockConversations.data, 'lastMessageAt'),
+    sortDesc(mockConversations.data),
     () => apiClient.get('/client/conversations')
-      .then(r => sortDesc(r.data.data.conversations, 'lastMessageAt')),
+      .then(r => sortDesc(r.data.data.conversations)),
   );
 }
 
@@ -225,9 +225,9 @@ export async function getConversationContext(conversationId) {
 
 export async function getProviderConversations() {
   return getMock(
-    sortDesc(mockConversations.data, 'lastMessageAt'),
+    sortDesc(mockConversations.data),
     () => apiClient.get('/provider/conversations')
-      .then(r => sortDesc(r.data.data.conversations, 'lastMessageAt')),
+      .then(r => sortDesc(r.data.data.conversations)),
   );
 }
 
