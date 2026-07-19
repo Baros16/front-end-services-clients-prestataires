@@ -71,54 +71,51 @@ export function useProviderProfile() {
   }, []);
 
   const handleDocumentUpload = useCallback(async (docType, file) => {
-    if (!file) return;
-    const result = await uploadDocument(file, docType);
-    setDocuments((prev) =>
-      prev.map((d) =>
-        d.type === docType
-          ? { ...d, documentId: result.uploads[0].id, status: "fourni" }
-          : d
-      )
-    );
-  }, []);
-  const handleDocumentRemove = useCallback((docType) => {
+  if (!file) return;
+  const result = await uploadDocument(file, docType);
   setDocuments((prev) =>
     prev.map((d) =>
       d.type === docType
-        ? { ...d, documentId: null, status: "manquant", url: null, name: null }
+        ? { ...d, id: result.uploads[0].id, status: "fourni" }
+        : d
+    )
+  );
+}, []);
+
+const handleDocumentRemove = useCallback((docType) => {
+  setDocuments((prev) =>
+    prev.map((d) =>
+      d.type === docType
+        ? { ...d, id: null, status: "manquant", fileUrl: null }
         : d
     )
   );
 }, []);
 
   const save = useCallback(async () => {
-    setIsSaving(true);
-    setError(null);
-    try {
-      const documentIds = documents.map((d) => d.documentId).filter(Boolean);
-      await updateProfile({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        phone: form.phone,
-        email: form.email,
-        specialty: form.tags[0] ?? "",
-        hourlyRate: Number(form.hourlyRate) || 0,
-        serviceZone: {
-          city: form.serviceZoneCity,
-          radiusKm: Number(form.serviceZoneRadiusKm) || 0,
-        },
-        certifications,
-        documentIds,
-      });
-      return true;
-    } catch (err) {
-      setError(err);
-      return false;
-    } finally {
-      setIsSaving(false);
-    }
-  }, [form, documents, certifications]);
-
+  setIsSaving(true);
+  setError(null);
+  try {
+    const documentIds = documents.map((d) => d.id).filter(Boolean);
+    await updateProfile({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      phone: form.phone,
+      specialty: form.tags[0] ?? "",
+      hourlyRate: Number(form.hourlyRate) || 0,
+      serviceZoneCity: form.serviceZoneCity,
+      radiusKm: Number(form.serviceZoneRadiusKm) || 0,
+      certifications,
+      documentIds,
+    });
+    return true;
+  } catch (err) {
+    setError(err);
+    return false;
+  } finally {
+    setIsSaving(false);
+  }
+}, [form, documents, certifications]);
   return {
     isLoading, isSaving, form, setField, addTag, removeTag,
     avatarUrl, handlePhotoChange, documents, handleDocumentUpload,
