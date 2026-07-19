@@ -8,8 +8,7 @@ import {
   Toast,
   EmptyState,
   SkeletonLoader,
-  ChevronLeft,
-  EmptyState,
+  ChevronLeft
 }                               from '../../components/commons';
 import { ProviderInfoCard }     from '../../components/admin/validation/ProviderInfoCard';
 import { DocumentList }         from '../../components/admin/validation/DocumentList';
