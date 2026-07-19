@@ -1,0 +1,38 @@
+{
+  "data": {
+    "id": "2f19902b-0770-49b9-9974-a92dbb44a77c",
+    "role": "provider",
+    "firstName": "Jean-Claude",
+    "lastName": "Mbarga",
+    "fullName": "Jean-Claude Mbarga",
+    "phone": "+237699234567",
+    "email": "jcmbarga@gmail.com",
+    "avatarUrl": null,
+    "avatarInitial": "J",
+    "status": "active",
+    "specialty": "Plomberie",
+    "rating": 4.8,
+    "completedMissions": 47,
+    "isAvailable": true,
+    "hourlyRate": 3500,
+    "serviceZone": { "city": "Bafoussam", "radiusKm": 15 },
+    "availability": {
+      "monday":    { "start": "08:00", "end": "18:00", "available": true },
+      "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+      "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+      "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+      "friday":    { "start": "08:00", "end": "18:00", "available": true },
+      "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+      "sunday":    { "start": null, "end": null, "available": false }
+    },
+    "monthlyEarnings": 185000,
+    "certifications": ["Artisan certifié"],
+    "estCertifie": true,
+    "documents": [
+      { "id": "doc_001", "type": "carte_professionnelle", "label": "Carte professionnelle", "reference": "Artisan plombier N°PLB-2024-041", "status": "valide", "fileUrl": "https://cdn.serviloc.cm/docs/doc_001.pdf" },
+      { "id": "doc_002", "type": "casier_judiciaire", "label": "Casier judiciaire < 3 mois", "reference": null, "status": "manquant", "fileUrl": null },
+      { "id": "doc_003", "type": "cni", "label": "Carte nationale d'identité", "reference": "CNI-CM-1990-087654", "status": "valide", "fileUrl": "https://cdn.serviloc.cm/docs/doc_003.pdf" }
+    ],
+    "createdAt": "2026-06-12T12:39:10+01:00"
+  }
+}

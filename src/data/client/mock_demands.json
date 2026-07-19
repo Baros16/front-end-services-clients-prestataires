@@ -4,30 +4,15 @@
     {
       "id": "dem_xyz789",
       "clientId": "usr_abc123",
-      "category": {
-        "id": "cat_plomberie",
-        "label": "Plomberie",
-        "iconKey": "wrench"
-      },
+      "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Fuite sous l'évier de la cuisine, eau qui s'écoule en permanence",
       "photos": [
-        {
-          "id": "photo_001",
-          "url": "https://cdn.serviloc.cm/demands/photo_001.jpg",
-          "name": "photo_sous_evier.jpg"
-        }
+        { "id": "photo_001", "url": "https://cdn.serviloc.cm/demands/photo_001.jpg", "name": "photo_sous_evier.jpg" }
       ],
-      "location": {
-        "address": "Bafoussam, Quartier Commercial",
-        "lat": 5.4764,
-        "lng": 10.4207
-      },
+      "location": { "address": "Bafoussam, Quartier Commercial", "lat": 5.4764, "lng": 10.4207 },
       "status": "en_cours",
-      "isUrgent": false,
-      "estimatedBudget": {
-        "min": 20000,
-        "max": 30000
-      },
+      "urgent": false,
+      "estimatedBudget": { "min": 20000, "max": 30000 },
       "providerId": "usr_jcm456",
       "providerName": "Jean-Claude M.",
       "quoteId": "quote_001",
@@ -38,24 +23,13 @@
     {
       "id": "dem_abc001",
       "clientId": "usr_abc123",
-      "category": {
-        "id": "cat_electricite",
-        "label": "Électricité",
-        "iconKey": "bolt"
-      },
+      "category": { "id": "cat_electricite", "label": "Électricité", "iconKey": "bolt" },
       "description": "Prise de courant défectueuse dans le salon, odeur de brûlé persistante",
       "photos": [],
-      "location": {
-        "address": "Bafoussam, Quartier Djeleng",
-        "lat": 5.4820,
-        "lng": 10.4150
-      },
+      "location": { "address": "Bafoussam, Quartier Djeleng", "lat": 5.4820, "lng": 10.4150 },
       "status": "terminee",
-      "isUrgent": true,
-      "estimatedBudget": {
-        "min": 10000,
-        "max": 15000
-      },
+      "urgent": true,
+      "estimatedBudget": { "min": 10000, "max": 15000 },
       "providerId": "usr_elec789",
       "providerName": "Thomas E.",
       "quoteId": "quote_002",
@@ -66,24 +40,13 @@
     {
       "id": "dem_def002",
       "clientId": "usr_abc123",
-      "category": {
-        "id": "cat_nettoyage",
-        "label": "Nettoyage",
-        "iconKey": "broom"
-      },
+      "category": { "id": "cat_nettoyage", "label": "Nettoyage", "iconKey": "broom" },
       "description": "Grand ménage appartement 3 pièces avant emménagement, nettoyage vitres compris",
       "photos": [],
-      "location": {
-        "address": "Bafoussam, Rue des Écoles",
-        "lat": 5.4795,
-        "lng": 10.4230
-      },
+      "location": { "address": "Bafoussam, Rue des Écoles", "lat": 5.4795, "lng": 10.4230 },
       "status": "terminee",
-      "isUrgent": false,
-      "estimatedBudget": {
-        "min": 8000,
-        "max": 12000
-      },
+      "urgent": false,
+      "estimatedBudget": { "min": 8000, "max": 12000 },
       "providerId": "usr_nettoie01",
       "providerName": "Cécile N.",
       "quoteId": "quote_003",
@@ -94,24 +57,13 @@
     {
       "id": "dem_ghi003",
       "clientId": "usr_abc123",
-      "category": {
-        "id": "cat_serrurerie",
-        "label": "Serrurerie",
-        "iconKey": "key"
-      },
+      "category": { "id": "cat_serrurerie", "label": "Serrurerie", "iconKey": "key" },
       "description": "Changement de serrure porte d'entrée suite à perte de clés",
       "photos": [],
-      "location": {
-        "address": "Bafoussam, Quartier Commercial",
-        "lat": 5.4764,
-        "lng": 10.4207
-      },
+      "location": { "address": "Bafoussam, Quartier Commercial", "lat": 5.4764, "lng": 10.4207 },
       "status": "annulee",
-      "isUrgent": true,
-      "estimatedBudget": {
-        "min": 15000,
-        "max": 25000
-      },
+      "urgent": true,
+      "estimatedBudget": { "min": 15000, "max": 25000 },
       "providerId": null,
       "providerName": null,
       "quoteId": null,
@@ -122,30 +74,15 @@
     {
       "id": "dem_jkl004",
       "clientId": "usr_abc123",
-      "category": {
-        "id": "cat_peinture",
-        "label": "Peinture",
-        "iconKey": "brush"
-      },
+      "category": { "id": "cat_peinture", "label": "Peinture", "iconKey": "brush" },
       "description": "Peinture chambre principale, environ 20m², couleur beige sable",
       "photos": [
-        {
-          "id": "photo_004",
-          "url": "https://cdn.serviloc.cm/demands/photo_004.jpg",
-          "name": "photo_chambre.jpg"
-        }
+        { "id": "photo_004", "url": "https://cdn.serviloc.cm/demands/photo_004.jpg", "name": "photo_chambre.jpg" }
       ],
-      "location": {
-        "address": "Bafoussam, Cité des Palmiers",
-        "lat": 5.4710,
-        "lng": 10.4180
-      },
+      "location": { "address": "Bafoussam, Cité des Palmiers", "lat": 5.4710, "lng": 10.4180 },
       "status": "ouverte",
-      "isUrgent": false,
-      "estimatedBudget": {
-        "min": 25000,
-        "max": 40000
-      },
+      "urgent": false,
+      "estimatedBudget": { "min": 25000, "max": 40000 },
       "providerId": null,
       "providerName": null,
       "quoteId": null,
@@ -154,10 +91,5 @@
       "updatedAt": "2026-06-01T10:00:00+01:00"
     }
   ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 5,
-    "totalPages": 1
-  }
+  "meta": { "page": 1, "limit": 20, "total": 5, "totalPages": 1 }
 }

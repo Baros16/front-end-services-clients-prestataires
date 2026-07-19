@@ -1,28 +1,14 @@
 // src/components/admin/dashboard/AdminDashboardPage.jsx
 
 import { PageHeader, StatCard, Button, SkeletonLoader } from "../../components/commons";
+import { formatXAF } from "../../utils/formatters";
 import { useAdminDashboard } from "../../hooks/admin/useAdminDashboard";
 import PendingValidationPanel  from "../../components/admin/dashboard/PendingValidationPanel";
 import ActiveLitigesPanel      from "../../components/admin/dashboard/ActiveLitigesPanel";
 import PopularCategoriesPanel  from "../../components/admin/dashboard/PopularCategoriesPanel";
 import RecentTransactionsTable from "../../components/admin/dashboard/RecentTransactionsTable";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Formate une valeur XAF pour les MetricCard.
- * 8 400 000 → "8,4M XAF" | 672 000 → "672k XAF"
- */
-function formatXAF(value) {
-  if (value >= 1_000_000) {
-    const m = value / 1_000_000;
-    return `${m % 1 === 0 ? m : m.toFixed(1).replace(".", ",")}M XAF`;
-  }
-  if (value >= 1_000) {
-    return `${Math.round(value / 1_000)}k XAF`;
-  }
-  return `${value} XAF`;
-}
 
 /**
  * Détermine la direction de la tendance depuis la chaîne API ("+12%", "-3%").
