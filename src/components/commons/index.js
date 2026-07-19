@@ -18,6 +18,7 @@ export { Button }            from "./Button";
 export { Input }             from "./Input";
 export { SearchInput }       from "./SearchInput";
 export { PhotoUploader }     from "./PhotoUploader";
+export { LocationPicker}     from "./LocationPicker";
 export { FileAttachment }    from "./FileAttachment";
 
 // ── Contenu & mise en page ───────────────────────────────────
