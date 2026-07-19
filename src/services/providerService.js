@@ -23,10 +23,10 @@ export async function getProviderDashboard() {
 }
 
 export async function getAvailableDemands(params = {}) {
-  // params : { page, limit, category }
+  // params : { categoryId } — l'API réelle ne supporte que categoryId, pas de pagination
   return getMockList(
     mock_avilable_demands,
-    () => apiClient.get(`/provider/demands/available`, { params }).then(r => r.data.data),
+    () => apiClient.get(`/provider/demands`, { params }).then(r => r.data.data),
   );
 }
 
@@ -146,8 +146,10 @@ export async function getProviderProfile() {
 }
 
 export async function updateProfile(payload) {
-  // payload : { firstName, lastName, phone, email, specialty, hourlyRate,
-  //             serviceZone: { city, radiusKm }, certifications[], documentIds[] }
+  // payload : { firstName, lastName, phone, specialty, hourlyRate,
+  //             serviceZoneCity, latitude, longitude, radiusKm,
+  //             estCertifie, certifications[], documentIds[] }
+  // ⚠️ Champs à plat — UpdateProfileRequest réel n'accepte pas de serviceZone imbriqué.
   return getMock(
     {
       success: true,
