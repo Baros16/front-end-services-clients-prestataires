@@ -30,17 +30,15 @@ export function ConversationListItem({ conversation, role, onClick, className = 
             {counterpart?.fullName}
           </p>
           <span className="text-[11px] text-sl-400 shrink-0">
-            {formatRelativeTime(conversation.lastMessageAt)}
+            {formatRelativeTime(conversation.lastMessage?.sentAt)}
           </span>
         </div>
 
         <div className="flex items-center justify-between gap-2 mt-[2px]">
-          <p
-            className={`text-[13px] truncate m-0 font-[family-name:var(--font-body)] ${
-              hasUnread ? "text-sl-700" : "text-sl-400"
-            }`}
-          >
-            {conversation.lastMessagePreview}
+          <p className={`text-[13px] truncate m-0 font-[family-name:var(--font-body)] ${
+            hasUnread ? "text-sl-700" : "text-sl-400"
+            }`}>
+            {conversation.lastMessage?.content}
           </p>
           {hasUnread && (
             <span

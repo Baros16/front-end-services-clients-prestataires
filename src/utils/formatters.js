@@ -47,3 +47,10 @@ export function formatRelativeTime(isoString) {
     timeZone: 'Africa/Douala',
   }).format(date);
 }
+
+// À ajouter dans src/utils/formatters.js
+// new Date().toISOString() (5 min avant maintenant) → 5
+export function getMinutesAgo(isoString) {
+  const diffMs = Date.now() - new Date(isoString).getTime();
+  return Math.max(0, Math.round(diffMs / 60000));
+}
