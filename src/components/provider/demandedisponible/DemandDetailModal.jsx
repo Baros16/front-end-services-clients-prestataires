@@ -1,27 +1,12 @@
-// src/components/provider/DemandeDisponible/DemandDetailModal.jsx
+// src/components/provider/demandedisponible/DemandDetailModal.jsx
 import { Modal }       from '../../commons/Modal';
 import { Button }      from '../../commons/Button';
 import { StatusBadge } from '../../commons/StatusBadge';
 import { RatingStars } from '../../commons/RatingStars';
-import { MapPin, Clock, Wrench, Zap, Sparkles, Key, Brush } from '../../commons/Icons';
+import { MapPin, Clock } from '../../commons/Icons';
 import { formatBudget } from './formatBudget';
-
-const CATEGORY_DISPLAY = {
-  wrench:  { Icon: Wrench,   bgVar: 'var(--color-accent-light)' },
-  bolt:    { Icon: Zap,      bgVar: 'var(--color-warning-light)' },
-  broom:   { Icon: Sparkles, bgVar: 'var(--color-success-light)' },
-  key:     { Icon: Key,      bgVar: 'var(--color-accent-light)' },
-  paint:   { Icon: Brush,    bgVar: '#F3E8FF' },
-  default: { Icon: Wrench,   bgVar: 'var(--color-sl-100)' },
-};
-
-function formatPostedAgo(d) {
-  if (d.postedAgo) return d.postedAgo;
-  const min = d.postedMinutesAgo ?? 0;
-  if (min < 60)   return `Il y a ${min} min`;
-  if (min < 1440) return `Il y a ${Math.floor(min / 60)}h`;
-  return `Il y a ${Math.floor(min / 1440)}j`;
-}
+import { CATEGORY_DISPLAY } from './categoryDisplay';
+import { formatPostedAgo } from '../../../utils/formatters';
 
 function getLocationText(location) {
   if (!location) return null;
@@ -74,7 +59,6 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
     >
       <div className="flex flex-col gap-5">
 
-        {/* ── Description complète ── */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest mb-1 text-[var(--color-sl-400)]">
             Description
@@ -84,7 +68,6 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           </p>
         </div>
 
-        {/* ── Budget ── */}
         <div className="flex items-center justify-between px-4 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)]">
           <span className="text-xs text-[var(--color-sl-400)]">
             Budget estimé
@@ -94,10 +77,8 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           </span>
         </div>
 
-        {/* ── Infos : distance + note + temps ── */}
         <div className="grid grid-cols-3 gap-3">
 
-          {/* Distance */}
           <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
             <MapPin size={18} className="text-[var(--color-sl-500)]" />
             <span className="text-sm font-semibold text-[var(--color-sl-900)]">
@@ -106,7 +87,6 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
             <span className="text-xs text-[var(--color-sl-400)]">Distance</span>
           </div>
 
-          {/* Note client */}
           <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
             <RatingStars value={demand?.clientRating} size="sm" />
             <span className="text-sm font-semibold text-[var(--color-sl-900)]">
@@ -115,7 +95,6 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
             <span className="text-xs text-[var(--color-sl-400)]">Note client</span>
           </div>
 
-          {/* Temps */}
           <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
             <Clock size={18} className="text-[var(--color-sl-500)]" />
             <span className="text-sm font-semibold text-[var(--color-sl-900)]">
@@ -125,7 +104,6 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           </div>
         </div>
 
-        {/* ── Localisation ── */}
         {getLocationText(demand?.location) && (
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest mb-1 text-[var(--color-sl-400)]">
