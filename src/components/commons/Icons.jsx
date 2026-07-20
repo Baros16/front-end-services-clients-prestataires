@@ -43,6 +43,7 @@ export { Star, StarOff }                                     from 'lucide-react'
 export { FileText, File, FileType, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
 export { Upload, Download, Trash2, Edit, Eye, EyeOff }               from 'lucide-react';
 
+
 // ─── Feedback & états ─────────────────────────────────────────
 export { AlertTriangle, Loader2, Loader }                            from 'lucide-react';
 export { ThumbsUp, ThumbsDown }                              from 'lucide-react';

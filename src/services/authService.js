@@ -82,7 +82,7 @@ export async function login(email, password) {
       },
       meta: null,
     },
-    () => axios.post(`${BASE}/login`, { email, password })
+    () => apiClient.post(`${BASE}/login`, { email, password })
   );
 
   persistSession(response);
@@ -106,7 +106,7 @@ export async function refreshToken() {
       },
       meta: null,
     },
-    () => axios.post(`${BASE}/refresh`, { refreshToken: storedRefreshToken })
+    () => apiClient.post(`${BASE}/refresh`, { refreshToken: storedRefreshToken })
   );
 
   persistSession(response);
@@ -120,14 +120,14 @@ export async function forgotPassword(email) {
       data: { message: "Si un compte existe avec cet email, un code de réinitialisation a été envoyé." },
       meta: null,
     },
-    () => axios.post(`${BASE}/forgot-password`, { email })
+    () => apiClient.post(`${BASE}/forgot-password`, { email })
   );
 }
 
 export async function resetPassword(email, code, newPassword) {
   return getMock(
     { success: true, data: { message: "Mot de passe réinitialisé avec succès" }, meta: null },
-    () => axios.post(`${BASE}/reset-password`, { email, code, newPassword })
+    () => apiClient.post(`${BASE}/reset-password`, { email, code, newPassword })
   );
 }
 
@@ -136,7 +136,7 @@ export async function logout() {
   clearSession();
   return getMock(
     { success: true, data: { message: "Déconnexion réussie" }, meta: null },
-    () => axios.post(`${BASE}/logout`, { refreshToken: storedRefreshToken })
+    () => apiClient.post(`${BASE}/logout`, { refreshToken: storedRefreshToken })
   );
 }
 export async function getUserById(userId) {

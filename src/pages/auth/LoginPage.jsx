@@ -39,7 +39,7 @@ export default function LoginPage() {
     const response = await login(email, password);
 
     // Login gère déjà le stockage via persistSession()
-    const user = response.data.user;
+    const user = response.user;
     
     // Redirection selon le rôle
     if (user.role === "client") {
@@ -117,7 +117,7 @@ export default function LoginPage() {
             onClick={() => navigate("/auth/register")}
             className="text-brand underline font-medium hover:opacity-80"
           >
-            Creer un compte
+            Créer un compte
           </button>
         </div>
       </div>
