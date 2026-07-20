@@ -1,95 +1,126 @@
-// src/components/MapEmbed.jsx
-import { useState } from "react";
+// src/components/common/MapEmbed.jsx
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
+// ─── Centre par défaut : Bafoussam ───────────────────────────────────────────
+const BAFOUSSAM = [5.4764, 10.4176];
+const DEFAULT_ZOOM = 14;
+
+// ─── Icône custom : SVG MapPin inline ────────────────────────────────────────
+// Évite la dépendance aux fichiers PNG de Leaflet (souvent cassés avec Vite).
+function makeIcon(color = 'var(--color-brand)') {
+  return L.divIcon({
+    className: '',
+    iconSize:    [28, 36],
+    iconAnchor:  [14, 36],
+    popupAnchor: [0, -36],
+    html: `
+      <svg width="28" height="36" viewBox="0 0 28 36"
+           xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M14 0C6.27 0 0 6.27 0 14c0 9.33 14 22 14 22S28 23.33 28 14C28 6.27 21.73 0 14 0z"
+          fill="${color}" />
+        <circle cx="14" cy="14" r="6" fill="white" />
+      </svg>
+    `,
+  });
+}
+
+// ─── Sous-composant : repositionne la carte quand lat/lng changent ───────────
+function RecenterMap({ lat, lng }) {
+  const map = useMap();
+  useEffect(() => {
+    if (lat != null && lng != null) {
+      map.setView([lat, lng], map.getZoom(), { animate: true });
+    }
+  }, [lat, lng, map]);
+  return null;
+}
+
+// ─── Sous-composant : capture les clics en mode interactif ───────────────────
+function ClickHandler({ onLocationChange }) {
+  useMapEvents({
+    click(e) {
+      onLocationChange?.({ lat: e.latlng.lat, lng: e.latlng.lng });
+    },
+  });
+  return null;
+}
+
+// ─── MapEmbed ─────────────────────────────────────────────────────────────────
 /**
- * MapEmbed
- * Zone carte placeholder (en attendant l'intégration Leaflet/Mapbox).
- * Mode interactif : clic pour sélectionner une position (simulé).
- * Mode lecture : affichage d'une adresse avec marqueur.
+ * Carte Leaflet + OpenStreetMap.
  *
- * En production S3/S4 : remplacer le div placeholder par un composant Leaflet.
+ * @prop {number}   lat               - Latitude du marqueur
+ * @prop {number}   lng               - Longitude du marqueur
+ * @prop {string}   label             - Texte affiché sous le marqueur (popup)
+ * @prop {boolean}  interactive       - Mode sélection : clic déplace le marqueur
+ * @prop {function} onLocationChange  - ({ lat, lng }) => void  (mode interactif)
+ * @prop {string}   height            - Hauteur CSS, ex : "200px"
+ * @prop {string}   markerColor       - Couleur SVG du marqueur (défaut : brand)
+ * @prop {string}   className         - Classes Tailwind supplémentaires
  */
 export function MapEmbed({
-  address,
-  label = "Localisation",
+  lat,
+  lng,
+  label       = '',
   interactive = false,
   onLocationChange,
-  height = "200px",
-  className = "",
+  height      = '200px',
+  markerColor = 'var(--color-brand)',
+  className   = '',
 }) {
-  const [selected, setSelected] = useState(false);
-
-  function handleClick(e) {
-    if (!interactive) return;
-    // Simulation de sélection — en prod : extraire lat/lng depuis l'event Leaflet
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width).toFixed(4);
-    const y = ((e.clientY - rect.top) / rect.height).toFixed(4);
-    // Coordonnées simulées centrées sur Bafoussam
-    const coords = {
-      lat: parseFloat((5.4764 - (y - 0.5) * 0.05).toFixed(6)),
-      lng: parseFloat((10.4176 + (x - 0.5) * 0.05).toFixed(6)),
-    };
-    setSelected(true);
-    onLocationChange?.(coords);
-  }
+  const center  = (lat != null && lng != null) ? [lat, lng] : BAFOUSSAM;
+  const hasMarker = lat != null && lng != null;
+  const icon    = makeIcon(markerColor);
 
   return (
-    <div className={`flex flex-col gap-2 font-[family-name:var(--font-body)] ${className}`}>
-      {/* Zone carte */}
-      <div
-        onClick={handleClick}
-        style={{ height }}
-        className={`
-          relative w-full rounded-[var(--radius-lg)] overflow-hidden
-          bg-info-light border-2 transition-all duration-150
-          ${interactive
-            ? selected
-              ? "border-success cursor-default"
-              : "border-info border-dashed cursor-crosshair hover:border-brand"
-            : "border-sl-200"
-          }
-        `}
+    <div
+      className={`w-full overflow-hidden rounded-[var(--radius-lg)] ${className}`}
+      style={{
+        height,
+        border: `1.5px solid var(--color-sl-200)`,
+        cursor: interactive ? 'crosshair' : 'default',
+      }}
+    >
+      <MapContainer
+        center={center}
+        zoom={DEFAULT_ZOOM}
+        style={{ height: '100%', width: '100%' }}
+        zoomControl={true}
+        scrollWheelZoom={false}   // évite le zoom accidentel en scrollant la page
+        attributionControl={true}
       >
-        {/* Grille de fond simulant une carte */}
-        <div className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage:
-              "linear-gradient(var(--color-info) 1px, transparent 1px), " +
-              "linear-gradient(90deg, var(--color-info) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
+        {/* Tuiles OpenStreetMap — gratuites, sans clé API */}
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          maxZoom={19}
         />
 
-        {/* Marqueur centré */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <span className="text-[28px] drop-shadow-sm">
-            {selected ? "📍" : interactive ? "🗺️" : "📍"}
-          </span>
-          <span className="text-[12px] font-medium text-info bg-white/80
-                           px-3 py-1 rounded-full backdrop-blur-sm">
-            {interactive && !selected
-              ? "Cliquez pour sélectionner la position"
-              : label}
-          </span>
-        </div>
+        {/* Recentre la carte si les coordonnées changent */}
+        <RecenterMap lat={lat} lng={lng} />
 
-        {/* Badge succès si sélectionné */}
-        {selected && (
-          <div className="absolute top-2 right-2 bg-success text-white text-[11px]
-                          font-bold px-2 py-[2px] rounded-full">
-            ✓ Sélectionné
-          </div>
+        {/* Marqueur — affiché seulement si on a des coordonnées */}
+        {hasMarker && (
+          <Marker
+            position={[lat, lng]}
+            icon={icon}
+            draggable={interactive}
+            eventHandlers={interactive ? {
+              dragend: (e) => {
+                const { lat: la, lng: lo } = e.target.getLatLng();
+                onLocationChange?.({ lat: la, lng: lo });
+              },
+            } : {}}
+          />
         )}
-      </div>
 
-      {/* Adresse sous la carte */}
-      {address && (
-        <div className="flex items-center gap-2">
-          <span className="text-[14px]">📌</span>
-          <span className="text-[13px] text-sl-600">{address}</span>
-        </div>
-      )}
+        {/* Capture les clics en mode interactif */}
+        {interactive && <ClickHandler onLocationChange={onLocationChange} />}
+      </MapContainer>
     </div>
   );
 }

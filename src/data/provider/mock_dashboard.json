@@ -40,7 +40,7 @@
       "averageRating": 4.8,
       "availableDemandsCount": 11,
       "trends": {
-        "missions": { "value": "+3",   "direction": "up", "subtext": "+3 vs avril" },
+        "missions": { "value": "-3",   "direction": "down", "subtext": "+3 vs avril" },
         "earnings": { "value": "+22%", "direction": "up", "subtext": "+22%" },
         "rating":   { "value": "+0.1", "direction": "up", "subtext": "+0.1" }
       }
