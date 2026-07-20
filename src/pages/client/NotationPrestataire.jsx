@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getMission, rateMission } from "../../services/clientService";
-import mockProviderDashboard from "../../data/provider/mock_dashboard.json";
+import { getUserById } from "../../services/authService";
 import {
   PageHeader,
   Card,
@@ -17,6 +17,7 @@ export default function NotationPrestataire() {
   const { missionId } = useParams();
   const navigate = useNavigate();
   const [mission, setMission] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(0);
   const [criteria, setCriteria] = useState({
@@ -36,6 +37,11 @@ export default function NotationPrestataire() {
 
         const data = await getMission(missionId);
         setMission(data);
+        const providerId = data.providerId;
+        if (providerId) {
+          const providerResponse = await getUserById(providerId);
+          setProvider(providerResponse.data);
+        }
       } catch (err) {
         console.error("Erreur chargement mission:", err);
         setError("Impossible de charger les données de la mission.");
@@ -49,13 +55,24 @@ export default function NotationPrestataire() {
     }
   }, [missionId]);
 
+  // Récupération des infos du prestataire avec fallback
   const getProviderInfo = () => {
-    const providerData = mockProviderDashboard.data.profile;
+    // 1. Si provider est chargé (via API)
+    if (provider) {
+      return {
+        fullName: provider.fullName,
+        avatarInitial: provider.avatarInitial,
+        specialty: provider.specialty,
+        rating: provider.rating || 0,
+      };
+    }
+
+    // 2. Fallback mock (en attendant)
     return {
-      fullName: providerData.fullName,
-      avatarInitial: providerData.avatarInitial,
-      specialty: providerData.specialty,
-      rating: providerData.rating,
+      fullName: "Jean-Claude Mbarga",
+      avatarInitial: "J",
+      specialty: "Plombier certifié",
+      rating: 4.8,
     };
   };
 
@@ -124,7 +141,7 @@ export default function NotationPrestataire() {
     );
   }
 
-  const provider = getProviderInfo();
+  const providerData = getProviderInfo();
 
   return (
     <div className="mx-auto">
@@ -144,7 +161,7 @@ export default function NotationPrestataire() {
               Mission terminée !
             </h2>
             <p className="text-sl-600">
-              {mission?.category}  ·  {mission?.location?.address}
+              {mission?.category} · {mission?.location?.address}
             </p>
             <div className="bg-success-light/80 border border-success/30 rounded-lg px-6 py-3 mt-1 mx-6 w-full">
               <p className="text-sm text-success-dark">Paiement libéré</p>
@@ -161,26 +178,26 @@ export default function NotationPrestataire() {
         <Card className="mb-6">
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-sl-400 uppercase tracking-wider mb-3">
-              NOTEZ {provider.fullName.toUpperCase()}
+              NOTEZ {providerData.fullName.toUpperCase()}
             </h3>
             <div className="flex items-center gap-3 mb-5">
-              <Avatar initial={provider.avatarInitial} size="lg" />
+              <Avatar initial={providerData.avatarInitial} size="lg" />
               <div>
                 <h4 className="text-lg font-semibold text-sl-900">
-                  {provider.fullName}
+                  {providerData.fullName}
                 </h4>
                 <div className="flex items-center gap-2">
                   <RatingStars
-                    value={provider.rating}
+                    value={providerData.rating}
                     size="sm"
                     showValue={true}
                     readonly
                   />
                   <span className="ml-2 text-sm font-medium text-sl-600 self-center">
-                    {provider.rating}
+                    {providerData.rating}
                   </span>
                 </div>
-                <p className="text-sm text-sl-500">{provider.specialty}</p>
+                <p className="text-sm text-sl-500">{providerData.specialty}</p>
               </div>
             </div>
             <div className="flex justify-center">
