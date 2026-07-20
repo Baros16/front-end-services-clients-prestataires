@@ -21,7 +21,7 @@ const STATUS_CONFIG = {
   paye_sequestre: { label: "Payé / Séq.",      classes: "bg-accent-light text-warning" },
 };
 
-export function StatusBadge({ variant, withDot = false, size = "md", className = "" }) {
+export function StatusBadge({ variant, label, withDot = false, size = "md", className = "" }) {
   const config = STATUS_CONFIG[variant] ?? STATUS_CONFIG.en_attente;
 
   const sizes = {
@@ -33,14 +33,15 @@ export function StatusBadge({ variant, withDot = false, size = "md", className =
     <span
       className={`
         inline-flex items-center gap-[5px] rounded-full font-semibold
-        tracking-[0.04em] uppercase font-[family-name:var(--font-body)]
+        tracking-[0.04em] whitespace-nowrap
+        uppercase font-[family-name:var(--font-body)]
         ${sizes[size]} ${config.classes} ${className}
       `}
     >
       {withDot && (
         <span className="w-[6px] h-[6px] rounded-full bg-current sl-animate-pulse-dot" />
       )}
-      {config.label}
+      {label ?? config.label}
     </span>
   );
 }

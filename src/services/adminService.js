@@ -72,11 +72,23 @@ export async function getPendingProviders(params = {}) {
 
 // ─── Validation Prestataire (ex validationService.js) ───────────────────────
 
-export async function getDossier(providerId) {
-  return getMock(
+export async function getDossiers() {
+  const raw = await getMock(
     mockProviderDossier,
-    () => apiClient.get(`/admin/providers/${providerId}/dossier`),
+    () => apiClient.get(`/admin/providers`, { params: { status: 'pending_verification' } }),
   );
+  return Array.isArray(raw) ? raw : [raw];
+}
+
+export async function getDossier(providerId) {
+  const raw = await getMock(
+    mockProviderDossier,
+    () => apiClient.get(`/admin/providers/${providerId}`),
+  );
+  if (Array.isArray(raw)) {
+    return raw.find(d => d.provider.id === providerId) ?? raw[0];
+  }
+  return raw;
 }
 
 export async function validerPrestataire(providerId) {
@@ -86,17 +98,31 @@ export async function validerPrestataire(providerId) {
   );
 }
 
-export async function refuserDossier(providerId, motif = '') {
+export async function refuserDossier(providerId, reason = '') {
   return getMock(
     { data: { success: true, message: 'Dossier refusé.' } },
-    () => apiClient.post(`/admin/providers/${providerId}/reject`, { motif }),
+    () => apiClient.post(`/admin/providers/${providerId}/reject`, { reason }),
   );
 }
 
-export async function envoyerRappelSMS(providerId) {
+// ─── Nouveau helper, à ajouter avant envoyerRappelSMS ──────────────────────
+function buildReminderMessage(documents = []) {
+  const problematic = documents.filter((d) => d.status !== 'valide');
+
+  if (problematic.length === 0) {
+    return 'Votre dossier ServiLoc est en cours de vérification. Merci de votre patience.';
+  }
+
+  const labels = problematic.map((d) => d.label ?? d.type).join(', ');
+  return `Votre dossier ServiLoc est incomplet : ${labels}. Merci de le mettre à jour pour finaliser votre inscription.`;
+}
+
+export async function envoyerRappelSMS(providerId, documents = []) {
+  const message = buildReminderMessage(documents);
+
   return getMock(
     { data: { success: true, message: 'SMS de rappel envoyé.' } },
-    () => apiClient.post(`/admin/providers/${providerId}/notify-sms`),
+    () => apiClient.post(`/admin/providers/${providerId}/notify`, { message }),
   );
 }
 
@@ -104,10 +130,14 @@ export async function envoyerRappelSMS(providerId) {
 // ⚠️ Écran existant mais ne consomme pas encore ces fonctions — à corriger.
 
 export async function getManagedUsers(params = {}) {
-  return getMockList(
-    mockManagedUsers,
-    () => apiClient.get(`/admin/users`, { params }),
-  );
+  if (USE_MOCK) {
+    return getMockList(mockManagedUsers, () => {});
+  }
+  const response = await apiClient.get(`/admin/users`, { params });
+  return {
+    data: response.data?.data?.users ?? [],
+    meta: response.data?.data?.meta ?? response.data?.meta ?? {},
+  };
 }
 
 export async function suspendUser(userId, reason) {
@@ -138,5 +168,12 @@ export async function resolveLitige(litigeId, payload) {
   return getMock(
     { data: { success: true, litigeId, status: "resolu", ...payload } },
     () => apiClient.post(`/admin/litiges/${litigeId}/resolve`, payload),
+  );
+}
+
+export async function assignLitige(litigeId, agentId) {
+  return getMock(
+    { data: { success: true, litigeId, agentId, status: "assigne" } },
+    () => apiClient.post(`/admin/litiges/${litigeId}/assign`, { agentId }),
   );
 }

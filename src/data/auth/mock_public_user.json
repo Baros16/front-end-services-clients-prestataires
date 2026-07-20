@@ -1,0 +1,49 @@
+
+{
+  "2f19902b-0770-49b9-9974-a92dbb44a77c": {
+    "id": "2f19902b-0770-49b9-9974-a92dbb44a77c",
+    "role": "provider",
+    "firstName": "Jean-Claude",
+    "lastName": "Mbarga",
+    "fullName": "Jean-Claude Mbarga",
+    "phone": "+237699234567",
+    "email": "jcm@serviloc.cm",
+    "avatarInitial": "J",
+    "status": "active",
+    "specialty": "Plomberie",
+    "rating": 0.0,
+    "completedMissions": 0,
+    "isAvailable": true,
+    "hourlyRate": 4000.0,
+    "serviceZone": {
+      "city": "Bafoussam",
+      "radiusKm": 20.0
+    },
+    "availability": {
+      "monday": { "start": "08:00", "end": "18:00", "available": true },
+      "tuesday": { "start": "08:00", "end": "18:00", "available": true },
+      "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+      "thursday": { "start": "08:00", "end": "18:00", "available": true },
+      "friday": { "start": "08:00", "end": "18:00", "available": true },
+      "saturday": { "start": "08:00", "end": "13:00", "available": true },
+      "sunday": { "start": null, "end": null, "available": false }
+    },
+    "certifications": ["Artisan certifié"],
+    "estCertifie": true,
+    "createdAt": "2026-06-12T12:39:10+01:00"
+  },
+  "b2adb724-8bd7-46b3-b527-b564f5c05a59": {
+    "id": "b2adb724-8bd7-46b3-b527-b564f5c05a59",
+    "role": "client",
+    "firstName": "Yannick",
+    "lastName": "Ulrich",
+    "fullName": "Yannick Ulrich",
+    "phone": "+237612345678",
+    "email": "yannick2@serviloc.cm",
+    "avatarInitial": "Y",
+    "status": "active",
+    "completedMissions": 0,
+    "location": null,
+    "createdAt": "2026-06-08T21:15:28+01:00"
+  }
+}

@@ -36,6 +36,7 @@ const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"))
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
 const SuiviMission       = lazy(() => import("../pages/client/SuiviMission"));
 const NotationPrestataire = lazy(() => import("../pages/client/NotationPrestataire"));
+const ConversationListClient = lazy(() => import("../pages/client/ConversationListPage"))
 const ChatPage            = lazy(() => import("../pages/client/ChatPage"));        
 const DevisClient         = lazy(() => import("../pages/client/DevisClient")); 
 const LitigeClient        = lazy(() => import("../pages/client/LitigeClient"));
@@ -44,14 +45,18 @@ const UrgenceContact      = lazy(() => import("../pages/client/UrgenceContact"))
 
 // ─── Lazy imports — Provider ─────────────────────────────────────────────────
 const ProviderDashboard  = lazy(() => import("../pages/provider/ProviderDashboard"));
-const ProfilPrestataire   = lazy(() => import("../pages/provider/ProfilPrestataire"));
+const ProfilPrestataire   = lazy(() => import("../pages/provider/ProfilePage"));
 const DemandesDisponibles = lazy(() => import("../pages/provider/DemandesDisponibles"));
+const Missions            = lazy(() => import("../pages/provider/Missions"));
+const ChatPageProvider   = lazy(() => import("../pages/provider/ChatPage"));
+const ConversationListProvider = lazy(() => import("../pages/provider/ConversationListPage"))
 const CreerDevis         = lazy(() => import("../pages/provider/CreerDevis"));
 const DemarrerMission    = lazy(() => import("../pages/provider/DemarrerMission"));
 const SignalerLitige     = lazy(() => import("../pages/provider/SignalerLitige"));
 const TacheTerminee       = lazy(() => import("../pages/provider/TacheTerminee"));     
 const NoterClient         = lazy(() => import("../pages/provider/NoterClient"));       
-const HistoriqueGains     = lazy(() => import("../pages/provider/HistoriqueGains"));   
+const HistoriqueGains     = lazy(() => import("../pages/provider/HistoriqueGains"));
+   
 
 // ─── Lazy imports — Admin ────────────────────────────────────────────────────
 const AdminDashboard     = lazy(() => import("../pages/admin/AdminDashboardPage"));
@@ -135,7 +140,8 @@ export function AppRouter() {
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
-            <Route path="chat"                    element={<ChatPage />} />          
+            <Route path="chat"                    element={<Navigate to="../conversations" replace />} />   
+            <Route path="conversations"           element={<ConversationListClient />} />     
             <Route path="chat/:conversationId"    element={<ChatPage />} />
             <Route path="devis/:id"               element={<DevisClient />} />        
             <Route path="missions/:id"            element={<SuiviMission />} />
@@ -157,6 +163,10 @@ export function AppRouter() {
             <Route index                              element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"                   element={<ProviderDashboard />} />
             <Route path="demandes"                    element={<DemandesDisponibles />} />
+            <Route path="missions"                    element={<Missions />} />
+            <Route path="chat"                        element={<Navigate to="../conversations" replace />} />
+            <Route path="conversations"               element={<ConversationListProvider />} />
+            <Route path="chat/:conversationId"        element={<ChatPageProvider />} />
             <Route path="devis/nouveau/:demandeId"    element={<CreerDevis />} />
             <Route path="missions/:id"                element={<DemarrerMission />} />
             <Route path="litige/:missionId"           element={<SignalerLitige />} />
