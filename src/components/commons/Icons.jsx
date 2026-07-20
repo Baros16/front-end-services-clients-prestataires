@@ -40,7 +40,7 @@ export { Wallet, CreditCard, Banknote, Receipt }             from 'lucide-react'
 export { Star, StarOff }                                     from 'lucide-react';
 
 // ─── Fichiers & documents ─────────────────────────────────────
-export { FileText, File, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
+export { FileText, File, FileType, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
 export { Upload, Download, Trash2, Edit, Eye, EyeOff }               from 'lucide-react';
 
 // ─── Feedback & états ─────────────────────────────────────────
