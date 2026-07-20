@@ -4,9 +4,10 @@ import axios from "axios";
 import { getMock } from "./mockSwitch.js";
 import mockUsers from "../data/auth/mock_user.json";
 import mockPublicUsers from "../data/auth/mock_public_user.json"
+import { buildDevToken } from "../router/AuthGuard.jsx";
 import apiClient from "./apiClient.js";
 
-const BASE = "/auth";
+const BASE = "/users";
 const ACCESS_KEY = "serviloc_access";
 const REFRESH_KEY = "serviloc_refresh";
 const USER_KEY = "serviloc_user";
@@ -73,7 +74,7 @@ export async function login(email, password) {
     {
       success: true,
       data: {
-        accessToken: "mock.jwt.access",
+        accessToken: buildDevToken(mockUser.id, mockUser.role.toUpperCase()),
         refreshToken: "mock.jwt.refresh",
         tokenType: "Bearer",
         expiresIn: 3600000, // ⚠️ en millisecondes (1h), pas en secondes
@@ -97,7 +98,7 @@ export async function refreshToken() {
     {
       success: true,
       data: {
-        accessToken: "mock.jwt.access.refreshed",
+        accessToken: buildDevToken(storedUser.id, storedUser.role.toUpperCase()),
         refreshToken: storedRefreshToken,
         tokenType: "Bearer",
         expiresIn: 3600000,
