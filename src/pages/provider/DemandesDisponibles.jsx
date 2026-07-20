@@ -1,6 +1,5 @@
 // src/pages/provider/DemandesDisponibles.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/commons/PageHeader';
 import { TabBar } from '../../components/commons/TabBar';
 import { AlertBanner } from '../../components/commons/AlertBanner';
@@ -19,11 +18,10 @@ const TABS = [
 ];
 
 export default function DemandesDisponibles() {
-  const navigate = useNavigate();
   const [allDemands, setAllDemands]   = useState([]);
   const [isLoading, setIsLoading]     = useState(true);
-  const [error, setError]             = useState(null); // erreur de chargement initial uniquement
-  const [feedback, setFeedback]       = useState(null); // { demandId, type: 'success' | 'danger', message }
+  const [error, setError]             = useState(null); 
+  const [feedback, setFeedback]       = useState(null); 
   const [activeTab, setActiveTab]     = useState('priority');
   const [isAvailable, setIsAvailable] = useState(true);
   const [applyingId, setApplyingId]   = useState(null);
@@ -48,14 +46,12 @@ export default function DemandesDisponibles() {
     })();
   }, []);
 
-  // Auto-fermeture feedback (succès/erreur postulation) après 3 secondes
   useEffect(() => {
     if (!feedback) return;
     const timer = setTimeout(() => setFeedback(null), 3000);
     return () => clearTimeout(timer);
   }, [feedback]);
 
-  // Auto-fermeture erreur de chargement après 3 secondes
   useEffect(() => {
     if (!error) return;
     const timer = setTimeout(() => setError(null), 3000);
@@ -78,6 +74,7 @@ export default function DemandesDisponibles() {
       await updateAvailability(next);
     } catch {
       setIsAvailable(!next);
+      setError('Impossible de mettre à jour votre disponibilité. Veuillez réessayer.');
     }
   };
 
@@ -92,7 +89,6 @@ export default function DemandesDisponibles() {
         type: 'success',
         message: res?.message ?? 'Candidature envoyée avec succès ! Le client sera notifié.',
       });
-      // On laisse la carte visible le temps que la bannière s'affiche avant de la retirer
       setTimeout(() => {
         setAllDemands((prev) => prev.filter((d) => d.id !== demandId));
       }, 1800);
@@ -125,6 +121,7 @@ export default function DemandesDisponibles() {
         withDot="true"
         subtitle="Demandes correspondant à vos compétences"
         actions={headerActions}
+        className="mb-4"
       />
 
       <TabBar tabs={tabsWithCount} activeId={activeTab} onChange={setActiveTab} />

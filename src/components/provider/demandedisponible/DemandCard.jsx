@@ -7,38 +7,19 @@ import { RatingStars } from '../../commons/RatingStars';
 import { AlertBanner } from '../../commons/AlertBanner';
 import { DemandDetailModal } from './DemandDetailModal';
 import { formatBudget } from './formatBudget';
-import {
-  MapPin,
-  Wrench,
-  Zap,
-  Brush,
-  Key,
-  Sparkles,
-  ChevronRight,
-} from '../../commons/Icons';
-
-/* ── Mapping catégories → icône Lucide + fond ─────────────── */
-const CATEGORY_DISPLAY = {
-  wrench:  { Icon: Wrench,   bgVar: 'var(--color-accent-light)' },
-  bolt:    { Icon: Zap,      bgVar: 'var(--color-warning-light)' },
-  broom:   { Icon: Brush,    bgVar: 'var(--color-success-light)' },
-  key:     { Icon: Key,      bgVar: 'var(--color-accent-light)' },
-  paint:   { Icon: Sparkles, bgVar: '#F3E8FF' },
-  default: { Icon: Wrench,   bgVar: 'var(--color-sl-100)' },
-};
-
-function formatPostedAgo(d) {
-  if (d.postedAgo) return d.postedAgo;
-  const min = d.postedMinutesAgo ?? 0;
-  if (min < 60)   return `Il y a ${min} min`;
-  if (min < 1440) return `Il y a ${Math.floor(min / 60)}h`;
-  return `Il y a ${Math.floor(min / 1440)}j`;
-}
+import { CATEGORY_DISPLAY } from './categoryDisplay';
+import { formatPostedAgo } from '../../../utils/formatters';
+import { MapPin, ChevronRight } from '../../commons/Icons';
 
 export function DemandCard({ demand, onViewDetails, onApply, isApplying = false, feedback = null, onDismissFeedback }) {
   const [showModal, setShowModal] = useState(false);
   const { Icon, bgVar } =
     CATEGORY_DISPLAY[demand.category?.iconKey] ?? CATEGORY_DISPLAY.default;
+
+  const handleOpenDetails = () => {
+    setShowModal(true);
+    onViewDetails?.(demand.id);
+  };
 
   return (
     <>
@@ -64,12 +45,10 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
       >
         <div className="flex flex-col gap-3 p-4">
 
-          {/* ── Description (2 lignes max) ── */}
           <p className="text-sm leading-relaxed line-clamp-2 text-[var(--color-sl-600)] font-[family-name:var(--font-body)]">
             {demand.description}
           </p>
 
-          {/* ── Budget ── */}
           <div className="flex items-center justify-between px-3 py-2 bg-[var(--color-sl-50)] rounded-[var(--radius-md)]">
             <span className="text-xs text-[var(--color-sl-400)]">
               Budget estimé
@@ -79,7 +58,6 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
             </span>
           </div>
 
-          {/* ── Distance + Note client ── */}
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1 text-xs text-[var(--color-sl-500)]">
               <MapPin size={12} />
@@ -93,12 +71,10 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
             </div>
           </div>
 
-          {/* ── Temps écoulé ── */}
           <span className="text-xs text-[var(--color-sl-400)]">
             {formatPostedAgo(demand)}
           </span>
 
-          {/* ── Feedback (succès / erreur postulation) ── */}
           {feedback && (
             <AlertBanner
               type={feedback.type}
@@ -108,12 +84,11 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
             />
           )}
 
-          {/* ── Actions ── */}
           <div className="flex gap-2 pt-2 mt-auto border-t border-[var(--color-sl-100)]">
             <Button
               variant="ghost"
               size="md"
-              onClick={() => setShowModal(true)}
+              onClick={handleOpenDetails}
               className="flex-1"
             >
               Voir détails
@@ -131,7 +106,6 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
         </div>
       </Card>
 
-      {/* ── Modal détails ── */}
       {showModal && (
         <DemandDetailModal
           open={showModal}
