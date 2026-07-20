@@ -22,7 +22,7 @@ export { House, Home, LayoutDashboard, ChartPie, BarChart3, BriefcaseBusiness, G
 
 // ─── Communication ────────────────────────────────────────────
 export { Phone, MessageCircle, Send, Mail }                  from 'lucide-react';
-export { Paperclip, Image }                                  from 'lucide-react';
+export { Paperclip, Image , Inbox}                                  from 'lucide-react';
 
 // ─── Utilisateurs & identité ──────────────────────────────────
 export { User, Users, UserCheck, UserX }                     from 'lucide-react';
@@ -40,9 +40,9 @@ export { Wallet, CreditCard, Banknote, Receipt }             from 'lucide-react'
 export { Star, StarOff }                                     from 'lucide-react';
 
 // ─── Fichiers & documents ─────────────────────────────────────
-export { FileText, File, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
+export { FileText, File, FileType, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
 export { Upload, Download, Trash2, Edit, Eye }               from 'lucide-react';
 
 // ─── Feedback & états ─────────────────────────────────────────
-export { AlertTriangle, Loader2 }                            from 'lucide-react';
+export { AlertTriangle, Loader2, Loader }                            from 'lucide-react';
 export { ThumbsUp, ThumbsDown }                              from 'lucide-react';

@@ -12,7 +12,7 @@ export default function UserFilterTabs({ activeTabId, onChange, users = [] }) {
   return (
     <TabBar
       tabs={tabs}
-      activeTabId={activeTabId}
+      activeId={activeTabId}
       onChange={onChange}
     />
   );
