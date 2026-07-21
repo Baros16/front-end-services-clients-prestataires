@@ -1,20 +1,4 @@
-// src/services/mockSwitch.js
-// ─────────────────────────────────────────────────────────────────────────────
-// SWITCH MOCK / API — fichier central à utiliser dans TOUS les services
-//
-// USAGE :
-//   Dans .env.development → VITE_USE_MOCK=true
-//   Dans .env.production  → VITE_USE_MOCK=false
-//
-// PATTERN À REPRODUIRE dans chaque service :
-//
-//   import { getMock } from './mockSwitch.js'
-//   import mockData from '../data/client/mockDashboard.js'
-//
-//   export async function getDashboard() {
-//     return getMock(mockData, () => axios.get('/client/dashboard'))
-//   }
-// ─────────────────────────────────────────────────────────────────────────────
+
 
 const USE_MOCK =  true;
 console.log("[mockSwitch] VITE_USE_MOCK =", import.meta.env.VITE_USE_MOCK);

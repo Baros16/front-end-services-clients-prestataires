@@ -43,11 +43,6 @@ export function StatCard({
           )}
         </div>
       )}
-
-      {/* Barre décorative */}
-      <div className="h-[3px] bg-sl-100 rounded-full mt-1">
-        <div className={`h-full w-[40%] ${accentColorClass} rounded-full`} />
-      </div>
     </div>
   );
 }

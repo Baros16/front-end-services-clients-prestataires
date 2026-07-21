@@ -44,7 +44,7 @@ export function ActionPanel({
       {hasMissing && (
         <>
           <AlertBanner
-            variant="warning"
+            type="warning"
             message={`${missingDocs.map(d => d.label).join(', ')} est requis. Notifier le prestataire ?`}
           />
           <Button

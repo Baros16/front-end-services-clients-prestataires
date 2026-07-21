@@ -4,7 +4,7 @@ import { Wrench, X }                                    from '../../commons';
 import { Card, StatusBadge, AmountDisplay,
          RatingStars, SkeletonLoader, Avatar }       from '../../commons';
 
-function MissionInfo({ mission }) {
+export function MissionInfo({ mission }) {
   return (
     <Card title="Mission associée">
       <div

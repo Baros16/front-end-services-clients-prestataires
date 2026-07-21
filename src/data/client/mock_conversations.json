@@ -14,12 +14,16 @@
         "fullName": "Jean-Claude Mbarga",
         "avatarInitial": "J"
       },
-      "lastMessagePreview": "D'accord, je peux intervenir demain matin.",
-      "lastMessageAt": "2026-05-21T09:00:00+01:00",
+      "lastMessage": {
+        "content": "D'accord, je peux intervenir demain matin.",
+        "sentAt": "2026-05-21T09:00:00+01:00",
+        "senderRole": "provider"
+      },
       "unreadCount": 2,
       "hasQuote": true,
       "quoteStatus": "en_attente",
-      "createdAt": "2026-05-20T13:00:00+01:00"
+      "createdAt": "2026-05-20T13:00:00+01:00",
+      "updatedAt": "2026-05-21T09:00:00+01:00"
     },
     {
       "id": "conv_002",
@@ -34,12 +38,16 @@
         "fullName": "Thomas Essama",
         "avatarInitial": "T"
       },
-      "lastMessagePreview": "Mission terminée, merci pour votre confiance !",
-      "lastMessageAt": "2026-05-12T16:30:00+01:00",
+      "lastMessage": {
+        "content": "Mission terminée, merci pour votre confiance !",
+        "sentAt": "2026-05-12T16:30:00+01:00",
+        "senderRole": "provider"
+      },
       "unreadCount": 0,
       "hasQuote": true,
       "quoteStatus": "accepte",
-      "createdAt": "2026-05-10T15:00:00+01:00"
+      "createdAt": "2026-05-10T15:00:00+01:00",
+      "updatedAt": "2026-05-12T16:30:00+01:00"
     },
     {
       "id": "conv_003",
@@ -54,12 +62,16 @@
         "fullName": "Rodrigue Atangana",
         "avatarInitial": "R"
       },
-      "lastMessagePreview": "Oui je suis disponible ce weekend pour un devis.",
-      "lastMessageAt": "2026-06-01T11:15:00+01:00",
+      "lastMessage": {
+        "content": "Oui je suis disponible ce weekend pour un devis.",
+        "sentAt": "2026-06-01T11:15:00+01:00",
+        "senderRole": "provider"
+      },
       "unreadCount": 1,
       "hasQuote": false,
       "quoteStatus": null,
-      "createdAt": "2026-06-01T10:45:00+01:00"
+      "createdAt": "2026-06-01T10:45:00+01:00",
+      "updatedAt": "2026-06-01T11:15:00+01:00"
     }
   ],
   "meta": {
