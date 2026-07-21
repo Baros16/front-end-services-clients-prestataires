@@ -6,10 +6,7 @@
     "quoteId": "quote_001",
     "clientId": "usr_abc123",
     "providerId": "usr_jcm456",
-    "providerName": "Jean-Claude Mbarga",
-    "providerAvatarInitial": "J",
     "category": "Plomberie",
-    "title": "Fuite cuisine — Madeleine K.",
     "status": "en_cours",
     "totalAmount": 23000,
     "sequesteredAmount": 23000,
@@ -55,12 +52,6 @@
         "order": 6
       }
     ],
-    "providerLocation": {
-      "lat": 5.4764,
-      "lng": 10.4207,
-      "label": "Jean-Claude est arrivé",
-      "sublabel": "Quartier Commercial, Bafoussam"
-    },
     "location": {
       "address": "Bafoussam, Quartier Commercial",
       "lat": 5.4764,
