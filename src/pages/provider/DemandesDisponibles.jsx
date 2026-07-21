@@ -22,8 +22,8 @@ export default function DemandesDisponibles() {
   const navigate = useNavigate();
   const [allDemands, setAllDemands]   = useState([]);
   const [isLoading, setIsLoading]     = useState(true);
-  const [error, setError]             = useState(null); // erreur de chargement initial uniquement
-  const [feedback, setFeedback]       = useState(null); // { demandId, type: 'success' | 'danger', message }
+  const [error, setError]             = useState(null);
+  const [feedback, setFeedback]       = useState(null);
   const [activeTab, setActiveTab]     = useState('priority');
   const [isAvailable, setIsAvailable] = useState(true);
   const [applyingId, setApplyingId]   = useState(null);
@@ -48,14 +48,12 @@ export default function DemandesDisponibles() {
     })();
   }, []);
 
-  // Auto-fermeture feedback (succès/erreur postulation) après 3 secondes
   useEffect(() => {
     if (!feedback) return;
     const timer = setTimeout(() => setFeedback(null), 3000);
     return () => clearTimeout(timer);
   }, [feedback]);
 
-  // Auto-fermeture erreur de chargement après 3 secondes
   useEffect(() => {
     if (!error) return;
     const timer = setTimeout(() => setError(null), 3000);
@@ -81,7 +79,13 @@ export default function DemandesDisponibles() {
     }
   };
 
-  const handleApply = async (demandId) => {
+  const handleViewDetails = (demandId) => {
+    console.log('[DemandesDisponibles] Voir détails →', demandId);
+  };
+
+  // Postule directement sur la carte concernée : affiche le feedback
+  // succès/erreur sur cette carte précise, puis la retire de la liste.
+  const handleCreateQuote = async (demandId) => {
     if (applyingId) return;
     setApplyingId(demandId);
     setFeedback(null);
@@ -92,7 +96,6 @@ export default function DemandesDisponibles() {
         type: 'success',
         message: res?.message ?? 'Candidature envoyée avec succès ! Le client sera notifié.',
       });
-      // On laisse la carte visible le temps que la bannière s'affiche avant de la retirer
       setTimeout(() => {
         setAllDemands((prev) => prev.filter((d) => d.id !== demandId));
       }, 1800);
@@ -105,10 +108,6 @@ export default function DemandesDisponibles() {
     } finally {
       setApplyingId(null);
     }
-  };
-
-  const handleViewDetails = (demandId) => {
-    console.log('[DemandesDisponibles] Voir détails →', demandId);
   };
 
   const headerActions = (
@@ -125,7 +124,7 @@ export default function DemandesDisponibles() {
         withDot="true"
         subtitle="Demandes correspondant à vos compétences"
         actions={headerActions}
-         className="mb-4"
+        className="mb-4"
       />
 
       <TabBar tabs={tabsWithCount} activeId={activeTab} onChange={setActiveTab} />
@@ -159,8 +158,7 @@ export default function DemandesDisponibles() {
                 key={demand.id}
                 demand={demand}
                 onViewDetails={handleViewDetails}
-                onApply={handleApply}
-                isApplying={applyingId === demand.id}
+                onCreateQuote={handleCreateQuote}
                 feedback={feedback?.demandId === demand.id ? feedback : null}
                 onDismissFeedback={() => setFeedback(null)}
               />

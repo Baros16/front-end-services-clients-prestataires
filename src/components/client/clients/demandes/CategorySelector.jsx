@@ -7,7 +7,8 @@ import mockCategories from '../../../../data/shared/mock_categories.json';
 const ICON_MAP = {
   wrench: <Wrench   size={24} strokeWidth={1.8} color="var(--color-cat-plomberie)" />,
   bolt:   <Zap      size={24} strokeWidth={1.8} color="var(--color-cat-electricite)" />,
-  broom:  <Brush    size={24} strokeWidth={1.8} color="var(--color-cat-peinture)" />,
+  broom:  <Brush    size={24} strokeWidth={
+    1.8} color="var(--color-cat-peinture)" />,
   key:    <Key      size={24} strokeWidth={1.8} color="var(--color-cat-serrurerie)" />,
   brush:  <Sparkles size={24} strokeWidth={1.8} color="var(--color-cat-netoyage)" />,
   plus:   <Plus     size={24} strokeWidth={1.8} color="var(--color-cat)" />,
