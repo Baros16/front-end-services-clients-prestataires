@@ -94,6 +94,15 @@ export async function rejectQuote(demandId) {
   );
 }
 
+
+export async function getClientMissions() {
+  const result = await getMock(
+    mockMission,
+    () => apiClient.get(`/client/missions`),
+  );
+  return Array.isArray(result) ? result.map(normalizeStatus) : [];
+}
+
 /**
  * Détail d'une mission en cours.
  */
@@ -108,7 +117,7 @@ export async function getMission(missionId) {
 export async function getMissionDetails(missionId) {
   const result = await getMock(
     mockMission.data,
-    () => apiClient.get(`/client/missions/${missionId}`).then(r => r.data.data),
+    () => apiClient.get(`/client/missions/${missionId}`), // laisser getMock déballer
   );
   return normalizeStatus(result);
 }
@@ -146,4 +155,3 @@ export async function createLitige(missionId, payload) {
     () => apiClient.post(`/client/missions/${missionId}/litige`, payload),
   );
 }
-
