@@ -62,7 +62,6 @@ actions={
 />
 <WelcomeBanner
 profile={data.profile}
-location={data.recentDemands?.[0]?.location}
 />
 <ServiceCategoryGrid
 onSelect={(cat) => navigate(`/client/nouvelle-demande?cat=${cat.id}`)}

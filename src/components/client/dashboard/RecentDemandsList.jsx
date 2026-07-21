@@ -1,10 +1,10 @@
 // src/components/client/dashboard/RecentDemandsList.jsx
 
 import { useNavigate } from "react-router-dom";
-import { StatusBadge } from "../../commons/index.js";
 import { formatDate } from "../../../utils/formatters.js";
-import { Wrench, Zap, Brush, Key, Sparkles, Plus } from "../../commons/Icons.jsx";
+import { Wrench, Zap, Brush, Key, Sparkles, Plus, FileText } from "../../commons/Icons.jsx";
 import { Button } from "../../commons/index.js";
+import { ServiceCategoryCard, StatusBadge, EmptyState } from "../../commons/index.js";
 
 const CATEGORY_ICONS = {
 cat_plomberie: <Wrench size={16} />,
@@ -16,7 +16,7 @@ cat_autre: <Plus size={16} />,
 };
 export default function RecentDemandsList({ demands }) {
 const navigate = useNavigate();
-if (!demands || demands.length === 0) return null;
+if (!demands || demands.length === 0) {
 return (
 <div
 style={{
@@ -27,6 +27,33 @@ border: "1px solid var(--color-sl-200)",
 }}
 className="p-4 w-full"
 >
+  <EmptyState
+  icon={<FileText size={40} style={{ color: "var(--color-sl-300)" }} />}
+  title="Aucune demande pour le moment"
+  subtitle="Vos demandes de service apparaitront ici une fois creees"
+  action={
+    <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => navigate("/client/nouvelle-demande")}
+    >
+      Faire une demande
+    </Button>    
+  }
+/> 
+</div>
+);
+}
+return (
+  <div 
+     style={{
+      background: "white",
+      borderRadius: "var(--radius-lg)",
+      boxShadow: "var(--shadow-card)",
+      border: "1px solid var(--color-sl-200)",
+     }}
+     className="p-4 w-full"
+>     
 <div className="flex justify-between items-center mb-4">
 <p
 style={{ fontFamily: "var(--font-body)", color: "var(--color-sl-700)" }}

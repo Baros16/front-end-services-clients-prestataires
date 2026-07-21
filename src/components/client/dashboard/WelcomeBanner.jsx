@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Zap } from "../../../components/commons/Icons.jsx";
 import { Button } from "../../commons/Button.jsx";
 
-export default function WelcomeBanner({ profile, location }) {
+export default function WelcomeBanner({ profile}) {
 
 const navigate = useNavigate();
+const location = profile?.location;
 
 return (
 <div
@@ -44,14 +45,15 @@ Trouver un prestataire maintenant →
 style={{ fontFamily: "var(--font-body)", color: "var(--color-sl-400)" }}
 className="text-xs"
 >
-Votre position détectée
+{location?.city &&  "Votre position détectée"}
 </p>
 <p
 style={{ fontFamily: "var(--font-body)" }}
 className="text-sm font-medium text-white flex items-center md:justify-end gap-1"
 >
 <MapPin size={14} style={{ color: "var(--color-accent)" }} />
-{location?.address || "Bafoussam, Cameroun"}
+{location?.district && location?.city ? 
+location.district + "," + location.city : location?.district || location?.city || "Dschang, Cameroun"}
 </p>
 </div>
 </div>
