@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, AlertBanner } from "../../components/commons";
-import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
+import { PhoneInput } from "../../components/auth/PhoneInput";
+import {RoleSwitcher} from "../../components/auth/RoleSwitcher";
+import { validateCamerounPhone } from "../../utils/formatters";
 import { register } from "../../services/authService.js";
 import { Eye, EyeOff } from "../../components/commons";
 
@@ -66,33 +68,41 @@ export default function RegisterPage() {
       return;
     }
 
+      // Validation du téléphone Cameroun
+    const phoneValidation = validateCamerounPhone(formData.phone);
+      if (!phoneValidation.valid) {
+    setError(phoneValidation.message);
+    return;
+  }
+
+
     setIsSubmitting(true);
     setError("");
 
     try {
-    const payload = {
-      role,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      phone: formData.phone,
-      email: formData.email,
-      password: formData.password,
-    };
+      const payload = {
+        role,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+      };
 
-    const response = await register(payload);
+      const response = await register(payload);
 
-    // Stockage de l'email (verifyOtp attend email maintenant)
-    sessionStorage.setItem("pendingEmail", payload.email);
-    sessionStorage.setItem("pendingPhone", formData.phone);
+      // Stockage de l'email (verifyOtp attend email maintenant)
+      sessionStorage.setItem("pendingEmail", payload.email);
+      sessionStorage.setItem("pendingPhone", formData.phone);
 
-    // Redirection vers OTP avec email en paramètre
-    navigate(`/auth/otp?email=${encodeURIComponent(payload.email)}`);
-  } catch (err) {
-    setError(err.message || "Une erreur est survenue.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      // Redirection vers OTP avec email en paramètre
+      navigate(`/auth/otp?email=${encodeURIComponent(payload.email)}`);
+    } catch (err) {
+      setError(err.message || "Une erreur est survenue.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -119,14 +129,15 @@ export default function RegisterPage() {
             onChange={(value) => handleChange("lastName", value)}
             required
           />
-          <Input
+          <PhoneInput
             label="Téléphone"
-            type="tel"
-            placeholder="+2376XXXXXXXX"
+            placeholder="6XXXXXXXX"
             value={formData.phone}
             onChange={(value) => handleChange("phone", value)}
             required
+            error={error.phone}
           />
+
           <Input
             label="Email"
             type="email"
@@ -142,7 +153,10 @@ export default function RegisterPage() {
             value={formData.password}
             onChange={(value) => handleChange("password", value)}
             rightIcon={
-              <button type="button" onClick={() => setShowPassword((prev) => !prev)}>
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             }
@@ -155,7 +169,10 @@ export default function RegisterPage() {
             value={formData.confirmPassword}
             onChange={(value) => handleChange("confirmPassword", value)}
             rightIcon={
-              <button type="button" onClick={() => setShowConfirmPassword((prev) => !prev)}>
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+              >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             }
