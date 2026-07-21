@@ -5,6 +5,8 @@ import mockClientDashboard from "../data/client/mock_dashboard.json";
 import mockDemands from "../data/client/mock_demands.json";
 import mockQuote from "../data/client/mock_quote.json";
 import mockMission from "../data/client/mock_mission.json";
+import mockProvidersSearch from "../data/client/mock_providers_search.json";
+import mockUrgencyContext from "../data/client/mock_urgency_context.json";
 
 // ─── En-tête du fichier — ajout ────────────────────────────────────────────
 function normalizeStatus(obj) {
@@ -147,3 +149,14 @@ export async function createLitige(missionId, payload) {
   );
 }
 
+export async function getUrgencyProviders() {
+  return getMockList(mockProvidersSearch, () =>
+    apiClient.get(`/client/providers/search`)
+  );
+}
+
+export async function getUrgencyContext() {
+  return getMock(mockUrgencyContext, () =>
+    apiClient.get(`/client/urgency/context`)
+  );
+}
