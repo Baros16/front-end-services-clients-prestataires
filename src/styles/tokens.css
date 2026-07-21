@@ -1,7 +1,7 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+@import "tailwindcss";
 
-@theme {
+:root {
   /* ── Fonts ── */
   --font-display: 'Syne', sans-serif;
   --font-body:    'DM Sans', sans-serif;
@@ -34,26 +34,25 @@
   --color-cat-peinture:    #db2777;
   --color-cat-autre:       #9ca3af;
 
+  /* ── Opérateurs de paiement mobile ──────────────────────────── */
+  --color-orange-money:      #FF6600;
+  --color-orange-money-light:#FFF0E6;
+  --color-mtn-momo:          #FFCB00;
+  --color-mtn-momo-light:    #FFFBE6;
 
-/* ── Opérateurs de paiement mobile ──────────────────────────── */
---color-orange-money:      #FF6600;
---color-orange-money-light:#FFF0E6;
---color-mtn-momo:          #FFCB00;
---color-mtn-momo-light:    #FFFBE6;
+  /* ── Mode urgence ────────────────────────────────────────────── */
+  --color-urgent:            #EF4444;
+  --color-urgent-light:      #FEE2E2;
 
-/* ── Mode urgence ────────────────────────────────────────────── */
---color-urgent:            #EF4444;
---color-urgent-light:      #FEE2E2;
+  /* ── Affichage montants XAF ──────────────────────────────────── */
+  --color-xaf:               #92400E;
+  --color-xaf-light:         #FEF3C7;
 
-/* ── Affichage montants XAF ──────────────────────────────────── */
---color-xaf:               #92400E;
---color-xaf-light:         #FEF3C7;
-
-/* ── Sidebar par rôle ────────────────────────────────────────── */
---color-sidebar-admin:     #0F172A;
---color-sidebar-client:    #1B4332;
---color-sidebar-provider:  #1E3A5F;
---color-sidebar-sc:        #3B1F5E;
+  /* ── Sidebar par rôle ────────────────────────────────────────── */
+  --color-sidebar-admin:     #0F172A;
+  --color-sidebar-client:    #1B4332;
+  --color-sidebar-provider:  #1E3A5F;
+  --color-sidebar-sc:        #3B1F5E;
 
   /* ── Surfaces ─────────────────────────────────────────────── */
   --color-surface:         #ffffff;
