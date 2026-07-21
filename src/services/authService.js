@@ -3,6 +3,8 @@
 import axios from "axios";
 import { getMock } from "./mockSwitch.js";
 import mockUsers from "../data/auth/mock_user.json";
+import mockPublicUsers from "../data/auth/mock_public_user.json"
+import apiClient from "./apiClient.js";
 
 const BASE = "/auth";
 const ACCESS_KEY = "serviloc_access";
