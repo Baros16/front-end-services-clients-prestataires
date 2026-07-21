@@ -1,7 +1,7 @@
 // src/components/provider/demandes/CategorySelector.jsx
-import { ServiceCategoryCard } from '../../../commons/ServiceCategoryCard';
-import { Wrench, Zap, Brush, Key, Sparkles, Plus } from '../../../commons/Icons';
-import mockCategories from '../../../../data/shared/mock_categories.json';
+import { ServiceCategoryCard } from '../../commons/ServiceCategoryCard';
+import { Wrench, Zap, Brush, Key, Sparkles, Plus } from '../../commons/Icons';
+import mockCategories from '../../../data/shared/mock_categories.json';
 
 const ICON_MAP = {
   wrench: <Wrench   size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,

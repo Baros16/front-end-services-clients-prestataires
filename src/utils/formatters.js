@@ -54,3 +54,9 @@ export function getMinutesAgo(isoString) {
   const diffMs = Date.now() - new Date(isoString).getTime();
   return Math.max(0, Math.round(diffMs / 60000));
 }
+
+export function formatBudgetRange(budget) {
+  if (!budget) return '—';
+  const fmt = (n) => n.toLocaleString('fr-FR');
+  return `${fmt(budget.min)} — ${fmt(budget.max)} FCFA`;
+}

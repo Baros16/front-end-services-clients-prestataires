@@ -35,11 +35,6 @@ export function CreerDevis() {
   const navigate = useNavigate();
   const location = useLocation();
   const { demandeId } = useParams(); // matche la route "devis/nouveau/:demandeId"
-
-  // La demande peut arriver via l'état de navigation (déjà chargée sur
-  // DemandesDisponibles / DemandDetailModal) pour éviter un re-fetch inutile.
-  // Sinon (accès direct à l'URL, refresh), on la retrouve dans la liste des
-  // demandes disponibles.
   const demandFromState = location.state?.demand ?? null;
 
   const [demand, setDemand] = useState(demandFromState);

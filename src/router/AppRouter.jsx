@@ -33,6 +33,7 @@ const ScLoginPage        = lazy(() => import("../pages/auth/ScLoginPage"));
 
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
+const Demands            = lazy(() => import("../pages/client/DemandListPage"))  
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
 const SuiviMission       = lazy(() => import("../pages/client/SuiviMission"));
 const NotationPrestataire = lazy(() => import("../pages/client/NotationPrestataire"));
@@ -137,6 +138,7 @@ export function AppRouter() {
           >
             <Route index                          element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"               element={<ClientDashboard />} />
+            <Route path="demandes"                element={<Demands />} />
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />

@@ -1,20 +1,20 @@
-// src/pages/client/NewDemandePage.jsx
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { PageHeader } from '../../components/commons/PageHeader';
 import { PhotoUploader } from '../../components/commons/PhotoUploader';
 import { Card } from '../../components/commons/Card.jsx';
+import { LocationPicker } from '../../components/commons/LocationPicker';
 
-import { StepIndicator } from '../../components/client/clients/demandes/StepIndicator.jsx';
-import CategorySelector from '../../components/client/clients/demandes/CategorySelector';
-import DemandDescriptionField from '../../components/client/clients/demandes/DemandDescriptionField';
-import LocationSidePanel from '../../components/client/clients/demandes/LocationSidePanel';
-import RecapSidePanel from '../../components/client/clients/demandes/RecapSidePanel';
+import { StepIndicator } from '../../components/client/demandes/StepIndicator.jsx';
+import CategorySelector from '../../components/client/demandes/CategorySelector.jsx';
+import DemandDescriptionField from '../../components/client/demandes/DemandDescriptionField.jsx';
+import { BudgetRangeField } from '../../components/client/demandes/BudgetRangeField.jsx';
+import RecapSidePanel from '../../components/client/demandes/RecapSidePanel.jsx';
 
-import { getCategories, uploadPhoto, createDemand } from '../../services/clentService';
-
-
+import { getCategories } from '../../services/sharedService';
+import { createDemand } from '../../services/clientService';
+import { uploadPhotos } from '../../services/uploadService';
 
 const STEPS = [
   { number: 1, label: 'Catégorie' },
@@ -24,9 +24,7 @@ const STEPS = [
   { number: 5, label: 'Confirmation' },
 ];
 
-const DEFAULT_ADDRESS = 'Bafoussam, Quartier Commercial';
 const DESCRIPTION_MIN_LENGTH = 30;
-
 
 export default function NouvelleDemande() {
   const navigate = useNavigate();
@@ -38,12 +36,13 @@ export default function NouvelleDemande() {
   // ── État du brouillon de demande ──
   const [selectedCatId, setSelectedCatId] = useState(null);
   const [description, setDescription] = useState('');
+  const [budget, setBudget] = useState({ min: '', max: '' });
   const [photos, setPhotos] = useState([]);
-  const [address, setAddress] = useState(DEFAULT_ADDRESS);
-  const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const [location, setLocation] = useState({ lat: null, lng: null, address: '' });
 
   // ── UI states ──
   const [descError, setDescError] = useState('');
+  const [budgetError, setBudgetError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [published, setPublished] = useState(false);
@@ -66,20 +65,23 @@ export default function NouvelleDemande() {
 
   const recap = {
     category: selectedCatLabel,
-    location: address,
+    location: location.address,
     photoCount: photos.length,
     status: 'Ouverte',
   };
 
+  const budgetComplete = budget.min !== '' && budget.max !== '' && Number(budget.max) >= Number(budget.min);
+  const hasCoords = location.lat != null && location.lng != null;
+
   const completedSteps = useMemo(() => {
     const set = new Set();
     if (selectedCatId) set.add(1);
-    if (description.trim().length >= DESCRIPTION_MIN_LENGTH) set.add(2);
+    if (description.trim().length >= DESCRIPTION_MIN_LENGTH && budgetComplete) set.add(2);
     if (photos.length > 0) set.add(3);
-    if (addressConfirmed) set.add(4);
+    if (hasCoords) set.add(4);
     if (published) set.add(5);
     return set;
-  }, [selectedCatId, description, photos, addressConfirmed, published]);
+  }, [selectedCatId, description, budgetComplete, photos, hasCoords, published]);
 
   const currentStep = useMemo(() => {
     const firstIncomplete = STEPS.find((s) => !completedSteps.has(s.number));
@@ -92,9 +94,11 @@ export default function NouvelleDemande() {
 
   const handleAddPhoto = useCallback(async (file) => {
     try {
-      const uploaded = await uploadPhoto(file);
-      const { photoId, url } = uploaded?.data ?? uploaded;
-      setPhotos((prev) => [...prev, { id: photoId, url, name: file.name }]);
+      const uploaded = await uploadPhotos([file], 'demand');
+      const first = uploaded?.uploads?.[0];
+      if (first) {
+        setPhotos((prev) => [...prev, { id: first.id, url: first.url, name: first.name }]);
+      }
     } catch (err) {
       setFeedback({ type: 'error', message: "Erreur lors de l'upload de la photo." });
     }
@@ -104,26 +108,42 @@ export default function NouvelleDemande() {
     setPhotos((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
-  const handleModifyLocation = useCallback(() => {
-    const newAddr = window.prompt('Entrez votre adresse :', address);
-    if (newAddr && newAddr.trim()) {
-      setAddress(newAddr.trim());
-      setAddressConfirmed(true);
-    }
-  }, [address]);
+  const handleLocationChange = useCallback((newLocation) => {
+    setLocation(newLocation);
+  }, []);
+
+  const handleBudgetChange = useCallback((newBudget) => {
+    setBudget(newBudget);
+    if (budgetError) setBudgetError('');
+  }, [budgetError]);
 
   const validate = () => {
     let valid = true;
-    if (!description || description.trim().length < 10) {
-      setDescError('La description doit contenir au moins 10 caractères.');
+
+    if (!description || description.trim().length < DESCRIPTION_MIN_LENGTH) {
+      setDescError(`La description doit contenir au moins ${DESCRIPTION_MIN_LENGTH} caractères.`);
       valid = false;
     } else {
       setDescError('');
     }
+
+    if (!budgetComplete) {
+      setBudgetError('Indiquez un budget minimum et maximum cohérents.');
+      valid = false;
+    } else {
+      setBudgetError('');
+    }
+
     if (!selectedCatId) {
       setFeedback({ type: 'error', message: 'Veuillez sélectionner une catégorie.' });
       valid = false;
     }
+
+    if (!hasCoords) {
+      setFeedback({ type: 'error', message: 'Veuillez sélectionner une localisation.' });
+      valid = false;
+    }
+
     return valid;
   };
 
@@ -137,8 +157,9 @@ export default function NouvelleDemande() {
         categoryId: selectedCatId,
         description: description.trim(),
         photoIds: photos.map((p) => p.id),
-        location: { address, lat: 5.4764, lng: 10.4207 },
-        isUrgent: false,
+        location: { address: location.address, lat: location.lat, lng: location.lng },
+        estimatedBudget: { min: Number(budget.min), max: Number(budget.max) },
+        urgent: false,
       });
       setPublished(true);
       setFeedback({ type: 'success', message: 'Votre demande a été publiée avec succès !' });
@@ -195,6 +216,13 @@ export default function NouvelleDemande() {
               minLength={DESCRIPTION_MIN_LENGTH}
             />
 
+            <BudgetRangeField
+              value={budget}
+              onChange={handleBudgetChange}
+              error={budgetError}
+              required
+            />
+
             <PhotoUploader
               label="Photos (optionnel)"
               maxPhotos={4}
@@ -202,14 +230,17 @@ export default function NouvelleDemande() {
               onAdd={handleAddPhoto}
               onRemove={handleRemovePhoto}
             />
+
+            <LocationPicker
+              value={location}
+              onChange={handleLocationChange}
+              label="Localisation de l'intervention"
+              required
+            />
           </div>
         </Card>
 
         <div className="space-y-4">
-          <LocationSidePanel
-            address={address}
-            onModify={handleModifyLocation}
-          />
           <RecapSidePanel
             recap={recap}
             onCancel={handleCancel}
