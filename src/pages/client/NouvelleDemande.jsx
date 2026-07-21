@@ -1,4 +1,4 @@
-// src/pages/client/NewDemandePage.jsx
+// src/pages/client/NouvelleDemande.jsx
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,9 +12,9 @@ import DemandDescriptionField from '../../components/client/clients/demandes/Dem
 import LocationSidePanel from '../../components/client/clients/demandes/LocationSidePanel';
 import RecapSidePanel from '../../components/client/clients/demandes/RecapSidePanel';
 
-import { getCategories, uploadPhoto, createDemand } from '../../services/clentService';
-
-
+import { createDemand } from '../../services/clientService';
+import { uploadPhotos } from '../../services/uploadService';
+import { getCategories } from '../../services/sharedService.js';
 
 const STEPS = [
   { number: 1, label: 'Catégorie' },
@@ -25,8 +25,9 @@ const STEPS = [
 ];
 
 const DEFAULT_ADDRESS = 'Bafoussam, Quartier Commercial';
+const DEFAULT_LAT = 5.4764;
+const DEFAULT_LNG = 10.4207;
 const DESCRIPTION_MIN_LENGTH = 30;
-
 
 export default function NouvelleDemande() {
   const navigate = useNavigate();
@@ -40,6 +41,8 @@ export default function NouvelleDemande() {
   const [description, setDescription] = useState('');
   const [photos, setPhotos] = useState([]);
   const [address, setAddress] = useState(DEFAULT_ADDRESS);
+  const [addressLat, setAddressLat] = useState(DEFAULT_LAT);
+  const [addressLng, setAddressLng] = useState(DEFAULT_LNG);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
 
   // ── UI states ──
@@ -90,11 +93,21 @@ export default function NouvelleDemande() {
     setSelectedCatId(id);
   }, []);
 
+  // ── Ajout d'une photo ──
+  // Fix 1 : uploadPhotos attend un tableau de fichiers, pas un fichier seul.
+  // Fix 2 : la réponse (mock ET API) a la forme { data: { uploads: [{ id, url, name }] } },
+  //         donc on va chercher uploads[0], pas des clés plates photoId/url.
   const handleAddPhoto = useCallback(async (file) => {
     try {
-      const uploaded = await uploadPhoto(file);
-      const { photoId, url } = uploaded?.data ?? uploaded;
-      setPhotos((prev) => [...prev, { id: photoId, url, name: file.name }]);
+      const uploaded = await uploadPhotos([file], "demand");
+      const payload = uploaded?.data ?? uploaded;
+      const first = payload?.uploads?.[0];
+
+      if (!first) {
+        throw new Error("Réponse d'upload invalide");
+      }
+
+      setPhotos((prev) => [...prev, { id: first.id, url: first.url, name: first.name }]);
     } catch (err) {
       setFeedback({ type: 'error', message: "Erreur lors de l'upload de la photo." });
     }
@@ -109,6 +122,9 @@ export default function NouvelleDemande() {
     if (newAddr && newAddr.trim()) {
       setAddress(newAddr.trim());
       setAddressConfirmed(true);
+      // Pas de géocodage disponible : lat/lng restent sur la valeur par défaut
+      // tant qu'aucun service de géocodage n'est branché (cf. audit — suggestion
+      // de prop `address` de confort sur MapEmbed, à trancher avec M1).
     }
   }, [address]);
 
@@ -137,7 +153,7 @@ export default function NouvelleDemande() {
         categoryId: selectedCatId,
         description: description.trim(),
         photoIds: photos.map((p) => p.id),
-        location: { address, lat: 5.4764, lng: 10.4207 },
+        location: { address, lat: addressLat, lng: addressLng },
         isUrgent: false,
       });
       setPublished(true);
@@ -208,6 +224,8 @@ export default function NouvelleDemande() {
         <div className="space-y-4">
           <LocationSidePanel
             address={address}
+            lat={addressLat}
+            lng={addressLng}
             onModify={handleModifyLocation}
           />
           <RecapSidePanel

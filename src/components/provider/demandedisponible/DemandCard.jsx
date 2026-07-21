@@ -3,12 +3,10 @@ import { useState } from 'react';
 import { Button }      from '../../commons/Button';
 import { Card }        from '../../commons/Card';
 import { StatusBadge } from '../../commons/StatusBadge';
-import { RatingStars } from '../../commons/RatingStars';
 import { AlertBanner } from '../../commons/AlertBanner';
 import { DemandDetailModal } from './DemandDetailModal';
 import { formatBudget } from './formatBudget';
 import {
-  MapPin,
   Wrench,
   Zap,
   Brush,
@@ -27,15 +25,22 @@ const CATEGORY_DISPLAY = {
   default: { Icon: Wrench,   bgVar: 'var(--color-sl-100)' },
 };
 
-function formatPostedAgo(d) {
-  if (d.postedAgo) return d.postedAgo;
-  const min = d.postedMinutesAgo ?? 0;
-  if (min < 60)   return `Il y a ${min} min`;
-  if (min < 1440) return `Il y a ${Math.floor(min / 60)}h`;
-  return `Il y a ${Math.floor(min / 1440)}j`;
+// audit 2.5 : postedMinutesAgo absent du schéma réel — dérivé de createdAt (réel)
+function formatPostedAgo(createdAt) {
+  if (!createdAt) return '';
+  const diffMin = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000));
+  if (diffMin < 60)   return `Il y a ${diffMin} min`;
+  if (diffMin < 1440) return `Il y a ${Math.floor(diffMin / 60)}h`;
+  return `Il y a ${Math.floor(diffMin / 1440)}j`;
 }
 
-export function DemandCard({ demand, onViewDetails, onApply, isApplying = false, feedback = null, onDismissFeedback }) {
+/**
+ * onCreateQuote(demandId) remplace l'ancien onApply(demandId) — audit 1.12 :
+ * POST /provider/demands/:id/apply n'existe dans aucun des 4 contrats réels.
+ * En attendant une décision backend, on navigue directement vers la création
+ * de devis plutôt que d'appeler un endpoint garanti 404.
+ */
+export function DemandCard({ demand, onViewDetails, onCreateQuote, feedback = null, onDismissFeedback }) {
   const [showModal, setShowModal] = useState(false);
   const { Icon, bgVar } =
     CATEGORY_DISPLAY[demand.category?.iconKey] ?? CATEGORY_DISPLAY.default;
@@ -57,7 +62,7 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
         }
         actions={
           <div className="flex gap-1.5 flex-wrap justify-end shrink-0">
-            {demand.isUrgent && <StatusBadge variant="urgent" size="sm" />}
+            {demand.urgent && <StatusBadge variant="urgent" size="sm" />}
             <StatusBadge variant="ouvert" size="sm" />
           </div>
         }
@@ -79,26 +84,12 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
             </span>
           </div>
 
-          {/* ── Distance + Note client ── */}
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1 text-xs text-[var(--color-sl-500)]">
-              <MapPin size={12} />
-              {demand.distanceKm} km
-            </span>
-            <div className="flex items-center gap-1">
-              <RatingStars value={demand.clientRating} size="sm" />
-              <span className="text-xs text-[var(--color-sl-500)]">
-                {demand.clientRating}
-              </span>
-            </div>
-          </div>
-
           {/* ── Temps écoulé ── */}
           <span className="text-xs text-[var(--color-sl-400)]">
-            {formatPostedAgo(demand)}
+            {formatPostedAgo(demand.createdAt)}
           </span>
 
-          {/* ── Feedback (succès / erreur postulation) ── */}
+          {/* ── Feedback (succès / erreur) ── */}
           {feedback && (
             <AlertBanner
               type={feedback.type}
@@ -121,11 +112,10 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
             <Button
               variant="dark"
               size="md"
-              onClick={() => onApply(demand.id)}
-              disabled={isApplying}
+              onClick={() => onCreateQuote(demand.id)}
               className="flex-1"
             >
-              {isApplying ? 'Envoi...' : <span className="flex items-center gap-1">Postuler <ChevronRight size={16} /></span>}
+              <span className="flex items-center gap-1">Postuler <ChevronRight size={16} /></span>
             </Button>
           </div>
         </div>
@@ -137,8 +127,7 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
           open={showModal}
           demand={demand}
           onClose={() => setShowModal(false)}
-          onApply={() => { setShowModal(false); onApply(demand.id); }}
-          isApplying={isApplying}
+          onCreateQuote={() => { setShowModal(false); onCreateQuote(demand.id); }}
         />
       )}
     </>

@@ -2,7 +2,6 @@
 import { Modal }       from '../../commons/Modal';
 import { Button }      from '../../commons/Button';
 import { StatusBadge } from '../../commons/StatusBadge';
-import { RatingStars } from '../../commons/RatingStars';
 import { MapPin, Clock, Wrench, Zap, Sparkles, Key, Brush } from '../../commons/Icons';
 import { formatBudget } from './formatBudget';
 
@@ -15,12 +14,12 @@ const CATEGORY_DISPLAY = {
   default: { Icon: Wrench,   bgVar: 'var(--color-sl-100)' },
 };
 
-function formatPostedAgo(d) {
-  if (d.postedAgo) return d.postedAgo;
-  const min = d.postedMinutesAgo ?? 0;
-  if (min < 60)   return `Il y a ${min} min`;
-  if (min < 1440) return `Il y a ${Math.floor(min / 60)}h`;
-  return `Il y a ${Math.floor(min / 1440)}j`;
+function formatPostedAgo(createdAt) {
+  if (!createdAt) return '';
+  const diffMin = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000));
+  if (diffMin < 60)   return `Il y a ${diffMin} min`;
+  if (diffMin < 1440) return `Il y a ${Math.floor(diffMin / 60)}h`;
+  return `Il y a ${Math.floor(diffMin / 1440)}j`;
 }
 
 function getLocationText(location) {
@@ -29,7 +28,7 @@ function getLocationText(location) {
   return location.address ?? location.city ?? JSON.stringify(location);
 }
 
-export function DemandDetailModal({ open, demand, onClose, onApply, isApplying = false }) {
+export function DemandDetailModal({ open, demand, onClose, onCreateQuote }) {
   const { Icon, bgVar } =
     CATEGORY_DISPLAY[demand?.category?.iconKey] ?? CATEGORY_DISPLAY.default;
 
@@ -50,7 +49,7 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
             </span>
           </div>
           <div className="flex gap-1.5 flex-wrap">
-            {demand?.isUrgent && <StatusBadge variant="urgent" size="sm" />}
+            {demand?.urgent && <StatusBadge variant="urgent" size="sm" />}
             <StatusBadge variant="ouvert" size="sm" />
           </div>
         </div>
@@ -63,11 +62,10 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           <Button
             variant="primary"
             size="md"
-            onClick={onApply}
-            disabled={isApplying}
+            onClick={onCreateQuote}
             className="flex-1"
           >
-            {isApplying ? '...' : 'Postuler →'}
+            Postuler →
           </Button>
         </>
       }
@@ -94,35 +92,12 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           </span>
         </div>
 
-        {/* ── Infos : distance + note + temps ── */}
-        <div className="grid grid-cols-3 gap-3">
-
-          {/* Distance */}
-          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
-            <MapPin size={18} className="text-[var(--color-sl-500)]" />
-            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
-              {demand?.distanceKm} km
-            </span>
-            <span className="text-xs text-[var(--color-sl-400)]">Distance</span>
-          </div>
-
-          {/* Note client */}
-          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
-            <RatingStars value={demand?.clientRating} size="sm" />
-            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
-              {demand?.clientRating}
-            </span>
-            <span className="text-xs text-[var(--color-sl-400)]">Note client</span>
-          </div>
-
-          {/* Temps */}
-          <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
-            <Clock size={18} className="text-[var(--color-sl-500)]" />
-            <span className="text-sm font-semibold text-[var(--color-sl-900)]">
-              {demand && formatPostedAgo(demand)}
-            </span>
-            <span className="text-xs text-[var(--color-sl-400)]">Publié</span>
-          </div>
+        {/* ── Temps écoulé ── */}
+        <div className="flex items-center gap-2 px-4 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
+          <Clock size={18} className="text-[var(--color-sl-500)]" />
+          <span className="text-sm text-[var(--color-sl-700)]">
+            Publié {demand && formatPostedAgo(demand.createdAt)}
+          </span>
         </div>
 
         {/* ── Localisation ── */}

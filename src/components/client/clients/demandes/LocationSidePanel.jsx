@@ -1,13 +1,14 @@
-// src/components/client/demand/LocationSidePanel.jsx
+// src/components/client/clients/demandes/LocationSidePanel.jsx
 import {MapEmbed} from '../../../../components/commons/MapEmbed';
 
 /**
  * LocationSidePanel — Panneau carte + adresse avec bouton Modifier
  * Props:
  *   address: string
+ *   lat, lng: number — coordonnées pour MapEmbed (MapEmbed n'a pas de prop `address`)
  *   onModify: () => void
  */
-export default function LocationSidePanel({ address, onModify }) {
+export default function LocationSidePanel({ address, lat, lng, onModify }) {
   return (
     <div className="bg-white rounded-[var(--radius-lg)] border border-[var(--color-sl-200)] overflow-hidden shadow-[var(--shadow-card)]">
       <div className="px-4 pt-4">
@@ -17,7 +18,8 @@ export default function LocationSidePanel({ address, onModify }) {
       </div>
 
       <MapEmbed
-        address={address}
+        lat={lat}
+        lng={lng}
         label="📍 Carte interactive"
         interactive={false}
         height="180px"

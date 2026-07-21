@@ -125,6 +125,7 @@ export default function DemandesDisponibles() {
         withDot="true"
         subtitle="Demandes correspondant à vos compétences"
         actions={headerActions}
+         className="mb-4"
       />
 
       <TabBar tabs={tabsWithCount} activeId={activeTab} onChange={setActiveTab} />

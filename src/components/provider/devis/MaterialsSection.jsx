@@ -1,4 +1,4 @@
-// src/components/provider/quote/MaterialsSection.jsx
+// src/components/provider/devis/MaterialsSection.jsx
 import { Card } from '../../commons/Card';
 import { Button } from '../../commons/Button';
 import { Plus, X } from '../../commons/Icons';
@@ -18,18 +18,7 @@ export function createEmptyMaterial() {
  *
  * Props
  * - materials: [{ id, designation, quantity, unitPrice }]
- * - onChange(nextMaterials)git add src/components/client/clients/demandes/ \
-        src/components/provider/demandedisponible/ \
-        src/components/provider/devis/ \
-        src/pages/client/NouvelleDemande.jsx \
-        src/pages/provider/CreerDevis.jsx \
-        src/pages/provider/DemandesDisponibles.jsx \
-        src/services/clentService.js \
-        src/services/providerService.js \
-        src/styles/tokens.css \
-        src/data/provider/mock_available_demands.json
-
-git commit -m "backup: demandes disponible, creer devis, nouvelle demande"
+ * - onChange(nextMaterials)
  */
 export function MaterialsSection({ materials, onChange }) {
   const updateRow = (id, patch) => {
@@ -106,21 +95,18 @@ export function MaterialsSection({ materials, onChange }) {
                         />
                       </td>
                       <td className="py-2.5 px-3">
-                     
-                    <td className="py-2.5 px-3">
-                    <input
-                    type="text"
-                    inputMode="numeric"
-                   value={m.unitPrice === 0 ? '' : m.unitPrice}
-                   onChange={(e) => {
-                  const digitsOnly = e.target.value.replace(/[^0-9]/g, '');
-                 updateRow(m.id, { unitPrice: digitsOnly === '' ? 0 : Number(digitsOnly) });
-                 }}
-                 placeholder="0"
-                 className="w-full rounded-md border border-sl-200 bg-surface px-2.5 py-1.5 text-sm
-                focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light"
-                />
-              </td>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={m.unitPrice === 0 ? '' : m.unitPrice}
+                          onChange={(e) => {
+                            const digitsOnly = e.target.value.replace(/[^0-9]/g, '');
+                            updateRow(m.id, { unitPrice: digitsOnly === '' ? 0 : Number(digitsOnly) });
+                          }}
+                          placeholder="0"
+                          className="w-full rounded-md border border-sl-200 bg-surface px-2.5 py-1.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light"
+                        />
                       </td>
                       <td className="py-2.5 pl-3 text-right font-semibold text-sl-900 whitespace-nowrap">
                         {formatXAF(subtotal)}
