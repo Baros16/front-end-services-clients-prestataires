@@ -1,5 +1,5 @@
 // src/components/client/NearbyProviderCard.jsx
-import { Avatar, RatingStars, Card, Button, PriceDisplay } from "../commons";
+import { Avatar, RatingStars, Card, Button, PriceDisplay, Badge } from "../commons";
 
 export default function NearbyProviderCard({ provider, onContact }) {
   const {
@@ -45,14 +45,9 @@ export default function NearbyProviderCard({ provider, onContact }) {
       </div>
 
       {isAvailable ? (
-        <span className="inline-flex items-center gap-1 self-start px-3 py-1 rounded-full text-xs font-semibold bg-success-light text-success">
-          <span className="w-2 h-2 rounded-full bg-success" />
-          DISPONIBLE
-        </span>
+        <Badge label="DISPONIBLE" variant="success" withDot className="self-start" />
       ) : (
-        <span className="inline-flex items-center gap-1 self-start px-3 py-1 rounded-full text-xs font-semibold bg-warning-light text-warning">
-          SOUS 30 MIN
-        </span>
+        <Badge label="SOUS 30 MIN" variant="warning" className="self-start" />
       )}
 
       <Button
