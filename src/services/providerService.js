@@ -6,6 +6,7 @@ import mock_avilable_demands from "../data/provider/mock_available_demands.json"
 import mock_profile     from "../data/provider/mock_profile.json"
 import mock_missions from "../data/provider/mock_mission.json"
 import mock_quote from "../data/client/mock_quote.json"
+import mock_earnings from "../data/provider/mock_earnings.json";
 
 function normalizeMissionStatus(mission) {
   if (!mission) return mission;
