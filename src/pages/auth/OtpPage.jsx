@@ -9,7 +9,8 @@ import { verifyOtp, resendOtp } from "../../services/authService";
 export default function OTPVerificationPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const email = searchParams.get("email") || sessionStorage.getItem("pendingEmail");
+  const email =
+    searchParams.get("email") || sessionStorage.getItem("pendingEmail");
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,6 +18,11 @@ export default function OTPVerificationPage() {
   const [success, setSuccess] = useState("");
   const [countdown, setCountdown] = useState(45);
   const [canResend, setCanResend] = useState(false);
+
+  const clearError = () => {
+    setError("");
+    setSuccess("");
+  };
 
   const otpCode = digits.join("");
 
@@ -30,7 +36,7 @@ export default function OTPVerificationPage() {
   }, [countdown]);
 
   useEffect(() => {
-    const isComplete = digits.every(d => d !== "");
+    const isComplete = digits.every((d) => d !== "");
     if (isComplete && !isSubmitting) {
       handleSubmit();
     }
@@ -42,22 +48,31 @@ export default function OTPVerificationPage() {
       return;
     }
 
+    if (otpCode.length !== 6) {
+      setError("Veuillez saisir les 6 chiffres du code.");
+      return;
+    }
+
     setIsSubmitting(true);
-    setError("");
-    setSuccess("");
+    clearError();
 
     try {
       const response = await verifyOtp(email, otpCode);
-      const message = response?.data?.message ?? response?.message ?? "Compte activé avec succès !";
+      const message =
+        response?.data?.message ??
+        response?.message ??
+        "Compte activé avec succès !";
       setSuccess(message);
-      
+
       setTimeout(() => {
         navigate("/auth/login");
       }, 2000);
     } catch (err) {
       const errorCode = err.code;
       if (errorCode === "INVALID_OTP") {
-        setError(`Code incorrect — ${err.attemptsRemaining || 2} tentative(s) restante(s)`);
+        setError(
+          `Code incorrect — ${err.attemptsRemaining || 2} tentative(s) restante(s)`,
+        );
         setDigits(["", "", "", "", "", ""]);
       } else if (errorCode === "OTP_EXPIRED") {
         setError("Code expiré. Cliquez sur 'Renvoyer'.");
@@ -113,7 +128,9 @@ export default function OTPVerificationPage() {
 
         {/* Inputs OTP centrés */}
         <div className="flex justify-center my-8">
-          <OTPDigitInput digits={digits} onChange={setDigits} />
+          <div onFocusCapture={clearError}>
+            <OTPDigitInput digits={digits} onChange={setDigits} />
+          </div>
         </div>
 
         {/* Message d'erreur avec icône */}

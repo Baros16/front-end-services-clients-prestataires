@@ -12,6 +12,10 @@ export default function ForgotPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const clearError = () => {
+    setError("");
+  };
+
   const handleSubmit = async () => {
     if (!email) {
       setError("Email requis");
@@ -50,14 +54,19 @@ export default function ForgotPassword() {
             Saisissez votre email pour recevoir un code de reinitialisation
           </p>
           <div className="space-y-4">
-            <Input
-              label="Email"
-              type="email"
-              placeholder="vous@email.com"
-              value={email}
-              onChange={setEmail}
-              required
-            />
+            <div onFocusCapture={clearError}>
+              <Input
+                label="Email"
+                type="email"
+                placeholder="vous@email.com"
+                value={email}
+                onChange={(value) => {
+                  setEmail(value);
+                  clearError();
+                }}
+                required
+              />
+            </div>
           </div>
           {error && (
             <div className="mt-4">

@@ -14,6 +14,12 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
+  const clearError = () => {
+    if (error) {
+      setError("");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!email || !password) {
       setError("Tous les champs sont obligatoires");
@@ -65,27 +71,37 @@ export default function LoginPage() {
         <p className="text-gray-500 mb-6">Acceder a votre compte</p>
 
         <div className="space-y-4">
-          <Input
-            label="Email"
-            type="email"
-            placeholder="vous@email.com"
-            value={email}
-            onChange={setEmail}
-            required
-          />
-          <Input
-            label="Mot de passe"
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={password}
-            onChange={setPassword}
-            required
-            rightIcon={
-              <button onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            }
-          />
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="vous@email.com"
+              value={email}
+              onChange={(value) => {
+                setEmail(value);
+                clearError();
+              }}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Mot de passe"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(value) => {
+                setPassword(value);
+                clearError();
+              }}
+              required
+              rightIcon={
+                <button onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+          </div>
         </div>
 
         {error && (

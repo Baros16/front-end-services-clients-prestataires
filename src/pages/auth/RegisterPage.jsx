@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Input, AlertBanner } from "../../components/commons";
 import { PhoneInput } from "../../components/auth/PhoneInput";
-import {RoleSwitcher} from "../../components/auth/RoleSwitcher";
+import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
 import { validateCamerounPhone } from "../../utils/formatters";
 import { register } from "../../services/authService.js";
 import { Eye, EyeOff } from "../../components/commons";
@@ -24,8 +24,13 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const clearError = () => {
+    setError("");
+  };
+
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    clearError();
   };
 
   const handleSubmit = async () => {
@@ -68,13 +73,12 @@ export default function RegisterPage() {
       return;
     }
 
-      // Validation du téléphone Cameroun
+    // Validation du téléphone Cameroun
     const phoneValidation = validateCamerounPhone(formData.phone);
-      if (!phoneValidation.valid) {
-    setError(phoneValidation.message);
-    return;
-  }
-
+    if (!phoneValidation.valid) {
+      setError(phoneValidation.message);
+      return;
+    }
 
     setIsSubmitting(true);
     setError("");
@@ -89,7 +93,7 @@ export default function RegisterPage() {
         password: formData.password,
       };
 
-      const response = await register(payload);
+      await register(payload);
 
       // Stockage de l'email (verifyOtp attend email maintenant)
       sessionStorage.setItem("pendingEmail", payload.email);
@@ -115,69 +119,85 @@ export default function RegisterPage() {
         <RoleSwitcher role={role} onChange={setRole} />
 
         <div className="space-y-4">
-          <Input
-            label="Prénom"
-            placeholder="Ex: Madeleine"
-            value={formData.firstName}
-            onChange={(value) => handleChange("firstName", value)}
-            required
-          />
-          <Input
-            label="Nom"
-            placeholder="Ex: Kamdem"
-            value={formData.lastName}
-            onChange={(value) => handleChange("lastName", value)}
-            required
-          />
-          <PhoneInput
-            label="Téléphone"
-            placeholder="6XXXXXXXX"
-            value={formData.phone}
-            onChange={(value) => handleChange("phone", value)}
-            required
-            error={error.phone}
-          />
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Prénom"
+              placeholder="Ex: Madeleine"
+              value={formData.firstName}
+              onChange={(value) => handleChange("firstName", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Nom"
+              placeholder="Ex: Kamdem"
+              value={formData.lastName}
+              onChange={(value) => handleChange("lastName", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <PhoneInput
+              label="Téléphone"
+              placeholder="6XXXXXXXX"
+              value={formData.phone}
+              onChange={(value) => handleChange("phone", value)}
+              required
+              error={error.phone}
+            />
+          </div>
 
-          <Input
-            label="Email"
-            type="email"
-            placeholder="vous@email.com"
-            value={formData.email}
-            onChange={(value) => handleChange("email", value)}
-            required
-          />
-          <Input
-            label="Mot de passe"
-            type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={(value) => handleChange("password", value)}
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            }
-            required
-          />
-          <Input
-            label="Confirmation mot de passe"
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={(value) => handleChange("confirmPassword", value)}
-            rightIcon={
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            }
-            required
-          />
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="vous@email.com"
+              value={formData.email}
+              onChange={(value) => handleChange("email", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Mot de passe"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(value) => handleChange("password", value)}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Confirmation mot de passe"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(value) => handleChange("confirmPassword", value)}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              }
+              required
+            />
+          </div>
         </div>
 
         {error && (
@@ -208,7 +228,7 @@ export default function RegisterPage() {
         <div className="mt-4">
           <AlertBanner
             type="info"
-            message="Un code SMS vous sera envoyé pour valider votre numéro de téléphone."
+            message="Un code par Email vous sera envoyé pour valider votre numéro de téléphone."
           />
         </div>
       </div>

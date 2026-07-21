@@ -17,6 +17,10 @@ export default function ResetPassword() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const clearError = () => {
+    setError("");
+  };
+
   const handleSubmit = async () => {
     const codeString = code.join("");
     if (!email || !codeString || !newPassword || !confirmPassword) {
@@ -71,25 +75,41 @@ export default function ResetPassword() {
             disabled
             classname="bg-gray-100 cursor-not-allowed"
           />
-          <div className="flex justify-center my-8">
-            <OTPDigitInput digits={code} onChange={setCode} />
+          <div className="flex justify-center my-8" onFocusCapture={clearError}>
+            <OTPDigitInput
+              digits={code}
+              onChange={(nextCode) => {
+                setCode(nextCode);
+                clearError();
+              }}
+            />
           </div>
-          <Input
-            label="Nouveau mot de passe"
-            type="password"
-            placeholder="••••••••"
-            value={newPassword}
-            onChange={setNewPassword}
-            required
-          />
-          <Input
-            label="Confirmer le mot de passe"
-            type="password"
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            required
-          />
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Nouveau mot de passe"
+              type="password"
+              placeholder="••••••••"
+              value={newPassword}
+              onChange={(value) => {
+                setNewPassword(value);
+                clearError();
+              }}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Confirmer le mot de passe"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(value) => {
+                setConfirmPassword(value);
+                clearError();
+              }}
+              required
+            />
+          </div>
         </div>
 
         {error && (
