@@ -1,6 +1,6 @@
 // src/pages/client/SuiviMission.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   PageHeader,
@@ -21,19 +21,39 @@ import { SequestredAmountCard }  from '../../components/client/missions/Sequestr
 import { LitigeAlertPanel }      from '../../components/client/missions/LitigeAlertPanel';
 
 import { getMission } from '../../services/clientService';
+import { useProviderLocation } from '../../hooks/useProviderLocation';
+import { buildMissionDisplayTitle } from '../../utils/formatters';
 
 export default function SuiviMission() {
   const navigate = useNavigate();
+  const { id: missionId } = useParams();
+
   const [mission, setMission] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
 
+  // Position live du prestataire — polling 10s géré par le hook, s'arrête
+  // automatiquement dès que mission.status !== 'en_cours'.
+  const { providerLocation } = useProviderLocation(missionId);
+
   useEffect(() => {
-    getMission('msn_001')
-      .then((data) => setMission(data))
-      .catch(() => setError('Impossible de charger la mission.'))
-      .finally(() => setLoading(false));
-  }, []);
+    if (!missionId) {
+      setError('Mission introuvable.');
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    getMission(missionId)
+      .then((data) => { if (!cancelled) setMission(data); })
+      .catch(() => { if (!cancelled) setError('Impossible de charger la mission.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [missionId]);
 
   // ── État chargement ──────────────────────────────────────
   if (loading) {
@@ -54,9 +74,15 @@ export default function SuiviMission() {
     );
   }
 
-  // Données prestataire depuis mock
-  const providerInitial = mission.providerAvatarInitial ?? '?';
-  const providerName = mission.providerName ?? 'Prestataire';
+  if (!mission) return null;
+
+  const providerInitial = mission.providerAvatarInitial ?? 'p';
+  const providerName = mission.providerName ?? buildMissionDisplayTitle(mission);
+
+  // Position live (polling) prioritaire, repli sur celle du chargement initial
+  // tant que le hook n'a pas encore répondu.
+  const location = providerLocation ?? mission.providerLocation ?? null;
+
   // ── État données ─────────────────────────────────────────
   return (
     <div className="flex flex-col gap-6 p-6 min-h-[100dvh] bg-sl-50">
@@ -76,27 +102,42 @@ export default function SuiviMission() {
         {/* ── Colonne gauche ── */}
         <div className="flex flex-col gap-6">
 
-        <Card title="Avancement">
-          <div className="flex flex-col gap-4">
-           <MissionProgressHeader
-             startedAt={mission.startedAt}
-             estimatedDurationHours={mission.estimatedDurationHours}
-            />
-            <div className="border-t border-sl-100 pt-4">
-             <span className="text-[11px] font-[family-name:var(--font-body)] font-bold tracking-[0.1em] uppercase text-sl-500 mb-3 block">
-               ETAPES DE LA MISSION
-              </span>
-              <MissionStepList steps={mission.steps} />
-           </div>
-          </div>
-        </Card>
+          <Card title="Avancement">
+            <div className="flex flex-col gap-4">
+              <MissionProgressHeader
+                startedAt={mission.startedAt}
+                estimatedDurationHours={mission.estimatedDurationHours}
+              />
+              <div className="border-t border-sl-100 pt-4">
+                <span className="text-[11px] font-[family-name:var(--font-body)] font-bold tracking-[0.1em] uppercase text-sl-500 mb-3 block">
+                  ETAPES DE LA MISSION
+                </span>
+                <MissionStepList steps={mission.steps} />
+              </div>
+            </div>
+          </Card>
+
           {/* Card Localisation */}
           <Card title="Localisation temps réel">
-            <MapEmbed
-              address={mission.providerLocation.sublabel}
-              label={mission.providerLocation.label}
-              height="200px"
-            />
+            {location ? (
+              <>
+                <MapEmbed
+                  lat={location.lat}
+                  lng={location.lng}
+                  label={location.label}
+                  height="200px"
+                />
+                {location.sublabel && (
+                  <p className="mt-2 text-[12px] text-sl-500 font-[family-name:var(--font-body)]">
+                    {location.sublabel}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-[13px] text-sl-500 font-[family-name:var(--font-body)]">
+                Position du prestataire indisponible pour le moment.
+              </p>
+            )}
           </Card>
         </div>
 
@@ -120,9 +161,9 @@ export default function SuiviMission() {
                     <span className="w-2 h-2 rounded-full bg-success sl-animate-pulse-dot" />
                     Sur place
                   </span>
-
                 </div>
-              </div><Button
+              </div>
+              <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => navigate('/client/chat')}
