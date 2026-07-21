@@ -54,3 +54,11 @@ export function getMinutesAgo(isoString) {
   const diffMs = Date.now() - new Date(isoString).getTime();
   return Math.max(0, Math.round(diffMs / 60000));
 }
+
+export function buildMissionDisplayTitle(mission) {
+  if (!mission) return 'Mission';
+  if (mission.title) return mission.title;
+  const category = mission.category ?? 'Mission';
+  const address = mission.location?.address;
+  return address ? `${category} — ${address}` : category;
+}
