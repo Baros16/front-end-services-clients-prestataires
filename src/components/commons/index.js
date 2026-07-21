@@ -18,6 +18,7 @@ export { Button }            from "./Button";
 export { Input }             from "./Input";
 export { SearchInput }       from "./SearchInput";
 export { PhotoUploader }     from "./PhotoUploader";
+export { LocationPicker}     from "./LocationPicker";
 export { FileAttachment }    from "./FileAttachment";
 
 // ── Contenu & mise en page ───────────────────────────────────
@@ -42,6 +43,7 @@ export { StatusBadge }       from "./StatusBadge";
 // ── Feedback & états ────────────────────────────────────────
 export { Spinner }           from "./Spinner";
 export { AlertBanner }       from "./AlertBanner";
+export { Toast}              from "./Toast"
 export { EmptyState }        from "./EmptyState";
 export { SkeletonLoader }    from "./SkeletonLoader";
 

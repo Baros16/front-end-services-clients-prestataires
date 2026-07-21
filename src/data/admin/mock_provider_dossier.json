@@ -1,78 +1,219 @@
+
 {
   "success": true,
-  "data": {
-    "provider": {
-      "id": "usr_jcm456",
-      "role": "provider",
-      "firstName": "Jean-Claude",
-      "lastName": "Mbarga",
-      "fullName": "Jean-Claude Mbarga",
-      "phone": "+237699234567",
-      "email": "jcm@email.cm",
-      "avatarInitial": "J",
-      "status": "pending_verification",
-      "specialty": "Plomberie",
-      "rating": 0,
-      "completedMissions": 0,
-      "isAvailable": false,
-      "hourlyRate": 4000,
-      "serviceZone": {
-        "city": "Bafoussam",
-        "radiusKm": 20
+  "data": [
+    {
+      "provider": {
+        "id": "usr_jcm456",
+        "role": "provider",
+        "firstName": "Jean-Claude",
+        "lastName": "Mbarga",
+        "fullName": "Jean-Claude Mbarga",
+        "phone": "+237699234567",
+        "email": "jcm@email.cm",
+        "avatarInitial": "J",
+        "status": "pending_verification",
+        "specialty": "Plomberie",
+        "rating": 0,
+        "completedMissions": 0,
+        "isAvailable": false,
+        "hourlyRate": 4000,
+        "serviceZone": { "city": "Bafoussam", "radiusKm": 20 },
+        "availability": {
+          "monday":    { "start": "08:00", "end": "18:00", "available": true },
+          "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
+          "wednesday": { "start": "08:00", "end": "18:00", "available": true },
+          "thursday":  { "start": "08:00", "end": "18:00", "available": true },
+          "friday":    { "start": "08:00", "end": "18:00", "available": true },
+          "saturday":  { "start": "08:00", "end": "13:00", "available": true },
+          "sunday":    { "start": null, "end": null, "available": false }
+        },
+        "monthlyEarnings": 0,
+        "certifications": ["Artisan certifié"],
+        "estCertifie": true,
+        "createdAt": "2026-05-20T08:00:00+01:00"
       },
-      "availability": {
-        "monday":    { "start": "08:00", "end": "18:00", "available": true },
-        "tuesday":   { "start": "08:00", "end": "18:00", "available": true },
-        "wednesday": { "start": "08:00", "end": "18:00", "available": true },
-        "thursday":  { "start": "08:00", "end": "18:00", "available": true },
-        "friday":    { "start": "08:00", "end": "18:00", "available": true },
-        "saturday":  { "start": "08:00", "end": "13:00", "available": true },
-        "sunday":    { "start": null,    "end": null,    "available": false }
-      },
-      "monthlyEarnings": 0,
-      "certifications": ["Artisan certifié"],
-      "estCertifie": true,
-      "createdAt": "2026-05-20T08:00:00+01:00"
-    },
-    "documents": [
-      {
-        "id": "doc_001",
-        "type": "carte_professionnelle",
-        "label": "Carte professionnelle",
-        "reference": "Artisan plombier N°PLB-2024-041",
-        "status": "valide",
-        "fileUrl": "https://cdn.serviloc.cm/docs/doc_001.pdf"
-      },
-      {
-        "id": "doc_002",
-        "type": "cni",
-        "label": "Carte nationale d'identité",
-        "reference": "CNI-CM-1990-087654",
-        "status": "valide",
-        "fileUrl": "https://cdn.serviloc.cm/docs/doc_002.pdf"
-      },
-      {
-        "id": "doc_003",
-        "type": "casier_judiciaire",
-        "label": "Casier judiciaire < 3 mois",
-        "reference": null,
-        "status": "manquant",
-        "fileUrl": null
-      },
-      {
-        "id": "doc_004",
-        "type": "assurance",
-        "label": "Attestation assurance responsabilité civile",
-        "reference": "ASSUR-RCP-2026-JCM",
-        "status": "valide",
-        "fileUrl": "https://cdn.serviloc.cm/docs/doc_004.pdf"
+      "documents": [
+        {
+          "id": "doc_001",
+          "type": "carte_professionnelle",
+          "label": "Carte professionnelle",
+          "reference": "Artisan plombier N°PLB-2024-041",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_001.pdf"
+        },
+        {
+          "id": "doc_002",
+          "type": "cni",
+          "label": "Carte nationale d'identité",
+          "reference": "CNI-CM-1990-087654",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_002.pdf"
+        },
+        {
+          "id": "doc_003",
+          "type": "casier_judiciaire",
+          "label": "Casier judiciaire < 3 mois",
+          "reference": null,
+          "status": "manquant",
+          "fileUrl": null
+        },
+        {
+          "id": "doc_004",
+          "type": "assurance",
+          "label": "Attestation assurance responsabilité civile",
+          "reference": "ASSUR-RCP-2026-JCM",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_004.pdf"
+        }
+      ],
+      "agentReview": {
+        "agentName": "Pauline F.",
+        "verdict": "needs_revision",
+        "comment": "Dossier presque complet. Le casier judiciaire est manquant. Documents existants tous valides.",
+        "reviewedAt": "2026-05-22T09:00:00+01:00"
       }
-    ],
-    "agentReview": {
-      "agentName": "Pauline F.",
-      "verdict": "needs_revision",
-      "comment": "Dossier presque complet. Le casier judiciaire est manquant. Documents existants tous valides.",
-      "reviewedAt": "2026-05-22T09:00:00+01:00"
+    },
+
+    {
+      "provider": {
+        "id": "usr_cng789",
+        "role": "provider",
+        "firstName": "Clarisse",
+        "lastName": "Nguimfo",
+        "fullName": "Clarisse Nguimfo",
+        "phone": "+237677456123",
+        "email": "clarisse.nguimfo@email.cm",
+        "avatarInitial": "C",
+        "status": "pending_verification",
+        "specialty": "Électricité",
+        "rating": 0,
+        "completedMissions": 0,
+        "isAvailable": false,
+        "hourlyRate": 5000,
+        "serviceZone": { "city": "Yaoundé", "radiusKm": 15 },
+        "availability": {
+          "monday":    { "start": "07:30", "end": "17:30", "available": true },
+          "tuesday":   { "start": "07:30", "end": "17:30", "available": true },
+          "wednesday": { "start": "07:30", "end": "17:30", "available": true },
+          "thursday":  { "start": "07:30", "end": "17:30", "available": true },
+          "friday":    { "start": "07:30", "end": "17:30", "available": true },
+          "saturday":  { "start": "08:00", "end": "12:00", "available": true },
+          "sunday":    { "start": null, "end": null, "available": false }
+        },
+        "monthlyEarnings": 0,
+        "certifications": ["Électricien agréé ARSEL", "Habilitation BT"],
+        "estCertifie": true,
+        "createdAt": "2026-06-10T10:30:00+01:00"
+      },
+      "documents": [
+        {
+          "id": "doc_011",
+          "type": "carte_professionnelle",
+          "label": "Carte professionnelle",
+          "reference": "Électricien N°ELEC-2025-118",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_011.pdf"
+        },
+        {
+          "id": "doc_012",
+          "type": "cni",
+          "label": "Carte nationale d'identité",
+          "reference": "CNI-CM-1995-203411",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_012.pdf"
+        },
+        {
+          "id": "doc_013",
+          "type": "casier_judiciaire",
+          "label": "Casier judiciaire < 3 mois",
+          "reference": "CJ-YDE-2026-06-2981",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_013.pdf"
+        },
+        {
+          "id": "doc_014",
+          "type": "assurance",
+          "label": "Attestation assurance responsabilité civile",
+          "reference": "ASSUR-RCP-2026-CNG",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_014.pdf"
+        }
+      ],
+      "agentReview": null
+    },
+
+    {
+      "provider": {
+        "id": "usr_rdt321",
+        "role": "provider",
+        "firstName": "Rodrigue",
+        "lastName": "Talla",
+        "fullName": "Rodrigue Talla",
+        "phone": "+237655789034",
+        "email": "rodrigue.talla@email.cm",
+        "avatarInitial": "R",
+        "status": "pending_verification",
+        "specialty": "Nettoyage",
+        "rating": 0,
+        "completedMissions": 0,
+        "isAvailable": false,
+        "hourlyRate": 2500,
+        "serviceZone": { "city": "Douala", "radiusKm": 25 },
+        "availability": {
+          "monday":    { "start": "06:00", "end": "16:00", "available": true },
+          "tuesday":   { "start": "06:00", "end": "16:00", "available": true },
+          "wednesday": { "start": "06:00", "end": "16:00", "available": true },
+          "thursday":  { "start": "06:00", "end": "16:00", "available": true },
+          "friday":    { "start": "06:00", "end": "16:00", "available": true },
+          "saturday":  { "start": "06:00", "end": "14:00", "available": true },
+          "sunday":    { "start": "08:00", "end": "12:00", "available": true }
+        },
+        "monthlyEarnings": 0,
+        "certifications": ["Technicien de surface certifié", "HACCP"],
+        "estCertifie": true,
+        "createdAt": "2026-06-18T07:45:00+01:00"
+      },
+      "documents": [
+        {
+          "id": "doc_021",
+          "type": "carte_professionnelle",
+          "label": "Carte professionnelle",
+          "reference": "Nettoyage Pro N°NET-2025-067",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_021.pdf"
+        },
+        {
+          "id": "doc_022",
+          "type": "cni",
+          "label": "Carte nationale d'identité",
+          "reference": "CNI-CM-1988-156720",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_022.pdf"
+        },
+        {
+          "id": "doc_023",
+          "type": "casier_judiciaire",
+          "label": "Casier judiciaire < 3 mois",
+          "reference": "CJ-DLA-2026-06-0774",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_023.pdf"
+        },
+        {
+          "id": "doc_024",
+          "type": "assurance",
+          "label": "Attestation assurance responsabilité civile",
+          "reference": "ASSUR-RCP-2026-RDT",
+          "status": "valide",
+          "fileUrl": "https://cdn.serviloc.cm/docs/doc_024.pdf"
+        }
+      ],
+      "agentReview": {
+        "agentName": "Pauline F.",
+        "verdict": "approved",
+        "comment": "Dossier complet et conforme. Tous les documents sont valides et à jour. Approbation recommandée.",
+        "reviewedAt": "2026-06-20T14:30:00+01:00"
+      }
     }
-  }
+  ]
 }

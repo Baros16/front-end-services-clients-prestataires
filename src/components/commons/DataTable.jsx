@@ -1,16 +1,5 @@
 // src/components/DataTable.jsx
 
-/**
- * DataTable
- * Tableau générique avec colonnes configurables.
- *
- * columns      : { key, header, render: (row) => ReactNode, width? }[]
- * data         : T[]
- * keyExtractor : (row) => string
- * onRowClick   : (row) => void
- * isLoading    : affiche skeleton rows
- * emptyState   : ReactNode
- */
 export function DataTable({
   columns = [],
   data = [],

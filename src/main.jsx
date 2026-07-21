@@ -2,6 +2,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { AppRouter } from "./router/AppRouter";
+import './utils/leafletIconFix.js';
+import 'leaflet/dist/leaflet.css';
 import "./styles/tokens.css";
 
 createRoot(document.getElementById("root")).render(

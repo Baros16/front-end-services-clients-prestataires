@@ -1,6 +1,6 @@
-
+import { Inbox } from "./Icons";
 export function EmptyState({
-  icon = "📭",
+  icon = <Inbox size={40} strokeWidth={1.5}/>,
   title,
   subtitle,
   action,
@@ -14,7 +14,7 @@ export function EmptyState({
         ${className}
       `}
     >
-      <span className="text-[40px] leading-none">{icon}</span>
+      <span className="var(--color-sl-300)">{icon}</span>
 
       <div>
         <p className="m-0 font-[family-name:var(--font-display)] font-bold text-[16px] text-sl-700">
