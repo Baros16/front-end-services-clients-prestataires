@@ -1,0 +1,92 @@
+// src/components/service-client/ResolutionPanel.jsx
+import { Card, Button } from "../commons";
+
+function formatMontantComplet(amount) {
+  return `${new Intl.NumberFormat("fr-FR").format(amount)} XAF`;
+}
+
+const RESOLUTION_OPTIONS = [
+  { value: "remboursement_partiel", label: "Remboursement partiel" },
+  { value: "annulation_complete", label: "Annulation complete" },
+  { value: "dedommagement_avoir", label: "Dedommagement / avoir" },
+];
+
+export default function ResolutionPanel({
+  selectedResolution,
+  refundAmount,
+  maxAmount,
+  onResolutionChange,
+  onRefundAmountChange,
+  onSubmit,
+  onClose,
+  isSubmitting,
+}) {
+  const isMontantDisabled = selectedResolution === "annulation_complete";
+  const numericAmount = Number(String(refundAmount).replace(/\s/g, "")) || 0;
+  const isAmountTooHigh = maxAmount != null && numericAmount > maxAmount;
+
+  const canSubmit =
+    !!selectedResolution &&
+    !isSubmitting &&
+    (isMontantDisabled || (refundAmount !== "" && !isAmountTooHigh));
+
+  const handleResolutionChange = (value) => {
+    onResolutionChange(value);
+    if (value === "annulation_complete") onRefundAmountChange("0");
+  };
+
+  return (
+    <Card title="Proposer une resolution">
+      <div className="space-y-2 mb-4">
+        {RESOLUTION_OPTIONS.map((opt) => (
+          <Button
+            key={opt.value}
+            variant="ghost"
+            size="md"
+            onClick={() => handleResolutionChange(opt.value)}
+            className={`w-full justify-start bg-white text-sl-900 ${
+              selectedResolution === opt.value
+                ? "border-2 border-sl-900 font-bold"
+                : "border border-sl-200"
+            }`}
+          >
+            {opt.label}
+          </Button>
+        ))}
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-xs text-sl-500 uppercase tracking-[0.06em] mb-1">
+          Montant rembourse (XAF)
+        </label>
+        <input
+          type="text"
+          value={refundAmount}
+          onChange={(e) => onRefundAmountChange(e.target.value)}
+          placeholder="Ex: 10 000"
+          disabled={isMontantDisabled}
+          className="w-full border border-sl-200 rounded-[var(--radius-md)] px-3 py-2 text-sm outline-none focus:border-brand disabled:bg-sl-100 disabled:text-sl-400"
+        />
+        {isAmountTooHigh && (
+          <p className="text-xs text-danger mt-1">
+            Le montant ne peut pas depasser {formatMontantComplet(maxAmount)}.
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Button
+          variant="primary"
+          onClick={onSubmit}
+          disabled={!canSubmit}
+          className="w-full bg-sl-900 hover:bg-sl-800 disabled:opacity-50"
+        >
+          {isSubmitting ? "Envoi..." : "Soumettre la resolution"}
+        </Button>
+        <Button variant="ghost" onClick={onClose} className="w-full">
+          Clôturer le litige
+        </Button>
+      </div>
+    </Card>
+  );
+}
