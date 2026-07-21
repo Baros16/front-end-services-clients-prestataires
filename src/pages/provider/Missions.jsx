@@ -1,8 +1,8 @@
 // src/pages/provider/MissionsPage.jsx
 import { useState, useEffect }        from 'react';
 
-import { MissionCard }                from '../../components/provider/missions/MissionCard';
-import { MissionsSkeleton }           from '../../components/provider/missions/MissionsSkeleton';
+import { MissionCard }                from '../../components/missions/MissionCard';
+import { MissionsSkeleton }           from '../../components/missions/MissionsSkeleton';
 
 import {
   PageHeader,
@@ -74,7 +74,7 @@ export default function MissionsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {missions.map(mission => (
-            <MissionCard key={mission.id} mission={mission} />
+            <MissionCard key={mission.id} mission={mission}  basePath="/provider/missions"/>
           ))}
         </div>
       )}
