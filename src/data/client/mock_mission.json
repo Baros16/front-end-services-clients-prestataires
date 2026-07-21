@@ -7,12 +7,11 @@
     "clientId": "usr_abc123",
     "providerId": "usr_jcm456",
     "category": "Plomberie",
-    "title": "Fuite cuisine — Madeleine K.",
     "status": "en_cours",
     "totalAmount": 23000,
     "sequesteredAmount": 23000,
     "paymentStatus": "sequestre",
-    "startedAt": "2026-05-21T09:32:00+01:00",
+    "startedAt": "2026-07-03T09:32:00+01:00",
     "estimatedDurationHours": 2,
     "completedAt": null,
     "steps": [
@@ -53,12 +52,6 @@
         "order": 6
       }
     ],
-    "providerLocation": {
-      "lat": 5.4764,
-      "lng": 10.4207,
-      "label": "Jean-Claude est arrivé",
-      "sublabel": "Quartier Commercial, Bafoussam"
-    },
     "location": {
       "address": "Bafoussam, Quartier Commercial",
       "lat": 5.4764,

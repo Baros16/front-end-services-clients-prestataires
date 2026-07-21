@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "data": {
+    "userId": "usr_abc123",
+    "phone": "+237695123456",
+    "otpSent": true,
+    "message": "Un code SMS a été envoyé au +237695123456"
+  }
+}

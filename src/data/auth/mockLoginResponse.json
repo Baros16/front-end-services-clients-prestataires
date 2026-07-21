@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_access_token",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock_refresh_token",
+    "user": {
+      "id": "usr_abc123",
+      "role": "client",
+      "firstName": "Madeleine",
+      "lastName": "Kamdem",
+      "fullName": "Madeleine Kamdem",
+      "phone": "+237695123456",
+      "email": "mk@email.cm",
+      "avatarInitial": "M",
+      "createdAt": "2026-03-15T10:00:00+01:00",
+      "status": "active"
+    }
+  }
+}
