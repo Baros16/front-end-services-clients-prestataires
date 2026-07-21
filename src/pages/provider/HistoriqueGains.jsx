@@ -5,7 +5,6 @@ import {
   PageHeader,
   Card,
   StatCard,
-  TabBar,
   Button,
   AlertBanner,
   SkeletonLoader,
@@ -13,8 +12,7 @@ import {
 
 import { EarningsMissionRow } from '../../components/provider/gains/EarningsMissionRow';
 import { MonthlyGainBar }     from '../../components/provider/gains/MonthlyGainBar';
-
-import { getEarnings } from '../../services/providerService';
+import { getEarnings }        from '../../services/providerService';
 
 const TABS = [
   { id: 'all',   label: 'Tout' },
@@ -39,7 +37,7 @@ export default function HistoriqueGains() {
     return (
       <div className="p-6 flex flex-col gap-4">
         <SkeletonLoader variant="metric" count={4} />
-        <SkeletonLoader variant="card"   count={2} />
+        <SkeletonLoader variant="card" count={2} />
       </div>
     );
   }
@@ -52,7 +50,18 @@ export default function HistoriqueGains() {
     );
   }
 
-  const { metrics, payouts, monthlyGains } = data;
+  const raw = data?.data ?? data;
+  const metrics = raw.metrics ?? {
+    missionsThisMonth: 0,
+    missionsThisMonthTrend: '',
+    netGains: raw.monthlyTotal ?? 0,
+    netGainsTrend: '',
+    averageRating: 0,
+    averageRatingTrend: '',
+    totalCumulated: 0,
+  };
+  const payouts      = raw.payouts      ?? [];
+  const monthlyGains = raw.monthlyGains ?? [];
 
   const filteredPayouts = payouts.filter((p) => {
     if (activeTab === 'paid')  return p.status === 'completed';
@@ -62,16 +71,14 @@ export default function HistoriqueGains() {
       return (
         date.getMonth() === now.getMonth() &&
         date.getFullYear() === now.getFullYear()
-
-      ) 
+      );
     }
     return true;
   });
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6 `min-h-[100dvh]` bg-sl-50">
+    <div className="flex flex-col gap-6 p-4 md:p-6 'min-h-[100dvh]' bg-sl-50">
 
-      {/* En-tête */}
       <PageHeader
         title="Gains & historique"
         subtitle="Votre activité et vos revenus"
@@ -82,59 +89,54 @@ export default function HistoriqueGains() {
         }
       />
 
-      {/* 4 StatCards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Missions ce mois"
           value={String(metrics.missionsThisMonth)}
           trend={{ direction: 'up', value: metrics.missionsThisMonthTrend }}
-          accentColorClass="bg-transparent "
+          accentColorClass="bg-transparent"
         />
         <StatCard
           label="Gains nets"
           value={`${Math.round(metrics.netGains / 1000)}k XAF`}
           trend={{ direction: 'up', value: metrics.netGainsTrend }}
-          accentColorClass="bg-transparent "
+          accentColorClass="bg-transparent"
         />
         <StatCard
           label="Note moyenne"
           value={`${metrics.averageRating} / 5`}
           trend={{ direction: 'up', value: metrics.averageRatingTrend }}
-          accentColorClass="bg-transparent "
+          accentColorClass="bg-transparent"
         />
         <StatCard
           label="Total cumulé"
           value={`${(metrics.totalCumulated / 1000000).toFixed(2)}M XAF`}
-          accentColorClass="bg-transparent "
+          accentColorClass="bg-transparent"
         />
       </div>
 
-      {/* Grille 2 colonnes */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
 
-        {/* ── Missions récentes ── */}
-        <Card 
+        <Card
           title="Missions récentes"
           actions={
-           <div className="flex items-center gap-2">
-             {TABS.map((tab) => (
-               <Button
-                 key={tab.id}
-                 variant={activeTab === tab.id ? 'primary' : 'ghost'}
-                 size="sm"
-                 onClick={() => setActiveTab(tab.id)}
-                 className="rounded-full"
+            <div className="flex items-center gap-2">
+              {TABS.map((tab) => (
+                <Button
+                  key={tab.id}
+                  variant={activeTab === tab.id ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setActiveTab(tab.id)}className="rounded-full"
                 >
-                 {tab.label}
+                  {tab.label}
                 </Button>
               ))}
-           </div>
+            </div>
           }
         >
-
           <div className="flex flex-col">
             {filteredPayouts.length === 0 ? (
-              <p className="text-[13px] `font-[family-name:var(--font-body)]` text-sl-400 py-4 text-center">
+              <p className="text-[13px] 'font-[family-name:var(--font-body)]' text-sl-400 py-4 text-center">
                 Aucune mission pour ce filtre.
               </p>
             ) : (
@@ -143,8 +145,8 @@ export default function HistoriqueGains() {
               ))
             )}
           </div>
-          
-        </Card>{/* ── Gains par mois ── */}
+        </Card>
+
         <Card title="Gains par mois" className="sticky top-6 self-start">
           <div className="flex flex-col gap-4">
             {monthlyGains.map((item) => (

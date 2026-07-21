@@ -3,21 +3,11 @@ export function formatTime(isoString) {
     hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Douala',
   });
 }
-export function formatXAF(value) {
-  if (value >= 1_000_000) {
-    const m = value / 1_000_000;
-    return `${m % 1 === 0 ? m : m.toFixed(1).replace(".", ",")}M XAF`;
-  }
-  if (value >= 1_000) {
-    return `${Math.round(value / 1_000)}k XAF`;
-  }
-  return `${value} XAF`;
-}
-export function formatDate(isoString) {
-  return new Date(isoString).toLocaleDateString('fr-CM', {
-    day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Africa/Douala',
-  });
-}
+export function formatXAF(amount) {
+if (amount == null) return "— XAF";
+return new Intl.NumberFormat("fr-FR").format(amount) + " XAF";
+} 
+
 
 // "2026-05-21T10:00:00+01:00" → "21 mai"
 export function formatDateShort(isoString) {
