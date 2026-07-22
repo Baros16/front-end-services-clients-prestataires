@@ -5,16 +5,7 @@ import mockClientDashboard from "../data/client/mock_dashboard.json";
 import mockDemands from "../data/client/mock_demands.json";
 import mockQuote from "../data/client/mock_quote.json";
 import mockMission from "../data/client/mock_mission.json";
-
-// ─── En-tête du fichier — ajout ────────────────────────────────────────────
-function normalizeStatus(obj) {
-  if (!obj) return obj;
-  return {
-    ...obj,
-    status: typeof obj.status === "string" ? obj.status.toLowerCase() : obj.status,
-  };
-}
-
+import mockCategories from "../data/shared/mock_categories.json";
 /**
  * Tableau de bord client.
  */
@@ -30,11 +21,10 @@ export async function getClientDashboard() {
  * params : { page, limit, status }
  */
 export async function getClientDemands(params = {}) {
-  const result = await getMockList(
+  return getMockList(
     mockDemands,
     () => apiClient.get(`/client/demands`, { params }),
   );
-  return { ...result, data: result.data.map(normalizeStatus) };
 }
 
 /**
@@ -76,11 +66,10 @@ export function getQuoteDetail(quoteId) {
 /**
  * Accepter un devis et déclencher le paiement.
  */
-export async function acceptQuote(demandId, quoteId, paymentMethod, phoneNumber) {
-  // AcceptQuoteRequest réel exige { quoteId, paymentMethod, phoneNumber } — les 3 requis.
+export async function acceptQuote(demandId, paymentMethod) {
   return getMock(
     { data: { success: true, data: { demandId, status: "en_cours", paymentMethod } } },
-    () => apiClient.post(`/client/demands/${demandId}/quote/accept`, { quoteId, paymentMethod, phoneNumber }),
+    () => apiClient.post(`/client/demands/${demandId}/quote/accept`, { paymentMethod }),
   );
 }
 
@@ -98,22 +87,11 @@ export async function rejectQuote(demandId) {
  * Détail d'une mission en cours.
  */
 export async function getMission(missionId) {
-  const result = await getMock(
+  return getMock(
     mockMission,
     () => apiClient.get(`/client/missions/${missionId}`),
   );
-  return normalizeStatus(result);
 }
-
-export async function getMissionDetails(missionId) {
-  const result = await getMock(
-    mockMission.data,
-    () => apiClient.get(`/client/missions/${missionId}`).then(r => r.data.data),
-  );
-  return normalizeStatus(result);
-}
-
-
 
 /**
  * Valider une mission terminée.
@@ -129,26 +107,68 @@ export async function validateMission(missionId) {
  * Noter une mission.
  * payload : { rating: 1-5, comment }
  */
+
+
 export async function rateMission(missionId, payload) {
   return getMock(
     { data: { success: true, data: { missionId, ...payload } } },
     () => apiClient.post(`/client/missions/${missionId}/rate`, payload),
   );
 }
-
 /**
  * Ouvrir un litige sur une mission.
  * payload : { motifId, description, evidencePhotoIds }
  */
+
+
+
 export async function createLitige(missionId, payload) {
+  // payload : { motifId, description, evidencePhotoIds }
   return getMock(
-    { data: { success: true, data: { missionId, status: "ouvert" } } },
-    () => apiClient.post(`/client/missions/${missionId}/litige`, payload),
+    { success: true, data: { missionId, status: "ouvert" } },
+    () => axios.post(`${BASE}/missions/${missionId}/litige`, payload)
   );
 }
 
 
+/**
+ * Liste des catégories de services disponibles.
+ */
+export async function getCategories() {
+  return getMock(
+    { data: mockCategories },
+    () => apiClient.get(`/client/categories`),
+  );
+}
 
+/**
+ * Upload d'une photo (contexte "demand" par défaut).
+ * Retourne { photoId, url, name } pour rester simple à consommer côté formulaire.
+ */
+export async function uploadPhoto(file, context = "demand") {
+  const mockResponse = {
+    success: true,
+    data: {
+      uploads: [
+        {
+          id: `photo_${Date.now()}`,
+          url: URL.createObjectURL(file),
+          name: file.name,
+          sizeBytes: file.size,
+        },
+      ],
+    },
+  };
 
+  const result = await getMock(mockResponse, () => {
+    const form = new FormData();
+    form.append("photos", file);
+    form.append("context", context);
+    return apiClient.post(`/uploads/photos`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  });
 
-
+  const upload = result?.data?.uploads?.[0] ?? result?.uploads?.[0];
+  return { photoId: upload?.id, url: upload?.url, name: upload?.name };
+}
