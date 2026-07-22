@@ -17,7 +17,7 @@ function normalizeMissionStatus(mission) {
 export async function getProviderDashboard() {
   return getMock(
     mock_dashboard,
-    () => apiClient.get(`/provider/dashboard`).then(r => r.data.data),
+    () => apiClient.get(`/provider/dashboard`),
   );
 }
 
@@ -25,7 +25,7 @@ export async function getAvailableDemands(params = {}) {
   // params : { categoryId } — l'API réelle ne supporte que categoryId, pas de pagination
   return getMockList(
     mock_avilable_demands,
-    () => apiClient.get(`/provider/demands`, { params }).then(r => r.data.data),
+    () => apiClient.get(`/provider/demands`, { params }),
   );
 }
 
@@ -39,7 +39,7 @@ export async function getProviderMissions(params = {}) {
     filtered,
     () => apiClient
       .get('/provider/missions', { params })
-      .then(r => r.data.data),
+      ,
   );
 }
 
@@ -48,7 +48,7 @@ export async function getMissionById(missionId) {
 
   const result = await getMock(
     { data: found },
-    () => apiClient.get(`/provider/missions/${missionId}`).then(r => r.data.data),
+    () => apiClient.get(`/provider/missions/${missionId}`),
   );
 
   return normalizeMissionStatus(result);
@@ -72,14 +72,14 @@ export async function addMissionSteps(missionId, payload) {
         steps: mockSteps,
       },
     },
-    () => apiClient.post(`/provider/missions/${missionId}/steps`, payload).then(r => r.data.data),
+    () => apiClient.post(`/provider/missions/${missionId}/steps`, payload),
   );
 }
 
 export async function applyToDemand(demandId) {
   return getMock(
     { success: true, data: { demandId, status: "applied" } },
-    () => apiClient.post(`/provider/demands/${demandId}/apply`).then(r => r.data.data),
+    () => apiClient.post(`/provider/demands/${demandId}/apply`),
   );
 }
 
@@ -87,21 +87,21 @@ export async function submitQuote(demandId, payload) {
   // payload : { laborDescription, laborAmount, materials[], estimatedDurationHours, validityDays }
   return getMock(
     { success: true, data: { demandId, ...payload } },
-    () => apiClient.post(`/provider/demands/${demandId}/quote`, payload).then(r => r.data.data),
+    () => apiClient.post(`/provider/demands/${demandId}/quote`, payload),
   );
 }
 
 export async function getQuoteById(quoteId) {
   return getMock(
     { data: mock_quote.data },
-    () => apiClient.get(`/provider/quotes/${quoteId}`).then(r => r.data.data),
+    () => apiClient.get(`/provider/quotes/${quoteId}`),
   );
 }
 
 export async function updateQuote(quoteId, payload) {
   return getMock(
     { success: true, data: { id: quoteId, ...payload } },
-    () => apiClient.patch(`/provider/quotes/${quoteId}`, payload).then(r => r.data.data),
+    () => apiClient.patch(`/provider/quotes/${quoteId}`, payload),
   );
 }
 
@@ -110,7 +110,7 @@ export async function updateQuote(quoteId, payload) {
 export async function startMission(missionId) {
   return getMock(
     { success: true, data: { missionId, status: "en_cours" } },
-    () => apiClient.post(`/provider/missions/${missionId}/start`).then(r => r.data.data),
+    () => apiClient.post(`/provider/missions/${missionId}/start`),
   );
 }
 
@@ -119,14 +119,14 @@ export async function updateStep(missionId, stepId, completed) {
     { success: true, data: { missionId, stepId, completed } },
     () => apiClient
       .patch(`/provider/missions/${missionId}/steps/${stepId}`, { completed })
-      .then(r => r.data.data),
+      ,
   );
 }
 
 export async function completeMission(missionId) {
   return getMock(
     { success: true, data: { missionId, status: "terminee" } },
-    () => apiClient.post(`/provider/missions/${missionId}/complete`).then(r => r.data.data),
+    () => apiClient.post(`/provider/missions/${missionId}/complete`),
   );
 }
 
@@ -140,7 +140,7 @@ export async function completeMission(missionId) {
 export async function getProviderProfile() {
   return getMock(
     mock_profile,
-    () => apiClient.get(`/provider/me`).then(r => r.data.data),
+    () => apiClient.get(`/provider/me`),
   );
 }
 
@@ -154,7 +154,7 @@ export async function updateProfile(payload) {
       success: true,
       data: { providerId: "usr_2f19902b", message: "Profil mis à jour avec succès" },
     },
-    () => apiClient.patch(`/provider/profile`, payload).then(r => r.data.data),
+    () => apiClient.patch(`/provider/profile`, payload),
   );
 }
 
@@ -164,7 +164,7 @@ export async function updateProfile(payload) {
 export async function updateAvailability(isAvailable) {
   return getMock(
     { success: true, data: { isAvailable } },
-    () => apiClient.patch(`/provider/availability`, { isAvailable }).then(r => r.data.data),
+    () => apiClient.patch(`/provider/availability`, { isAvailable }),
   );
 }
 
@@ -179,7 +179,7 @@ export async function updateSchedule(schedule) {
       success: true,
       data: { providerId: "usr_2f19902b", message: "Horaires mis à jour avec succès" },
     },
-    () => apiClient.patch(`/provider/schedule`, schedule).then(r => r.data.data),
+    () => apiClient.patch(`/provider/schedule`, schedule),
   );
 }
 
@@ -193,7 +193,7 @@ export async function getEarnings(params = {}) {
   // params : { page, month } — ex. month: "2026-05"
   return getMock(
     mock_earnings.data,
-    () => apiClient.get(`/provider/earnings`, { params }).then(r => r.data.data),
+    () => apiClient.get(`/provider/earnings`, { params }),
   );
 }
 
@@ -216,6 +216,6 @@ export async function updateMissionLocation(missionId, lat, lng) {
     },
     () => apiClient
       .patch(`/provider/missions/${missionId}/location`, { lat, lng })
-      .then(r => r.data.data),
+      ,
   );
 }
