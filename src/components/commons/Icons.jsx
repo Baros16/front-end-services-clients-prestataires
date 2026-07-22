@@ -14,7 +14,7 @@
  */
 
 // ─── Navigation & UI ──────────────────────────────────────────
-export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
+export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ArrowLeft, ArrowRight } from 'lucide-react';
 export { X, Menu, Search, SlidersHorizontal }                from 'lucide-react';
 export { Plus, Minus, Check, Copy }                          from 'lucide-react';
 export { LogOut, Settings, Bell, LogIn }                            from 'lucide-react';
@@ -45,5 +45,5 @@ export { Upload, Download, Trash2, Edit, Eye, EyeOff }               from 'lucid
 
 
 // ─── Feedback & états ─────────────────────────────────────────
-export { AlertTriangle, Loader2, Loader }                            from 'lucide-react';
+export { AlertTriangle, Loader2, Loader, RefreshCw }                 from 'lucide-react';
 export { ThumbsUp, ThumbsDown }                              from 'lucide-react';

@@ -46,6 +46,7 @@ export { Spinner }           from "./Spinner";
 export { AlertBanner }       from "./AlertBanner";
 export { Toast}              from "./Toast"
 export { EmptyState }        from "./EmptyState";
+export { ErrorState }        from "./ErrorState";
 export { SkeletonLoader }    from "./SkeletonLoader";
 
 // Ajouter à src/components/common/index.js
