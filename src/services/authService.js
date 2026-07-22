@@ -8,7 +8,7 @@ import { buildDevToken } from "../router/AuthGuard.jsx";
 import apiClient from "./apiClient.js";
 
 
-const BASE = "/users";
+const BASE = "/auth"; // préfixe commun à toutes les routes auth (login, register, refresh, etc.)
 const ACCESS_KEY = "serviloc_access";
 const REFRESH_KEY = "serviloc_refresh";
 const USER_KEY = "serviloc_user";
