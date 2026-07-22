@@ -17,3 +17,15 @@ export async function getLitigeMotifs() {
     () => apiClient.get(`/shared/litige-motifs`),
   );
 }
+// /src/services/sharedService.js
+
+// Vos exports existants (ex: getLitigeMotifs)...
+
+export const signalerLitige = async (data) => {
+  // Simule un délai réseau de 500ms
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  console.log("Litige envoyé avec succès (Mock):", data);
+
+  return { success: true, id: "litige-" + Date.now() };
+};
