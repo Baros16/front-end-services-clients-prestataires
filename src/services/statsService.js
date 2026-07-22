@@ -28,7 +28,7 @@ function generateDailyPoints(totalCompleted) {
 export async function getStats() {
   const raw = await getMock(
     mockStats.data,
-    () => apiClient.get('/admin/stats').then(r => r.data.data),
+    () => apiClient.get('/admin/stats'),
   );
 
   return {

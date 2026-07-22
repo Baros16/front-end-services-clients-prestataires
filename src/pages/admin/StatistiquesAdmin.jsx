@@ -1,4 +1,4 @@
-// src/pages/admin/StatisticsPage.jsx
+// src/pages/admin/StatistiquesAdmin.jsx
 
 import { useState, useEffect }  from 'react';
 import {

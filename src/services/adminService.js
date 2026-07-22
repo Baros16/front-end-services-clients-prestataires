@@ -130,14 +130,10 @@ export async function envoyerRappelSMS(providerId, documents = []) {
 // ⚠️ Écran existant mais ne consomme pas encore ces fonctions — à corriger.
 
 export async function getManagedUsers(params = {}) {
-  if (USE_MOCK) {
-    return getMockList(mockManagedUsers, () => {});
-  }
-  const response = await apiClient.get(`/admin/users`, { params });
-  return {
-    data: response.data?.data?.users ?? [],
-    meta: response.data?.data?.meta ?? response.data?.meta ?? {},
-  };
+  return getMockList(
+    mockManagedUsers,
+    () => apiClient.get(`/admin/users`, { params }),
+  );
 }
 
 export async function suspendUser(userId, reason) {
