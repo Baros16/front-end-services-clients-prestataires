@@ -1,9 +1,11 @@
 // src/components/UserAvatarFooter.jsx
+import { LogOut } from './Icons';
 
 /**
  * UserAvatarFooter
  * Bloc complet affiché en bas de Sidebar :
  * cercle initiale + nom complet + sous-titre (rôle, spécialité, note…)
+ * + bouton de déconnexion optionnel.
  */
 export function UserAvatarFooter({
   initial,
@@ -12,11 +14,12 @@ export function UserAvatarFooter({
   collapse = false,
   avatarColor = "bg-sl-300",
   className = "",
+  onLogout,
 }) {
   return (
     <div
       className={`
-        flex items-center gap-3 px-4 py-4
+        flex items-center gap-2 px-4 py-4
         font-[family-name:var(--font-body)]
         ${className}
       `}
@@ -26,7 +29,7 @@ export function UserAvatarFooter({
         size="md"
         bgClass={avatarColor}
       />
-      {!collapse &&(
+      {!collapse && (
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold text-sl-900 truncate leading-tight m-0">
             {name}
@@ -35,7 +38,19 @@ export function UserAvatarFooter({
             {subtitle}
           </p>
         </div>
-      )};
+      )}
+      {onLogout && (
+        <button
+          onClick={onLogout}
+          aria-label="Se déconnecter"
+          title="Se déconnecter"
+          className="shrink-0 w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center
+                     text-sl-400 hover:text-danger hover:bg-danger-light
+                     transition-colors cursor-pointer"
+        >
+          <LogOut size={16} />
+        </button>
+      )}
     </div>
   );
 }
