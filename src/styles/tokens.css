@@ -54,6 +54,9 @@
   --color-sl-800: #1E293B;
   --color-sl-900: #0F172A;
 
+  --color-sidebar-client:   #FFFFFF;
+  --color-sidebar-provider: #1B4332;
+  --color-sidebar-admin:    #0F172A;
   /* ── Radius ── */
   --radius-sm: 6px;
   --radius-md: 10px;

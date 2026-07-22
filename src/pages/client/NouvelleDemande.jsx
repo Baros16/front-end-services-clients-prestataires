@@ -163,7 +163,7 @@ export default function NouvelleDemande() {
       });
       setPublished(true);
       setFeedback({ type: 'success', message: 'Votre demande a été publiée avec succès !' });
-      setTimeout(() => navigate('/client/demands'), 1800);
+      setTimeout(() => navigate('/client/demandes'), 1800);
     } catch (err) {
       setFeedback({
         type: 'error',

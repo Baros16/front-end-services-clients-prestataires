@@ -26,7 +26,7 @@ export function DelaiSection({ estimatedDurationHours, onChange, error }) {
           id="estimatedDurationHours"
           value={estimatedDurationHours}
           onChange={(e) => onChange(Number(e.target.value))}
-          aria-invalid={Boolean={error}}
+          aria-invalid={Boolean(error)}
           className={`w-full appearance-none rounded-md border border-sl-200 bg-surface px-3.5 py-2.5 pr-9 text-sm
             text-sl-900 shadow-card transition-colors
             focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light
