@@ -37,7 +37,7 @@ Mes demandes récentes
 <Button
   variant="secondary"
   size="sm"
-  onClick={() => navigate("/client/mes-demandes")}
+  onClick={() => navigate("/client/demandes")}
 >
 Tout voir
 </Button></div>

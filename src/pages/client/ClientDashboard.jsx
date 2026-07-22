@@ -45,13 +45,13 @@ actions={
   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
     <Button 
       variant="ghost"
-      size="md"
+      size="sm"
     > 
-      <Bell size={18} />
+      <Bell size={16} />
     </Button>  
 <Button 
  variant="secondary"
- size="md"
+ size="sm"
  className="!bg-black !text-white !border-black hover:!bg-gray-900"
  onClick={() => navigate("/client/nouvelle-demande")}
 >

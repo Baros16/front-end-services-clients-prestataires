@@ -1,4 +1,3 @@
-// src/services/providerService.js
 import { getMock, getMockList } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
 import mock_dashboard from "../data/provider/mock_dashboard.json";
@@ -164,10 +163,7 @@ export async function updateProfile(payload) {
  */
 export async function updateAvailability(isAvailable) {
   return getMock(
-    {
-      success: true,
-      data: { providerId: "usr_2f19902b", isAvailable, message: "Disponibilité mise à jour" },
-    },
+    { success: true, data: { isAvailable } },
     () => apiClient.patch(`/provider/availability`, { isAvailable }).then(r => r.data.data),
   );
 }

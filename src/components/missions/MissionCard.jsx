@@ -1,7 +1,7 @@
 // src/components/provider/missions/MissionCard.jsx
 import { useNavigate }                          from 'react-router-dom';
-import { AmountDisplay, StatusBadge, Avatar, Button, Card } from '../../commons';
-import { formatDateShort }                      from '../../../utils/formatters';
+import { AmountDisplay, StatusBadge, Avatar, Button, Card } from '../commons';
+import { formatDateShort }                      from '../../utils/formatters';
 
 export function MissionCard({ mission }) {
   const navigate     = useNavigate();

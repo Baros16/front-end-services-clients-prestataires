@@ -92,6 +92,7 @@ export function MapEmbed({
         zoomControl={true}
         scrollWheelZoom={false}   // évite le zoom accidentel en scrollant la page
         attributionControl={true}
+        keyboard={false}
       >
         {/* Tuiles OpenStreetMap — gratuites, sans clé API */}
         <TileLayer

@@ -55,12 +55,18 @@ export function getMinutesAgo(isoString) {
   return Math.max(0, Math.round(diffMs / 60000));
 }
 
+export function formatBudgetRange(budget) {
+  if (!budget) return '—';
+  const fmt = (n) => n.toLocaleString('fr-FR');
+  return `${fmt(budget.min)} — ${fmt(budget.max)} XAF`;
+}
 export function buildMissionDisplayTitle(mission) {
   if (!mission) return 'Mission';
   if (mission.title) return mission.title;
   const category = mission.category ?? 'Mission';
   const address = mission.location?.address;
   return address ? `${category} — ${address}` : category;
+}
 /**
  * Vérifie si un numéro est un mobile Orange Cameroun
  */
@@ -126,4 +132,13 @@ export function validateCamerounPhone(phone) {
     formatted: `+237 ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6, 9)}`,
     compact: number,
   };
+}
+
+export function shortenName(fullName) {
+  if (!fullName) return '';
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  const firstNames = parts.slice(0, -1).join(' ');
+  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+  return `${firstNames} ${lastInitial}.`;
 }

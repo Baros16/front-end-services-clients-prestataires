@@ -5,7 +5,7 @@ const STATUS_CONFIG = {
   terminee:       { label: "Terminée",         classes: "bg-success-light text-success" },
   annulee:        { label: "Annulée",          classes: "bg-danger-light text-danger" },
   en_attente:     { label: "En attente",       classes: "bg-accent-light text-warning" },
-  ouvert:         { label: "Ouvert",           classes: "bg-danger-light text-danger" },
+  ouvert:         { label: "Ouvert",           classes: "bg-success-light text-successr" },
   traitement:     { label: "En traitement",    classes: "bg-accent-light text-warning" },
   resolu:         { label: "Résolu",           classes: "bg-success-light text-success" },
   disponible:     { label: "Disponible",       classes: "bg-success-light text-success" },

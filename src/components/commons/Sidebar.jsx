@@ -65,6 +65,7 @@ export function Sidebar({
   role = 'client',
   user,
   onNavigate,
+  onLogout,
   // Injectées par AppShell
   collapsed = false,
   onToggleCollapse,
@@ -205,6 +206,7 @@ export function Sidebar({
                 initial={user.avatarInitial}
                 name={user.name}
                 subtitle={user.subtitle}
+                onLogout={onLogout}
               />
             )
           }
