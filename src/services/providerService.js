@@ -25,7 +25,7 @@ export async function getAvailableDemands(params = {}) {
   // params : { categoryId } — l'API réelle ne supporte que categoryId, pas de pagination
   return getMockList(
     mock_avilable_demands,
-    () => apiClient.get(`/provider/demands`, { params }).then(r => r.data.data),
+    () => apiClient.get(`/provider/demands`, { params }),
   );
 }
 
