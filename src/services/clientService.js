@@ -41,6 +41,34 @@ export async function getClientDemands(params = {}) {
  * Créer une nouvelle demande.
  * payload : { categoryId, description, location, isUrgent, estimatedBudget, photoIds }
  */
+/**
+ * Détail complet d'une demande du client.
+ */
+export async function getDemandDetail(demandId) {
+  const result = await getMock(
+    mockDemands,
+    () => apiClient.get(`/client/demands/${demandId}`),
+  );
+  // mockDemands est une liste → on filtre par id
+  const list = Array.isArray(result) ? result : (result?.data ?? []);
+  const found = list.find((d) => d.id === demandId) ?? null;
+  return found ? normalizeStatus(found) : null;
+}
+
+/**
+ * Liste des postulants (prestataires ayant postulé) pour une demande donnée.
+ */
+export async function getDemandApplications(demandId) {
+  // Import dynamique pour éviter les imports circulaires
+  const mockApplications = await import('../data/client/mock_demand_applications.json');
+  const result = await getMock(
+    mockApplications,
+    () => apiClient.get(`/client/demands/${demandId}/applications`),
+  );
+  const list = Array.isArray(result) ? result : (result?.data ?? []);
+  return list.filter((app) => app.demandId === demandId);
+}
+
 export async function createDemand(payload) {
   return getMock(
     { data: { success: true, data: payload } },

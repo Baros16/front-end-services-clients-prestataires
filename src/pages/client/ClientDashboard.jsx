@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getClientDashboard } from "../../services/clientService.js";
-import { PageHeader, SkeletonLoader, AlertBanner } from "../../components/commons/index.js";
+import { PageHeader, SkeletonLoader, ErrorState } from "../../components/commons/index.js";
 import WelcomeBanner from "../../components/client/dashboard/WelcomeBanner.jsx";
 import ServiceCategoryGrid from "../../components/client/dashboard/CategoryGrid.jsx";
 import RecentDemandsList from "../../components/client/dashboard/RecentDemandsList.jsx";
@@ -31,7 +31,10 @@ if (loading) return (
 );
 if (error) return (
 <div className="p-4 md:p-6">
-<AlertBanner variant="error" message={error} />
+<ErrorState
+title="Erreur de chargement"
+subtitle={error}
+/>
 </div>
 );
 return (

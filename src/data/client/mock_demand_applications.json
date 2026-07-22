@@ -1,0 +1,91 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "app_001",
+      "demandId": "dem_xyz789",
+      "provider": {
+        "id": "usr_jcm456",
+        "fullName": "Jean-Claude Mbarga",
+        "avatarInitial": "J",
+        "phone": "+237699234567",
+        "rating": 4.8,
+        "missionCount": 47,
+        "specialty": "Plombier certifié",
+        "category": "Plomberie"
+      },
+      "conversationId": "conv_001",
+      "appliedAt": "2026-05-20T10:30:00+01:00"
+    },
+    {
+      "id": "app_002",
+      "demandId": "dem_xyz789",
+      "provider": {
+        "id": "usr_plom02",
+        "fullName": "Samuel Nkwi",
+        "avatarInitial": "S",
+        "phone": "+237677123456",
+        "rating": 4.5,
+        "missionCount": 28,
+        "specialty": "Plombier expérimenté",
+        "category": "Plomberie"
+      },
+      "conversationId": null,
+      "appliedAt": "2026-05-20T14:15:00+01:00"
+    },
+    {
+      "id": "app_003",
+      "demandId": "dem_xyz789",
+      "provider": {
+        "id": "usr_plom03",
+        "fullName": "David Tagne",
+        "avatarInitial": "D",
+        "phone": "+237655987654",
+        "rating": 4.2,
+        "missionCount": 15,
+        "specialty": "Plombier - Fuites et installations",
+        "category": "Plomberie"
+      },
+      "conversationId": null,
+      "appliedAt": "2026-05-21T08:45:00+01:00"
+    },
+    {
+      "id": "app_004",
+      "demandId": "dem_jkl004",
+      "provider": {
+        "id": "usr_peint02",
+        "fullName": "Rodrigue Atangana",
+        "avatarInitial": "R",
+        "phone": "+237655123456",
+        "rating": 4.2,
+        "missionCount": 15,
+        "specialty": "Peintre en bâtiment",
+        "category": "Peinture"
+      },
+      "conversationId": "conv_003",
+      "appliedAt": "2026-06-01T10:00:00+01:00"
+    },
+    {
+      "id": "app_005",
+      "demandId": "dem_jkl004",
+      "provider": {
+        "id": "usr_peint03",
+        "fullName": "Marie Eyanga",
+        "avatarInitial": "M",
+        "phone": "+237690456789",
+        "rating": 4.7,
+        "missionCount": 33,
+        "specialty": "Peintre décoratrice",
+        "category": "Peinture"
+      },
+      "conversationId": null,
+      "appliedAt": "2026-06-01T11:20:00+01:00"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 5,
+    "totalPages": 1
+  }
+}

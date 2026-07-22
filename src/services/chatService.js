@@ -1,5 +1,5 @@
 // src/services/chatService.js
-import { getMock }       from './mockSwitch.js';
+import { getMock, USE_MOCK } from './mockSwitch.js';
 import mockConversations from '../data/client/mock_conversations.json';
 import mockMessages      from '../data/client/mock_messages.json';
 import apiClient         from './apiClient.js';
@@ -62,6 +62,7 @@ const MOCK_CONTEXT = {
     mission: null,
   },
 };
+
 const MOCK_CLIENT_CONTEXT = {
   conv_001: {
     client: {
@@ -121,43 +122,43 @@ function sortDesc(arr, key = 'updatedAt') {
 /**
  * Appel GET messages — mutualisé client/provider.
  * v2.1 : la réponse est { data: { messages: [], meta: {} } }
+ * NB: ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
  */
 async function apiFetchMessages(convId, role) {
-  const r = await apiClient.get(
-    `/${role}/conversations/${convId}/messages`,
-    { params: { limit: 50 } },
-  );
-  return sortAsc(r.data.data.messages);
+  return apiClient.get(`/${role}/conversations/${convId}/messages`, { params: { limit: 50 } });
 }
 
 /**
  * Appel POST message — mutualisé client/provider.
  * v2.1 : la réponse est { data: Message }
+ * NB: ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
  */
 async function apiPostMessage(convId, content, imageId = null, role) {
-  const r = await apiClient.post(
-    `/${role}/conversations/${convId}/messages`,
-    { content, imageId },
-  );
-  return r.data.data;
+  return apiClient.post(`/${role}/conversations/${convId}/messages`, { content, imageId });
 }
 
+// ─── CLIENT ───────────────────────────────────────────────────────────────────
+
 export async function getConversations() {
-  return getMock(
-    sortDesc(mockConversations.data),
-    () => apiClient.get('/client/conversations')
-      .then(r => sortDesc(r.data.data.conversations)),
+  const result = await getMock(
+    mockConversations,
+    () => apiClient.get('/client/conversations'),
   );
+  // mock -> tableau direct ; API -> { conversations: [...] }
+  const list = Array.isArray(result) ? result : (result?.conversations ?? []);
+  return sortDesc(list);
 }
 
 export async function getMessages(conversationId) {
   const mockFiltered = sortAsc(
     mockMessages.data.filter(m => m.conversationId === conversationId),
   );
-  return getMock(
-    mockFiltered,
+  const result = await getMock(
+    { data: mockFiltered },
     () => apiFetchMessages(conversationId, 'client'),
   );
+  const list = Array.isArray(result) ? result : (result?.messages ?? []);
+  return sortAsc(list);
 }
 
 export async function sendMessage(conversationId, content, imageId = null) {
@@ -177,68 +178,99 @@ export async function sendMessage(conversationId, content, imageId = null) {
   );
 }
 
+/**
+ * Vérifie si une conversation existe déjà entre ce client et ce prestataire
+ * pour cette demande. Si oui, la retourne. Sinon, en crée une nouvelle.
+ * Décision actée : pas de doublon de conversation pour un même (client, provider, demand).
+ */
+export async function getOrCreateConversation(providerId, demandId) {
+  // En mode mock : on filtre les conversations existantes
+  const existing = mockConversations.data.find(
+    (c) => c.provider.id === providerId && c.demandId === demandId
+  );
+
+  if (existing) {
+    await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 200));
+    return existing;
+  }
+
+  // Pas de conversation existante → on en crée une nouvelle
+  return openConversation(providerId, demandId);
+}
+
 export async function openConversation(providerId, demandId = null) {
   return getMock(
     mockConversations.data[0] ?? null,
-    () => apiClient
-      .post('/client/conversations', { providerId, demandId })
-      .then(r => r.data.data),
+    () => apiClient.post('/client/conversations', { providerId, demandId }),
   );
 }
 
+/**
+ * Cas particulier : compose des données depuis 2 appels API (conversations + user).
+ * Ne rentre pas dans le contrat générique getMock(mockData, apiFn) — on gère
+ * USE_MOCK manuellement ici plutôt que de forcer ce cas dans getMock.
+ */
 export async function getConversationContext(conversationId) {
-  return getMock(
-    MOCK_CONTEXT[conversationId] ?? null,
-    async () => {
-      // Étape 1 : retrouver la conversation dans la liste
-      const convs = await apiClient
-        .get('/client/conversations')
-        .then(r => r.data.data.conversations);
+  if (USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
+    return MOCK_CONTEXT[conversationId] ?? null;
+  }
 
-      const conv = convs.find(c => c.id === conversationId);
-      if (!conv) return null;
+  try {
+    // Étape 1 : retrouver la conversation dans la liste
+    const convs = await apiClient
+      .get('/client/conversations')
+      .then(r => r.data.data.conversations);
 
-      // Étape 2 : profil complet du prestataire
-      const provider = await apiClient
-        .get(`/user/${conv.provider.id}`)
-        .then(r => r.data.data);
+    const conv = convs.find(c => c.id === conversationId);
+    if (!conv) return null;
 
-      return {
-        provider: {
-          id:            provider.id,
-          fullName:      provider.fullName,
-          avatarInitial: provider.avatarInitial,
-          phone:         provider.phone  ?? null,
-          rating:        provider.rating ?? null,
-          missionCount:  provider.completedMissions ?? null,
-          specialty:     provider.specialty ?? null,
-          isOnline:      null, // Non disponible API v2.1
-          category:      provider.specialty ?? null,
-        },
-        mission: null, // Endpoint dédié à prévoir — v2.2
-      };
-    },
-  );
+    // Étape 2 : profil complet du prestataire
+    const provider = await apiClient
+      .get(`/user/${conv.provider.id}`)
+      .then(r => r.data.data);
+
+    return {
+      provider: {
+        id:            provider.id,
+        fullName:      provider.fullName,
+        avatarInitial: provider.avatarInitial,
+        phone:         provider.phone  ?? null,
+        rating:        provider.rating ?? null,
+        missionCount:  provider.completedMissions ?? null,
+        specialty:     provider.specialty ?? null,
+        isOnline:      null, // Non disponible API v2.1
+        category:      provider.specialty ?? null,
+      },
+      mission: null, // Endpoint dédié à prévoir — v2.2
+    };
+  } catch (error) {
+    console.error("[ServiLoc API Error]", error);
+    throw error;
+  }
 }
 
 // ─── PROVIDER ─────────────────────────────────────────────────────────────────
 
 export async function getProviderConversations() {
-  return getMock(
-    sortDesc(mockConversations.data),
-    () => apiClient.get('/provider/conversations')
-      .then(r => sortDesc(r.data.data.conversations)),
+  const result = await getMock(
+    mockConversations,
+    () => apiClient.get('/provider/conversations'),
   );
+  const list = Array.isArray(result) ? result : (result?.conversations ?? []);
+  return sortDesc(list);
 }
 
 export async function getProviderMessages(conversationId) {
   const mockFiltered = sortAsc(
     mockMessages.data.filter(m => m.conversationId === conversationId),
   );
-  return getMock(
-    mockFiltered,
+  const result = await getMock(
+    { data: mockFiltered },
     () => apiFetchMessages(conversationId, 'provider'),
   );
+  const list = Array.isArray(result) ? result : (result?.messages ?? []);
+  return sortAsc(list);
 }
 
 /**
@@ -261,43 +293,50 @@ export async function sendProviderMessage(conversationId, content, imageId = nul
   );
 }
 
-
+/**
+ * Cas particulier : compose des données depuis 2 appels API (conversations + user).
+ * Même raison que getConversationContext — on sort du contrat générique getMock.
+ */
 export async function getProviderConversationContext(conversationId) {
-  return getMock(
-    MOCK_CLIENT_CONTEXT[conversationId] ?? null,
-    async () => {
-      const convs = await apiClient
-        .get('/provider/conversations')
-        .then(r => r.data.data.conversations);
+  if (USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
+    return MOCK_CLIENT_CONTEXT[conversationId] ?? null;
+  }
 
-      const conv = convs.find(c => c.id === conversationId);
-      if (!conv) return null;
+  try {
+    const convs = await apiClient
+      .get('/provider/conversations')
+      .then(r => r.data.data.conversations);
 
-      const client = await apiClient
-        .get(`/user/${conv.client.id}`)
-        .then(r => r.data.data);
+    const conv = convs.find(c => c.id === conversationId);
+    if (!conv) return null;
 
-      return {
-        client: {
-          id:                client.id,
-          fullName:          client.fullName,
-          avatarInitial:     client.avatarInitial,
-          phone:             client.phone ?? null,
-          completedMissions: client.completedMissions ?? null,
-          isOnline:          null, // Non disponible API v2.1
-        },
-        mission: null, // Endpoint dédié à prévoir — v2.2
-      };
-    },
-  );
+    const client = await apiClient
+      .get(`/user/${conv.client.id}`)
+      .then(r => r.data.data);
+
+    return {
+      client: {
+        id:                client.id,
+        fullName:          client.fullName,
+        avatarInitial:     client.avatarInitial,
+        phone:             client.phone ?? null,
+        completedMissions: client.completedMissions ?? null,
+        isOnline:          null, // Non disponible API v2.1
+      },
+      mission: null, // Endpoint dédié à prévoir — v2.2
+    };
+  } catch (error) {
+    console.error("[ServiLoc API Error]", error);
+    throw error;
+  }
 }
 
 export async function deleteMessage(conversationId, messageId) {
-  // En mock : simule une latence réseau légère
-  await new Promise(resolve => setTimeout(resolve, 120));
-  return { success: true };
-  // Quand chatService passera en toggle API :
-  // return apiClient
-  //   .delete(`/client/conversations/${conversationId}/messages/${messageId}`)
-  //   .then(r => r.data);
+  return getMock(
+    { success: true },
+    () => apiClient
+      .delete(`/client/conversations/${conversationId}/messages/${messageId}`)
+      .then(r => r.data),
+  );
 }
