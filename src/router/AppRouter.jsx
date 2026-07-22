@@ -23,19 +23,21 @@ import { Spinner } from "../components/commons/Spinner";
  *  /admin/*             → AdminLayout + AuthGuard ADMIN | SERVICE_CLIENT
  *  *                    → page 404
  */
-// Ajout de la page d'accueil (HomePage) pour la route racine "/":
-
 
 // ─── Lazy imports — Auth ─────────────────────────────────────────────────────
 const RegisterPage    = lazy(() => import("../pages/auth/RegisterPage"));
 const LoginPage       = lazy(() => import("../pages/auth/LoginPage"));
 const AdminLoginPage  = lazy(() => import("../pages/auth/AdminLoginPage"));
 const OtpPage         = lazy(() => import("../pages/auth/OtpPage"));
-const ScLoginPage        = lazy(() => import("../pages/auth/ScLoginPage"));
+const ForgotPassword  = lazy(() => import("../pages/auth/ForgotPassword"));
+const ResetPassword   = lazy(() => import("../pages/auth/ResetPassword"));
+const ScLoginPage     = lazy(() => import("../pages/auth/ScLoginPage"));
 
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
+const Demands            = lazy(() => import("../pages/client/DemandListPage"))  
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
+const MissionPage        = lazy(() => import("../pages/client/Mission"))
 const SuiviMission       = lazy(() => import("../pages/client/SuiviMission"));
 const NotationPrestataire = lazy(() => import("../pages/client/NotationPrestataire"));
 const ConversationListClient = lazy(() => import("../pages/client/ConversationListPage"))
@@ -73,7 +75,6 @@ const TraitementLitigeSC     = lazy(() => import("../pages/admin/TraitementLitig
 // ─── Lazy imports — Misc ─────────────────────────────────────────────────────
 const ShowcasePage       = lazy(() => import("../pages/showcase/ComponentShowcase"));
 const NotFoundPage       = lazy(() => import("../pages/NotFoundPage"));
-const HomePage           = lazy(() => import("../pages/Home/HomePage"));
 
 // ─── SmartRedirect ───────────────────────────────────────────────────────────
 // Lit le rôle du mock token et redirige vers le bon dashboard.
@@ -90,11 +91,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-<<<<<<< HEAD
-  return <Navigate to="/auth/register" replace />;
-=======
-   return <HomePage />;
->>>>>>> 4422333 (page home)
+  return <Navigate to="/auth/login" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
@@ -121,23 +118,21 @@ export function AppRouter() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
 
-
           {/* ── Racine ── */}
           <Route path="/" element={<SmartRedirect />} />
-          
-          <Route path="/home">
-            <Route index      element={<HomePage />} />
-          </Route>
 
           {/* ── Auth (public) ── */}
           <Route path="/auth">
-            <Route index      element={<Navigate to="/auth/register" replace />} />
+            <Route index      element={<Navigate to="/auth/login" replace />} />
             <Route path="register"    element={<RegisterPage/>} />
             <Route path="login"       element={<LoginPage />} />
             <Route path="login/admin" element={<AdminLoginPage />} />
             <Route path="login/sc"   element={<ScLoginPage />} />
             <Route path="otp"         element={<OtpPage />} />
+            <Route path="forgot-password"  element={<ForgotPassword />} />
+            <Route path="reset-password"  element={<ResetPassword />} />
           </Route>
+
           {/* ── Espace Client ── */}
           <Route
             path="/client"
@@ -149,7 +144,9 @@ export function AppRouter() {
           >
             <Route index                          element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"               element={<ClientDashboard />} />
+            <Route path="demandes"                element={<Demands />} />
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
+            <Route path="missions"                element={<MissionPage />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="chat"                    element={<Navigate to="../conversations" replace />} />   
