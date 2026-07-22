@@ -6,7 +6,7 @@ import { RatingStars } from '../../commons/RatingStars';
 import { MapPin, Clock } from '../../commons/Icons';
 import { formatBudget } from './formatBudget';
 import { CATEGORY_DISPLAY } from './categoryDisplay';
-import { formatPostedAgo } from '../../../utils/formatters';
+import { formatRelativeTime } from '../../../utils/formatters';
 
 function getLocationText(location) {
   if (!location) return null;
@@ -98,7 +98,7 @@ export function DemandDetailModal({ open, demand, onClose, onApply, isApplying =
           <div className="flex flex-col items-center gap-1 py-3 bg-[var(--color-sl-50)] rounded-[var(--radius-md)] border border-[var(--color-sl-100)]">
             <Clock size={18} className="text-[var(--color-sl-500)]" />
             <span className="text-sm font-semibold text-[var(--color-sl-900)]">
-              {demand && formatPostedAgo(demand)}
+              {demand && formatRelativeTime(demand)}
             </span>
             <span className="text-xs text-[var(--color-sl-400)]">Publié</span>
           </div>

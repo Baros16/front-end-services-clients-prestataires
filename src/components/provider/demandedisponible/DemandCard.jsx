@@ -8,7 +8,7 @@ import { AlertBanner } from '../../commons/AlertBanner';
 import { DemandDetailModal } from './DemandDetailModal';
 import { formatBudget } from './formatBudget';
 import { CATEGORY_DISPLAY } from './categoryDisplay';
-import { formatPostedAgo } from '../../../utils/formatters';
+import { formatRelativeTime } from '../../../utils/formatters';
 import { MapPin, ChevronRight } from '../../commons/Icons';
 
 export function DemandCard({ demand, onViewDetails, onApply, isApplying = false, feedback = null, onDismissFeedback }) {
@@ -38,7 +38,7 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
         }
         actions={
           <div className="flex gap-1.5 flex-wrap justify-end shrink-0">
-            {demand.isUrgent && <StatusBadge variant="urgent" size="sm" />}
+            {demand.urgent && <StatusBadge variant="urgent" size="sm" />}
             <StatusBadge variant="ouvert" size="sm" />
           </div>
         }
@@ -61,18 +61,20 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1 text-xs text-[var(--color-sl-500)]">
               <MapPin size={12} />
-              {demand.distanceKm} km
+              {demand.distanceKm != null ? `${demand.distanceKm} km` : '—'}
             </span>
-            <div className="flex items-center gap-1">
-              <RatingStars value={demand.clientRating} size="sm" />
-              <span className="text-xs text-[var(--color-sl-500)]">
-                {demand.clientRating}
-              </span>
-            </div>
+            {demand.clientRating != null && (
+              <div className="flex items-center gap-1">
+                <RatingStars value={demand.clientRating} size="sm" />
+                <span className="text-xs text-[var(--color-sl-500)]">
+                  {demand.clientRating}
+                </span>
+              </div>
+            )}
           </div>
 
           <span className="text-xs text-[var(--color-sl-400)]">
-            {formatPostedAgo(demand)}
+            {formatRelativeTime(demand.createdAt)}
           </span>
 
           {feedback && (

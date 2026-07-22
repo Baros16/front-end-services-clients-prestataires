@@ -1,7 +1,7 @@
 import { Button }      from '../../commons/Button';
 import { Card }        from '../../commons/Card';
 import { StatusBadge } from '../../commons/StatusBadge';
-import { formatDateShort } from '../../../utils/formatters';
+import { formatDateShort, formatBudgetRange } from '../../../utils/formatters';
 
 export function DemandCard({ demand, onClick }) {
   const clickable = Boolean(onClick);

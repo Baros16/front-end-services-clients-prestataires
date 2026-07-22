@@ -14,8 +14,6 @@ import {
 
 import { useClientDemands } from '../../hooks/useClientDemands';
 
-const navigate = useNavigate();
-
 const TABS = [
   { id: '',         label: 'Toutes'    },
   { id: 'ouverte',  label: 'Ouvertes'  },
@@ -24,6 +22,8 @@ const TABS = [
 ];
 
 export default function DemandsListPage() {
+
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('');
   const { demands, loading, error } = useClientDemands(activeTab);
 

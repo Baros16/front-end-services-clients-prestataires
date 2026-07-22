@@ -1,16 +1,24 @@
 // src/pages/provider/DemandesDisponibles.jsx
 import { useState, useEffect } from 'react';
-import { PageHeader } from '../../components/commons/PageHeader';
-import { TabBar } from '../../components/commons/TabBar';
-import { AlertBanner } from '../../components/commons/AlertBanner';
-import { EmptyState } from '../../components/commons/EmptyState';
-import { SkeletonLoader } from '../../components/commons/SkeletonLoader';
-import { DemandCard } from '../../components/provider/demandedisponible/DemandCard';
-import { Button } from '../../components/commons/Button';
-import { AvailabilityToggle } from "../../components/commons/AvailabilityToggle";
-import { SortMenu } from '../../components/provider/demandedisponible/SortMenu';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  PageHeader,
+  TabBar,
+  AlertBanner,
+  EmptyState,
+  SkeletonLoader,
+  Button,
+  AvailabilityToggle,
+  Toast,
+} from '../../components/commons';
+
+import { DemandCard }  from '../../components/provider/demandedisponible/DemandCard';
+import { SortMenu }    from '../../components/provider/demandedisponible/SortMenu';
 import { sortDemands } from '../../components/provider/demandedisponible/sortUtils';
-import { getAvailableDemands, applyToDemand, updateAvailability } from '../../services/providerService';
+import { updateAvailability } from '../../services/providerService';
+import { useAvailableDemands } from '../../hooks/useAvailableDemands';
+import { useGeolocation } from '../../hooks/useGeolocation';
 
 const TABS = [
   { id: 'priority', label: 'Zone prioritaire' },
@@ -18,54 +26,46 @@ const TABS = [
 ];
 
 export default function DemandesDisponibles() {
-  const [allDemands, setAllDemands]   = useState([]);
-  const [isLoading, setIsLoading]     = useState(true);
-  const [error, setError]             = useState(null); 
-  const [feedback, setFeedback]       = useState(null); 
-  const [activeTab, setActiveTab]     = useState('priority');
-  const [isAvailable, setIsAvailable] = useState(true);
-  const [applyingId, setApplyingId]   = useState(null);
-  const [activeSort, setActiveSort]   = useState('recent');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        const res = await getAvailableDemands();
-        const raw = Array.isArray(res) ? res : res.data ?? [];
-        const normalized = raw.map((d) => ({
-          ...d,
-          zone: d.distanceKm <= 2 ? 'priority' : 'extended',
-        }));
-        setAllDemands(normalized);
-      } catch {
-        setError('Impossible de charger les demandes. Veuillez réessayer.');
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, []);
+  // ── Position du prestataire — transmise au hook pour calculer distance/zone ──
+  const { lat: providerLat, lng: providerLng } = useGeolocation({ autoRequest: true });
 
+  const {
+    demands,
+    loading,
+    error,
+    applyingId,
+    refetch,
+    apply,
+    toast,
+    dismissToast,
+  } = useAvailableDemands(providerLat, providerLng);
+
+   const isLocating = providerLat == null || providerLng == null;
+   const isLoading = loading || isLocating;
+
+  // ── UI state uniquement ────────────────────────────────────────────────
+  const [feedback,     setFeedback]     = useState(null);
+  const [activeTab,    setActiveTab]    = useState('priority');
+  const [isAvailable,  setIsAvailable]  = useState(true);
+  const [activeSort,   setActiveSort]   = useState('recent');
+
+  // Auto-dismiss du feedback par carte
   useEffect(() => {
     if (!feedback) return;
     const timer = setTimeout(() => setFeedback(null), 3000);
     return () => clearTimeout(timer);
   }, [feedback]);
 
-  useEffect(() => {
-    if (!error) return;
-    const timer = setTimeout(() => setError(null), 3000);
-    return () => clearTimeout(timer);
-  }, [error]);
-
   const filteredDemands = sortDemands(
-    allDemands.filter((d) => d.zone === activeTab),
+    demands.filter((d) => d.zone === activeTab),
     activeSort
   );
 
   const tabsWithCount = TABS.map((t) => ({
     ...t,
-    count: allDemands.filter((d) => d.zone === t.id).length,
+    count: demands.filter((d) => d.zone === t.id).length,
   }));
 
   const handleAvailabilityToggle = async (next) => {
@@ -74,37 +74,17 @@ export default function DemandesDisponibles() {
       await updateAvailability(next);
     } catch {
       setIsAvailable(!next);
-      setError('Impossible de mettre à jour votre disponibilité. Veuillez réessayer.');
     }
   };
 
   const handleApply = async (demandId) => {
-    if (applyingId) return;
-    setApplyingId(demandId);
-    setFeedback(null);
-    try {
-      const res = await applyToDemand(demandId);
-      setFeedback({
-        demandId,
-        type: 'success',
-        message: res?.message ?? 'Candidature envoyée avec succès ! Le client sera notifié.',
-      });
-      setTimeout(() => {
-        setAllDemands((prev) => prev.filter((d) => d.id !== demandId));
-      }, 1800);
-    } catch {
-      setFeedback({
-        demandId,
-        type: 'danger',
-        message: 'Erreur lors de la postulation. Veuillez réessayer.',
-      });
-    } finally {
-      setApplyingId(null);
-    }
+    const result = await apply(demandId);
+    if (result) setFeedback({ demandId, ...result });
   };
 
   const handleViewDetails = (demandId) => {
-    console.log('[DemandesDisponibles] Voir détails →', demandId);
+    const demand = demands.find((d) => d.id === demandId);
+    navigate(`/provider/devis/nouveau/${demandId}`, { state: { demand } });
   };
 
   const headerActions = (
@@ -115,10 +95,9 @@ export default function DemandesDisponibles() {
   );
 
   return (
-    <div className="flex flex-col h-full" style={{ background: 'var(--color-sl-50)' }}>
+    <div className="flex flex-col h-full bg-sl-50">
       <PageHeader
         title="Demandes disponibles"
-        withDot="true"
         subtitle="Demandes correspondant à vos compétences"
         actions={headerActions}
         className="mb-4"
@@ -126,26 +105,19 @@ export default function DemandesDisponibles() {
 
       <TabBar tabs={tabsWithCount} activeId={activeTab} onChange={setActiveTab} />
 
-      <div className="flex-1 overflow-y-auto" style={{ padding: '1rem 1.5rem' }}>
-
+      <div className="flex-1 overflow-y-auto py-4 px-6">
         {error && (
-          <div style={{ marginBottom: '1rem' }}>
-            <AlertBanner
-              type="danger"
-              message={error}
-              onClose={() => setError(null)}
-              size="sm"
-              className="max-w-sm"
-            />
+          <div className="mb-4">
+            <AlertBanner variant="error" message={error} />
           </div>
         )}
 
         {isLoading && (
-          <SkeletonLoader
-            variant="card"
-            count={6}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonLoader key={i} variant="card" />
+            ))}
+          </div>
         )}
 
         {!isLoading && filteredDemands.length > 0 && (
@@ -167,19 +139,28 @@ export default function DemandesDisponibles() {
         {!isLoading && filteredDemands.length === 0 && !error && (
           <EmptyState
             title="Aucune demande disponible"
-            subtitle={
+            description={
               activeTab === 'priority'
                 ? "Aucune demande dans votre zone prioritaire pour l'instant."
                 : "Aucune demande dans les zones éloignées."
             }
             action={
-              <Button variant="primary" size="md" onClick={() => window.location.reload()}>
+              <Button variant="primary" size="md" onClick={refetch}>
                 Rafraîchir
               </Button>
             }
           />
         )}
       </div>
+
+      {/* Toast global — erreurs d'action remontées par le hook (aligné useChat) */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={dismissToast}
+        />
+      )}
     </div>
   );
 }

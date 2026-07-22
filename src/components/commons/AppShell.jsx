@@ -1,20 +1,7 @@
 // src/components/AppShell.jsx
 import { useState, useEffect, cloneElement, isValidElement } from "react";
 
-/**
- * AppShell — mise en page racine responsive
- *
- * Desktop (≥ md) : sidebar sticky, collapsible via bouton chevron
- * Mobile  (< md) : sidebar masquée, s'ouvre en drawer overlay (hamburger topbar)
- *
- * Props : identiques à l'ancienne version — aucun changement dans layouts.jsx
- *   role     : "client" | "provider" | "admin" | "service_client"
- *   sidebar  : <Sidebar {...} />
- *   children : <Outlet />
- */
 
-// ─── Thèmes par rôle ──────────────────────────────────────────────────────────
-// topbarBg : fond de la topbar mobile (doit correspondre au bg du Sidebar)
 const ROLE_THEMES = {
   client:         { bg: "bg-sl-50",  mainBg: "bg-sl-50",  topbarBg: "bg-white",   darkTopbar: false },
   provider:       { bg: "bg-sl-50",  mainBg: "bg-sl-50",  topbarBg: "bg-brand",   darkTopbar: true  },

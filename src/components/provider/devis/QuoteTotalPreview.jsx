@@ -1,11 +1,7 @@
 // src/components/provider/quote/QuoteTotalPreview.jsx
-import { formatXAF } from './formatXAF';
+import { formatXAF } from '../../../utils/formatters';
 
-/**
- * QuoteTotalPreview
- * Carte sombre récapitulant Main d'œuvre + Matériaux → Total (AmountDisplayTotal).
- * Se met à jour en temps réel pendant la saisie du devis.
- */
+
 export function QuoteTotalPreview({ laborAmount, materialsTotal, totalAmount }) {
   return (
     <div className="rounded-lg bg-sl-900 text-white p-5 sm:p-6 shadow-lg lg:sticky lg:top-6">

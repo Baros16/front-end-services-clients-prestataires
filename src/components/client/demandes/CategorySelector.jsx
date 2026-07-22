@@ -4,7 +4,7 @@ import { Wrench, Zap, Brush, Key, Sparkles, Plus } from '../../commons/Icons';
 import mockCategories from '../../../data/shared/mock_categories.json';
 
 const ICON_MAP = {
-  wrench: <Wrench   size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,
+  wrench: <Wrench   size={24} strokeWidth={1.8} color="var(--color-cat-plomberie)" />,
   bolt:   <Zap      size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,
   broom:  <Brush    size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,
   key:    <Key      size={24} strokeWidth={1.8} color="var(--color-sl-700)" />,
@@ -39,12 +39,7 @@ export default function CategorySelector({ categories, selectedId, onSelect }) {
           return (
             <ServiceCategoryCard
               key={cat.id}
-              category={{
-                id:    cat.id,
-                label,
-                icon,
-                color: cat.color,
-              }}
+              category={{...cat, label, icon}}
               selected={selectedId === cat.id}
               onClick={onSelect}
               size="md"
