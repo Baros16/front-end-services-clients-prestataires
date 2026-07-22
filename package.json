@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "axios": "^1.16.1",
+    "framer-motion": "^12.42.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.21.0",
     "react": "^19.1.1",
