@@ -16,7 +16,7 @@ function decodeToken(token) {
   return JSON.parse(atob(base64));
 }
 
-function getCurrentUser() {
+export function getCurrentUser() {
   try {
     const token = localStorage.getItem(ACCESS_KEY);
     if (!token) return null;
