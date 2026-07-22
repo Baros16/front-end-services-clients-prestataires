@@ -6,6 +6,7 @@ import { AuthGuard } from "./AuthGuard";
 import { ProviderLayout } from "../components/layouts/ProviderLayout";
 import { AdminLayout } from "../components/layouts/AdminLayout";
 import { ClientLayout } from "../components/layouts/ClientLayout";
+import { ServiceClientLayout } from "../components/layouts/ServiceClientLayout";
 import { Spinner } from "../components/commons/Spinner";
 
 /**
@@ -35,6 +36,7 @@ const ScLoginPage     = lazy(() => import("../pages/auth/ScLoginPage"));
 
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
+const DemandDetailPage    = lazy(() => import("../pages/client/DemandDetailPage"));
 const Demands            = lazy(() => import("../pages/client/DemandListPage"))  
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
 const MissionPage        = lazy(() => import("../pages/client/Mission"))
@@ -71,6 +73,9 @@ const StatistiquesAdmin      = lazy(() => import("../pages/admin/StatistiquesAdm
 const CommissionsPage        = lazy(() => import("../pages/admin/CommissionsPage"));     // M6 — écran 27
 const PaiementsPage          = lazy(() => import("../pages/admin/PaiementsPage"));       // M7 — écran 28
 const TraitementLitigeSC     = lazy(() => import("../pages/admin/TraitementLitigeSC"));
+const ServiceClientDashboard = lazy(() => import("../pages/service-client/ServiceClientDashboard"));
+const LitigesSC              = lazy(() => import("../pages/service-client/LitigesSC"));
+const TraitementLitigeSCPage = lazy(() => import("../pages/service-client/TraitementLitigeSC"));
 
 // ─── Lazy imports — Misc ─────────────────────────────────────────────────────
 const ShowcasePage       = lazy(() => import("../pages/showcase/ComponentShowcase"));
@@ -145,6 +150,7 @@ export function AppRouter() {
             <Route index                          element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"               element={<ClientDashboard />} />
             <Route path="demandes"                element={<Demands />} />
+            <Route path="demandes/:id"            element={<DemandDetailPage />} />
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
             <Route path="missions"                element={<MissionPage />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
@@ -153,8 +159,6 @@ export function AppRouter() {
             <Route path="conversations"           element={<ConversationListClient />} />     
             <Route path="chat/:conversationId"    element={<ChatPage />} />
             <Route path="devis/:id"               element={<DevisClient />} />        
-            <Route path="missions/:id"            element={<SuiviMission />} />
-            <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="litige/:missionId"       element={<LitigeClient />} />       
             <Route path="urgence"                 element={<UrgencePage />} />        
             <Route path="urgence/contact"         element={<UrgenceContact />} />
@@ -180,10 +184,24 @@ export function AppRouter() {
             <Route path="missions/:id"                element={<DemarrerMission />} />
             <Route path="litige/:missionId"           element={<SignalerLitige />} />
             <Route path="profil"                      element={<ProfilPrestataire />} />      
-            <Route path="devis/nouveau/:demandeId"    element={<CreerDevis />} />      
             <Route path="missions/:id/termine"        element={<TacheTerminee />} />           
             <Route path="missions/:id/noter-client"   element={<NoterClient />} />             
             <Route path="gains"                       element={<HistoriqueGains />} /> 
+          </Route>
+
+          {/* ── Espace Service Client ── */}
+          <Route
+            path="/service-client"
+            element={
+              <AuthGuard allowedRoles={["SERVICE_CLIENT", "AGENT"]}>
+                <ServiceClientLayout />
+              </AuthGuard>
+            }
+          >
+            <Route index                          element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard"               element={<ServiceClientDashboard />} />
+            <Route path="litiges"                 element={<LitigesSC />} />
+            <Route path="litiges/:id"             element={<TraitementLitigeSCPage />} />
           </Route>
 
           {/* ── Espace Admin ── */}

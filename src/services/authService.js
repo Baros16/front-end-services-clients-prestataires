@@ -145,6 +145,6 @@ export async function getUserById(userId) {
   const mockEntry = mockPublicUsers[userId] ?? Object.values(mockPublicUsers)[0];
   return getMock(
     { data: mockEntry },
-    () => apiClient.get(`/user/${userId}`)
+    () => apiClient.get(`${BASE}/${userId}`)
   );
 }
