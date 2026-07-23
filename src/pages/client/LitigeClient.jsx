@@ -102,6 +102,12 @@ export default function LitigeClient() {
         />
       </Card>
 
+      {/* Montant concerne */}
+      <Card>
+        <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-sl-400)' }}>Montant concerne</h3>
+        <p className="text-3xl font-black" style={{ color: 'var(--color-sl-900)' }}>23 000 XAF</p>
+      </Card>
+
       {error && <AlertBanner type="danger" message={error} />}
 
       <Button variant="danger" size="lg" className="w-full" disabled={submitting} onClick={handleSubmit}>
