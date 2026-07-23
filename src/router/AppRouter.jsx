@@ -8,6 +8,7 @@ import { AdminLayout } from "../components/layouts/AdminLayout";
 import { ClientLayout } from "../components/layouts/ClientLayout";
 import { ServiceClientLayout } from "../components/layouts/ServiceClientLayout";
 import { Spinner } from "../components/commons/Spinner";
+import HomePage from "../pages/Home/HomePage";
 
 /**
  * AppRouter
@@ -233,6 +234,7 @@ export function AppRouter() {
 
           {/* ── Showcase (S1 uniquement) ── */}
           <Route path="/showcase" element={<ShowcasePage />} />
+          <Route path="/home"  element={<HomePage/>}/>
 
           {/* ── 404 ── */}
           <Route path="*" element={<NotFoundPage />} />

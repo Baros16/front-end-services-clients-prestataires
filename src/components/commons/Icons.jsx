@@ -36,7 +36,7 @@ export { PlayCircle, StopCircle, Flag }                      from 'lucide-react'
 
 // ─── Finances & stats ─────────────────────────────────────────
 export { BarChart2, TrendingUp, TrendingDown }               from 'lucide-react';
-export { Wallet, CreditCard, Banknote, Receipt }             from 'lucide-react';
+export { Wallet, CreditCard, Banknote, Receipt, Percent }             from 'lucide-react';
 export { Star, StarOff }                                     from 'lucide-react';
 
 // ─── Fichiers & documents ─────────────────────────────────────
