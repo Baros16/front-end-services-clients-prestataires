@@ -38,7 +38,7 @@ export function AmountDisplay({
   return (
     <span
       className={`
-        font-[family-name:var(--font-display)] font-bold tracking-[-0.02em]
+        font-[family-name:var(--font-body)] font-bold tracking-[-0.02em]
         ${SIZES[size]} ${VARIANTS[variant]} ${className}
       `}
     >

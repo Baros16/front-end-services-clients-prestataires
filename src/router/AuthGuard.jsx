@@ -16,7 +16,7 @@ function decodeToken(token) {
   return JSON.parse(atob(base64));
 }
 
-function getCurrentUser() {
+export function getCurrentUser() {
   try {
     const token = localStorage.getItem(ACCESS_KEY);
     if (!token) return null;
@@ -90,7 +90,7 @@ function base64UrlEncode(obj) {
     .replace(/=+$/, "");
 }
 
-function buildDevToken(userId, role) {
+export function buildDevToken(userId, role) {
   const header = { alg: "none", typ: "JWT" };
   const payload = {
     userId,

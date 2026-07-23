@@ -29,11 +29,15 @@ const RegisterPage    = lazy(() => import("../pages/auth/RegisterPage"));
 const LoginPage       = lazy(() => import("../pages/auth/LoginPage"));
 const AdminLoginPage  = lazy(() => import("../pages/auth/AdminLoginPage"));
 const OtpPage         = lazy(() => import("../pages/auth/OtpPage"));
-const ScLoginPage        = lazy(() => import("../pages/auth/ScLoginPage"));
+const ForgotPassword  = lazy(() => import("../pages/auth/ForgotPassword"));
+const ResetPassword   = lazy(() => import("../pages/auth/ResetPassword"));
+const ScLoginPage     = lazy(() => import("../pages/auth/ScLoginPage"));
 
 // ─── Lazy imports — Client ───────────────────────────────────────────────────
 const ClientDashboard    = lazy(() => import("../pages/client/ClientDashboard"));
+const Demands            = lazy(() => import("../pages/client/DemandListPage"))  
 const NouvelleDemande    = lazy(() => import("../pages/client/NouvelleDemande"));
+const MissionPage        = lazy(() => import("../pages/client/Mission"))
 const SuiviMission       = lazy(() => import("../pages/client/SuiviMission"));
 const NotationPrestataire = lazy(() => import("../pages/client/NotationPrestataire"));
 const ConversationListClient = lazy(() => import("../pages/client/ConversationListPage"))
@@ -87,7 +91,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-  return <Navigate to="/auth/register" replace />;
+  return <Navigate to="/auth/login" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
@@ -119,13 +123,16 @@ export function AppRouter() {
 
           {/* ── Auth (public) ── */}
           <Route path="/auth">
-            <Route index      element={<Navigate to="/auth/register" replace />} />
+            <Route index      element={<Navigate to="/auth/login" replace />} />
             <Route path="register"    element={<RegisterPage/>} />
             <Route path="login"       element={<LoginPage />} />
             <Route path="login/admin" element={<AdminLoginPage />} />
             <Route path="login/sc"   element={<ScLoginPage />} />
             <Route path="otp"         element={<OtpPage />} />
+            <Route path="forgot-password"  element={<ForgotPassword />} />
+            <Route path="reset-password"  element={<ResetPassword />} />
           </Route>
+
           {/* ── Espace Client ── */}
           <Route
             path="/client"
@@ -137,7 +144,9 @@ export function AppRouter() {
           >
             <Route index                          element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard"               element={<ClientDashboard />} />
+            <Route path="demandes"                element={<Demands />} />
             <Route path="nouvelle-demande"        element={<NouvelleDemande />} />
+            <Route path="missions"                element={<MissionPage />} />
             <Route path="missions/:id"            element={<SuiviMission />} />
             <Route path="notation/:missionId"     element={<NotationPrestataire />} />
             <Route path="chat"                    element={<Navigate to="../conversations" replace />} />   

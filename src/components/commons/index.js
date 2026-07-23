@@ -20,6 +20,7 @@ export { SearchInput }       from "./SearchInput";
 export { PhotoUploader }     from "./PhotoUploader";
 export { LocationPicker}     from "./LocationPicker";
 export { FileAttachment }    from "./FileAttachment";
+export { AvailabilityToggle } from "./AvailabilityToggle";
 
 // ── Contenu & mise en page ───────────────────────────────────
 export { Card }              from "./Card";

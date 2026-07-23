@@ -1,6 +1,6 @@
 // src/pages/provider/DashboardPage.jsx
 import { useState, useEffect }        from 'react';
-import { useNavigate }                from 'react-router-dom';
+import { useNavigate, useLocation }   from 'react-router-dom';
 
 import { DashboardSkeleton }          from '../../components/provider/dashboard/DashboardSkeleton';
 import { RecentMissionRow }           from '../../components/provider/dashboard/RecentMissionRow';
@@ -21,12 +21,30 @@ import {
 import { formatXAF }                  from '../../utils/formatters';
 import { getProviderDashboard }       from '../../services/providerService';
 
-export default function ProviderDashboardPage() {
+export default function ProviderDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
+
+  // Message de succès transmis via la redirection
+  const successMessage = location.state?.successMessage;
+  const [showSuccess, setShowSuccess] = useState(Boolean(successMessage));
+
+  // Timer de 3 secondes pour effacer le message
+  useEffect(() => {
+    if (showSuccess) {
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+        // Supprime le message de l'historique de navigation
+        navigate(location.pathname, { replace: true, state: {} });
+      }, 3000); // 3000 ms = 3 secondes
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess, navigate, location.pathname]);
 
   useEffect(() => {
     setLoading(true);
@@ -45,7 +63,7 @@ export default function ProviderDashboardPage() {
   if (error) {
     return (
       <div className="p-6">
-        <AlertBanner message={error} variant="error" />
+        <AlertBanner type="danger" title="Erreur" message={error} />
       </div>
     );
   }
@@ -68,6 +86,16 @@ export default function ProviderDashboardPage() {
           />
         }
       />
+
+      {/* ── Alerte de succès (s'affiche 3 secondes puis disparaît) ─────── */}
+      {showSuccess && successMessage && (
+        <AlertBanner
+          type="success"
+          title="Litige transmis"
+          message={successMessage}
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
 
       {/* ── 4 StatCards ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

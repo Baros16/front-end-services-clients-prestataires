@@ -2,82 +2,85 @@
   "success": true,
   "data": [
     {
-      "id": "dem_xyz789",
-      "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
-      "description": "Fuite sous l'évier de la cuisine, eau qui s'écoule en permanence",
-      "isUrgent": false,
-      "status": "ouverte",
-      "estimatedBudget": { "min": 20000, "max": 30000 },
-      "distanceKm": 0.8,
-      "clientRating": 4.2,
-      "postedMinutesAgo": 5,
-      "location": { "address": "Bafoussam, Quartier Commercial" }
-    },
-    {
       "id": "dem_prv011",
+      "clientId": "usr_cli201",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Chasse d'eau cassée dans les toilettes, le réservoir ne se remplit plus",
-      "isUrgent": true,
+      "photos": [],
+      "location": { "address": "Bafoussam, Djeleng Centre", "lat": 5.4680, "lng": 10.4090 },
       "status": "ouverte",
+      "urgent": true,
       "estimatedBudget": { "min": 8000, "max": 15000 },
-      "distanceKm": 1.2,
-      "clientRating": 4.8,
-      "postedMinutesAgo": 12,
-      "location": { "address": "Bafoussam, Djeleng Centre" }
+      "providerId": null,
+      "quoteId": null,
+      "missionId": null,
+      "createdAt": "2026-07-22T07:48:00+01:00",
+      "updatedAt": "2026-07-22T07:48:00+01:00"
     },
     {
       "id": "dem_prv012",
+      "clientId": "usr_cli202",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Installation d'un nouveau chauffe-eau électrique 80L",
-      "isUrgent": false,
+      "photos": [],
+      "location": { "address": "Bafoussam, Cité des Palmiers", "lat": 5.4710, "lng": 10.4180 },
       "status": "ouverte",
+      "urgent": false,
       "estimatedBudget": { "min": 35000, "max": 55000 },
-      "distanceKm": 2.5,
-      "clientRating": 3.9,
-      "postedMinutesAgo": 47,
-      "location": { "address": "Bafoussam, Cité des Palmiers" }
+      "providerId": null,
+      "quoteId": null,
+      "missionId": null,
+      "createdAt": "2026-07-22T07:13:00+01:00",
+      "updatedAt": "2026-07-22T07:13:00+01:00"
     },
     {
       "id": "dem_prv013",
+      "clientId": "usr_cli203",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Remplacement robinetterie salle de bain complète, 3 points d'eau",
-      "isUrgent": false,
+      "photos": [],
+      "location": { "address": "Bafoussam, Djeleng Nord", "lat": 5.4920, "lng": 10.4260 },
       "status": "ouverte",
+      "urgent": false,
       "estimatedBudget": { "min": 40000, "max": 65000 },
-      "distanceKm": 3.1,
-      "clientRating": 4.5,
-      "postedMinutesAgo": 120,
-      "location": { "address": "Bafoussam, Djeleng Nord" }
+      "providerId": null,
+      "quoteId": null,
+      "missionId": null,
+      "createdAt": "2026-07-22T06:00:00+01:00",
+      "updatedAt": "2026-07-22T06:00:00+01:00"
     },
     {
       "id": "dem_prv014",
+      "clientId": "usr_cli204",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Odeur d'égout dans l'appartement, soupçon de fuite sous dallage",
-      "isUrgent": true,
+      "photos": [],
+      "location": { "address": "Bafoussam, Rue des Bougainvilliers", "lat": 5.4500, "lng": 10.3950 },
       "status": "ouverte",
+      "urgent": true,
       "estimatedBudget": { "min": 25000, "max": 50000 },
-      "distanceKm": 4.0,
-      "clientRating": 4.1,
-      "postedMinutesAgo": 8,
-      "location": { "address": "Bafoussam, Rue des Bougainvilliers" }
+      "providerId": null,
+      "quoteId": null,
+      "missionId": null,
+      "createdAt": "2026-07-22T07:52:00+01:00",
+      "updatedAt": "2026-07-22T07:52:00+01:00"
     },
     {
       "id": "dem_prv015",
+      "clientId": "usr_cli205",
       "category": { "id": "cat_plomberie", "label": "Plomberie", "iconKey": "wrench" },
       "description": "Mise en conformité installation plomberie maison neuve, branchement réseau ville",
-      "isUrgent": false,
+      "photos": [],
+      "location": { "address": "Bafoussam, Quartier Tougang", "lat": 5.4200, "lng": 10.3700 },
       "status": "ouverte",
+      "urgent": false,
       "estimatedBudget": { "min": 80000, "max": 120000 },
-      "distanceKm": 7.3,
-      "clientRating": 4.7,
-      "postedMinutesAgo": 210,
-      "location": { "address": "Bafoussam, Quartier Tougang" }
+      "providerId": null,
+      "quoteId": null,
+      "missionId": null,
+      "createdAt": "2026-07-22T04:30:00+01:00",
+      "updatedAt": "2026-07-22T04:30:00+01:00"
     }
   ],
-  "meta": {
-    "page": 1,
-    "limit": 20,
-    "total": 11,
-    "totalPages": 1
-  }
+  "meta": { "page": 1, "limit": 20, "total": 5, "totalPages": 1 }
 }
