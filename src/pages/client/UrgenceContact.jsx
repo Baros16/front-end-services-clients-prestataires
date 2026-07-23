@@ -2,91 +2,135 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  PageHeader, Card, Button, Input, AlertBanner, EmptyState,
+  PageHeader, Card, Button, AlertBanner, Avatar,
 } from '../../components/commons';
-import { Phone, UserPlus, Trash2, ArrowLeft } from '../../components/commons';
+import { Send, Info, Phone } from '../../components/commons';
+import { ProviderInfoCard } from '../../components/client/urgency/ProviderInfoCard';
+
+const PRESET_MESSAGES = [
+  "Bonjour, j'ai besoin d'une intervention urgente",
+  "Je suis a l'adresse indiquee, pouvez-vous venir rapidement ?",
+  "Merci de me rappeler d'urgence au plus vite",
+];
+
+const MOCK_PROVIDER = {
+  avatarInitial: 'J',
+  fullName: 'Jean-Claude M.',
+  rating: 4.8,
+  missionsCount: 127,
+  specialty: 'Plombier agree',
+  distance: '0.8 km',
+};
 
 export default function UrgenceContact() {
   const navigate = useNavigate();
-  const [contacts, setContacts] = useState([
-    { id: '1', name: 'Paul Kamga', phone: '691234567' },
-    { id: '2', name: 'Marie Tagne', phone: '698765432' },
-  ]);
-  const [newName, setNewName] = useState('');
-  const [newPhone, setNewPhone] = useState('');
-  const [error, setError] = useState(null);
-  const [sending, setSending] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [sent, setSent] = useState(false);
 
-  const addContact = () => {
-    if (!newName.trim() || !newPhone.trim()) {
-      setError('Nom et téléphone requis');
-      return;
-    }
-    setContacts(prev => [...prev, { id: Date.now().toString(), name: newName.trim(), phone: newPhone.trim() }]);
-    setNewName('');
-    setNewPhone('');
-    setError(null);
+  const handleSendPreset = (text) => {
+    setMessages((prev) => [...prev, { text, isOwn: true }]);
+    setSent(true);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { text: "Je suis en route, arrivee prevue dans 10 min", isOwn: false }]);
+    }, 1200);
   };
 
-  const removeContact = (id) => setContacts(prev => prev.filter(c => c.id !== id));
-
-  const sendAlert = async () => {
-    setSending(true);
-    await new Promise(r => setTimeout(r, 1000));
-    alert(`Alerte envoyée à ${contacts.length} contact(s)`);
-    setSending(false);
+  const handleSend = () => {
+    if (!input.trim()) return;
+    setMessages((prev) => [...prev, { text: input, isOwn: true }]);
+    setInput('');
   };
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-2xl mx-auto">
-      <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/client/urgence')} className="p-2 rounded-lg hover:bg-sl-100">
-          <ArrowLeft size={20} />
-        </button>
-        <PageHeader title="Contacts d'urgence" subtitle="Personnes à prévenir en cas d'urgence" />
-      </div>
+    <div className="p-6 flex flex-col gap-6">
+      <PageHeader title="Contacter un prestataire" subtitle="Intervention urgente" />
 
-      <Card title="Ajouter un contact">
-        <div className="flex flex-col gap-3">
-          <Input label="Nom complet" value={newName} onChange={setNewName} placeholder="Ex: Paul Kamga" />
-          <Input label="Téléphone" value={newPhone} onChange={setNewPhone} placeholder="6XXXXXXXX" />
-          {error && <AlertBanner type="danger" message={error} />}
-          <Button variant="secondary" size="sm" onClick={addContact} disabled={!newName || !newPhone}>
-            <UserPlus size={16} /> Ajouter
-          </Button>
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chat */}
+        <div className="lg:col-span-2 flex flex-col gap-4">
+          {!sent && (
+            <Card title="Messages pre-rediges">
+              <div className="flex flex-col gap-2">
+                {PRESET_MESSAGES.map((msg, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleSendPreset(msg)}
+                    className="text-left w-full p-4 rounded-lg text-sm transition-all active:scale-95"
+                    style={{ border: '1px solid var(--color-sl-200)', background: 'var(--color-surface-subtle)' }}
+                  >
+                    "{msg}"
+                  </button>
+                ))}
+              </div>
+            </Card>
+          )}
 
-      <Card title="Mes contacts">
-        {contacts.length === 0 ? (
-          <EmptyState icon={<Phone size={32} />} title="Aucun contact" description="Ajoutez des contacts d'urgence." />
-        ) : (
-          <div className="flex flex-col gap-2">
-            {contacts.map((c) => (
-              <div key={c.id} className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--color-surface-subtle)' }}>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--color-brand-xlight)' }}>
-                    <Phone size={16} style={{ color: 'var(--color-brand)' }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-sl-700)' }}>{c.name}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-sl-400)' }}>+237 {c.phone}</p>
+          <AlertBanner
+            message="Intervention d'urgence - Le prestataire a ete alerte"
+            type="warning"
+          />
+
+          <AlertBanner
+            message="Temps d'intervention estime : 10 minutes"
+            type="info"
+          />
+
+          {/* Messages */}
+          <Card>
+            <div className="flex flex-col gap-3 min-h-[200px]">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className="max-w-[75%] px-4 py-3 text-sm leading-relaxed"
+                    style={{
+                      background: msg.isOwn ? 'var(--color-sl-900)' : 'var(--color-sl-50)',
+                      color: msg.isOwn ? 'var(--color-sl-50)' : 'var(--color-sl-800)',
+                      borderRadius: msg.isOwn
+                        ? 'var(--radius-lg) var(--radius-sm) var(--radius-lg) var(--radius-lg)'
+                        : 'var(--radius-sm) var(--radius-lg) var(--radius-lg) var(--radius-lg)',
+                      border: msg.isOwn ? 'none' : '1px solid var(--color-sl-200)',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    {msg.text}
                   </div>
                 </div>
-                <button onClick={() => removeContact(c.id)} className="p-2 rounded-lg hover:bg-danger-light transition-colors">
-                  <Trash2 size={16} style={{ color: 'var(--color-danger)' }} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
+              ))}
+            </div>
+          </Card>
 
-      {contacts.length > 0 && (
-        <Button variant="danger" size="lg" className="w-full" onClick={sendAlert} disabled={sending}>
-          {sending ? 'Envoi des alertes SMS...' : `Envoyer une alerte à ${contacts.length} contact(s)`}
-        </Button>
-      )}
+          {/* Input */}
+          <div className="flex gap-3">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Tapez un message..."
+              className="flex-1 px-4 py-3 rounded-lg text-sm outline-none"
+              style={{ border: '1px solid var(--color-sl-300)', background: 'var(--color-surface)' }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            />
+            <Button variant="primary" size="sm" onClick={handleSend} disabled={!input.trim()}>
+              <Send size={16} />
+            </Button>
+          </div>
+        </div>
+
+        {/* Sidebar prestataire */}
+        <div className="flex flex-col gap-4">
+          <ProviderInfoCard provider={MOCK_PROVIDER} />
+          <Card>
+            <div className="flex flex-col gap-2">
+              <Button variant="secondary" size="sm" className="w-full">
+                <Phone size={16} /> Appeler maintenant
+              </Button>
+              <Button variant="secondary" size="sm" className="w-full">
+                <Info size={16} /> Partager ma position
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
