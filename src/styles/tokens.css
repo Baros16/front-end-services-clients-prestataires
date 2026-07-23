@@ -1,5 +1,4 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 @import "tailwindcss";
 @theme {
   /* ── Fonts ── */
@@ -55,6 +54,9 @@
   --color-sl-800: #1E293B;
   --color-sl-900: #0F172A;
 
+  --color-sidebar-client:   #FFFFFF;
+  --color-sidebar-provider: #1B4332;
+  --color-sidebar-admin:    #0F172A;
   /* ── Radius ── */
   --radius-sm: 6px;
   --radius-md: 10px;

@@ -16,7 +16,7 @@ function decodeToken(token) {
   return JSON.parse(atob(base64));
 }
 
-function getCurrentUser() {
+export function getCurrentUser() {
   try {
     const token = localStorage.getItem(ACCESS_KEY);
     if (!token) return null;
@@ -46,10 +46,11 @@ function getCurrentUser() {
 
 // ─── Redirections par rôle ───────────────────────────────────────────────────
 const ROLE_HOME = {
-  CLIENT:   "/client/dashboard",
-  PROVIDER: "/provider/dashboard",
-  ADMIN:    "/admin/dashboard",
-  AGENT:    "/admin/dashboard", // ⚠️ était "SERVICE_CLIENT" — corrigé pour matcher le rôle réel du backend (v2.1). À ajuster si l'espace Service Client obtient sa propre route d'accueil.
+  CLIENT:         "/client/dashboard",
+  PROVIDER:       "/provider/dashboard",
+  ADMIN:          "/admin/dashboard",
+  AGENT:          "/service-client/dashboard",
+  SERVICE_CLIENT: "/service-client/dashboard",
 };
 
 // ─── Composant ───────────────────────────────────────────────────────────────
@@ -90,7 +91,7 @@ function base64UrlEncode(obj) {
     .replace(/=+$/, "");
 }
 
-function buildDevToken(userId, role) {
+export function buildDevToken(userId, role) {
   const header = { alg: "none", typ: "JWT" };
   const payload = {
     userId,
@@ -133,6 +134,6 @@ export function clearMockUser() {
 window.__sl = { setMockUser, clearMockUser };
 console.info(
   "%c[ServiLoc Dev] " +
-  "Connecte-toi via : __sl.setMockUser('CLIENT') | __sl.setMockUser('PROVIDER') | __sl.setMockUser('ADMIN') | __sl.setMockUser('AGENT')",
+  "Connecte-toi via : __sl.setMockUser('CLIENT') | __sl.setMockUser('PROVIDER') | __sl.setMockUser('ADMIN') | __sl.setMockUser('AGENT') | __sl.setMockUser('SERVICE_CLIENT')",
   "color:#1B4332;font-weight:bold"
 );

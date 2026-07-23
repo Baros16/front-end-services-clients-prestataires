@@ -14,9 +14,9 @@
  */
 
 // ─── Navigation & UI ──────────────────────────────────────────
-export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
+export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ArrowLeft, ArrowRight } from 'lucide-react';
 export { X, Menu, Search, SlidersHorizontal }                from 'lucide-react';
-export { Plus, Minus, Check, Copy }                          from 'lucide-react';
+export { Plus, Minus, Check, Copy, Save }                          from 'lucide-react';
 export { LogOut, Settings, Bell, LogIn }                            from 'lucide-react';
 export { House, Home, LayoutDashboard, ChartPie, BarChart3, BriefcaseBusiness, Gavel, MessageSquare} from 'lucide-react';
 
@@ -25,7 +25,7 @@ export { Phone, MessageCircle, Send, Mail }                  from 'lucide-react'
 export { Paperclip, Image , Inbox}                                  from 'lucide-react';
 
 // ─── Utilisateurs & identité ──────────────────────────────────
-export { User, Users, UserCheck, UserX }                     from 'lucide-react';
+export { User, Users, UserCheck, UserX, UserPlus }                     from 'lucide-react';
 export { Shield, ShieldCheck }                               from 'lucide-react';
 
 // ─── Services & missions ──────────────────────────────────────
@@ -41,8 +41,9 @@ export { Star, StarOff }                                     from 'lucide-react'
 
 // ─── Fichiers & documents ─────────────────────────────────────
 export { FileText, File, FileType, FilePlus, FileCheck, FileX, ClipboardList }        from 'lucide-react';
-export { Upload, Download, Trash2, Edit, Eye }               from 'lucide-react';
+export { Upload, Download, Trash2, Edit, Eye, EyeOff }               from 'lucide-react';
+
 
 // ─── Feedback & états ─────────────────────────────────────────
-export { AlertTriangle, Loader2, Loader }                            from 'lucide-react';
+export { AlertTriangle, Loader2, Loader, RefreshCw }                 from 'lucide-react';
 export { ThumbsUp, ThumbsDown }                              from 'lucide-react';

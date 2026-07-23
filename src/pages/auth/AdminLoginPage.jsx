@@ -1,11 +1,102 @@
 // src/pages/auth/AdminLoginPage.jsx
-// TODO Semaine 2 — M5
-import { useLocation } from "react-router-dom";
-import PlaceHolderPage from "../_placeholder";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input, Button, AlertBanner } from "../../components/commons";
+import { Shield, ShieldCheck } from "../../components/commons";
+import { login } from "../../services/authService";
 
 export default function AdminLoginPage() {
-  const { pathname } = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      setError("Tous les champs sont obligatoires");
+      return;
+    }
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await login(email, password);
+      const user = response.user;
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (err) {
+      setError(err.message || "Identifiants incorrects");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <PlaceHolderPage/>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-xl shadow-lg p-8">
+        <div className="flex flex-col items-center mb-8">
+          <div
+            className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+            style={{ background: "var(--color-sidebar-admin, #0F172A)" }}
+          >
+            <ShieldCheck size={28} className="text-white" />
+          </div>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-sl-900)" }}>
+            Administrateur
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "var(--color-sl-500)" }}>
+            Accès réservé à l'administration
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="admin@serviloc.cm"
+            value={email}
+            onChange={(v) => { setEmail(v); setError(""); }}
+            required
+          />
+          <Input
+            label="Mot de passe"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(v) => { setPassword(v); setError(""); }}
+            required
+          />
+        </div>
+
+        {error && (
+          <div className="mt-4">
+            <AlertBanner type="danger" message={error} />
+          </div>
+        )}
+
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full mt-6"
+        >
+          {isSubmitting ? "Connexion..." : "Se connecter"}
+        </Button>
+
+        <div className="text-center mt-6">
+          <button
+            onClick={() => navigate("/auth/login")}
+            className="text-sm hover:underline"
+            style={{ color: "var(--color-brand)" }}
+          >
+            ← Espace client / prestataire
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

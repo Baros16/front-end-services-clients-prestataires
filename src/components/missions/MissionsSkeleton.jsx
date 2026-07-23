@@ -1,5 +1,5 @@
 // src/components/provider/missions/MissionsSkeleton.jsx
-import { SkeletonLoader } from '../../commons';
+import { SkeletonLoader } from '../commons';
 
 export function MissionsSkeleton() {
   return (

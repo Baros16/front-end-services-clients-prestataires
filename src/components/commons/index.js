@@ -20,6 +20,7 @@ export { SearchInput }       from "./SearchInput";
 export { PhotoUploader }     from "./PhotoUploader";
 export { LocationPicker}     from "./LocationPicker";
 export { FileAttachment }    from "./FileAttachment";
+export { AvailabilityToggle } from "./AvailabilityToggle";
 
 // ── Contenu & mise en page ───────────────────────────────────
 export { Card }              from "./Card";
@@ -45,6 +46,7 @@ export { Spinner }           from "./Spinner";
 export { AlertBanner }       from "./AlertBanner";
 export { Toast}              from "./Toast"
 export { EmptyState }        from "./EmptyState";
+export { ErrorState }        from "./ErrorState";
 export { SkeletonLoader }    from "./SkeletonLoader";
 
 // Ajouter à src/components/common/index.js

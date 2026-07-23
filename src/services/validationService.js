@@ -14,7 +14,7 @@ export async function getDossier(providerId) {
     mockDossier.data,
     () => apiClient
       .get(`/admin/providers/${providerId}/dossier`)
-      .then(r => r.data.data),
+      ,
   );
 }
 

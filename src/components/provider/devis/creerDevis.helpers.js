@@ -1,4 +1,4 @@
-// src/pages/provider/creerDevis.helpers.js
+// src/componnents/provider/devis/creerDevis.helpers.js
 // Fonctions utilitaires extraites de CreerDevis.jsx pour alléger le composant
 // et permettre leur réutilisation/leur test isolément.
 

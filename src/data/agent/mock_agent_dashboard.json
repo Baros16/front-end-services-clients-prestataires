@@ -1,0 +1,87 @@
+{
+  "success": true,
+  "data": {
+    "metrics": {
+      "assignedLitiges": 5,
+      "openLitiges": 3,
+      "resolvedThisMonth": 8,
+      "avgResolutionTime": "2.5 jours",
+      "totalAmountSequestred": 287000
+    },
+    "recentLitiges": [
+      {
+        "id": "lit_042",
+        "reference": "LIT-2026-0042",
+        "clientName": "Jean Kamdem",
+        "providerName": "Paul Biya",
+        "motif": "Prestation incomplète",
+        "status": "en_traitement",
+        "assignedAt": "2026-07-20T10:30:00+01:00",
+        "amount": 23000,
+        "priority": "haute"
+      },
+      {
+        "id": "lit_041",
+        "reference": "LIT-2026-0041",
+        "clientName": "Marie Tagne",
+        "providerName": "Simplice Tchinda",
+        "motif": "Non-respect des délais",
+        "status": "ouvert",
+        "assignedAt": "2026-07-19T14:00:00+01:00",
+        "amount": 45000,
+        "priority": "moyenne"
+      },
+      {
+        "id": "lit_040",
+        "reference": "LIT-2026-0040",
+        "clientName": "Pierre Nguemo",
+        "providerName": "Alain Kamga",
+        "motif": "Produit défectueux",
+        "status": "resolu",
+        "assignedAt": "2026-07-18T09:15:00+01:00",
+        "amount": 12000,
+        "priority": "basse"
+      },
+      {
+        "id": "lit_039",
+        "reference": "LIT-2026-0039",
+        "clientName": "Esther Mbah",
+        "providerName": "Christophe Nkwi",
+        "motif": "Litige financier",
+        "status": "en_traitement",
+        "assignedAt": "2026-07-17T11:45:00+01:00",
+        "amount": 89000,
+        "priority": "haute"
+      },
+      {
+        "id": "lit_038",
+        "reference": "LIT-2026-0038",
+        "clientName": "David Fokou",
+        "providerName": "Sylvie Ngo",
+        "motif": "Prestation incomplète",
+        "status": "ouvert",
+        "assignedAt": "2026-07-16T16:30:00+01:00",
+        "amount": 34000,
+        "priority": "moyenne"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "notif_001",
+        "type": "assignment",
+        "message": "Nouveau litige assigné : LIT-2026-0042",
+        "litigeId": "lit_042",
+        "createdAt": "2026-07-20T10:30:00+01:00",
+        "read": false
+      },
+      {
+        "id": "notif_002",
+        "type": "escalation",
+        "message": "Litige LIT-2026-0039 escaladé par l'admin",
+        "litigeId": "lit_039",
+        "createdAt": "2026-07-19T08:00:00+01:00",
+        "read": false
+      }
+    ]
+  }
+}

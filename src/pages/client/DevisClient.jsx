@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// src/pages/client/QuoteDetailPage.jsx
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   PageHeader, StatusBadge, Button,
@@ -10,11 +11,15 @@ import ProviderSummaryCard   from '../../components/client/quote/ProviderSummary
 import PaymentMethodSelector from '../../components/client/quote/PaymentMethodSelector';
 import PaymentMethodPanel from '../../components/client/quote/PaymentMethodPanel';
 import ProviderAvatarReveal from '../../components/client/quote/ProviderAvatarReveal';
-import { getQuoteDetail, acceptQuote, rejectQuote } from '../../services/clientService';
-import { formatXAF } from '../../utils/formatters';
+import { getQuoteDetail, acceptQuote, rejectQuote, getDemandDetail } from '../../services/clientService';
+import { formatXAF, validateCamerounPhone } from '../../utils/formatters';
 
 // Toggle temporaire pour comparer les 2 variantes paiement — à retirer une fois choisie
 const PAYMENT_DISPLAY_MODE = 'inline'; // 'inline' | 'panel'
+
+// Polling de confirmation de paiement (push USSD) — 5s x 12 tentatives = 60s
+const POLL_INTERVAL_MS = 5000;
+const POLL_MAX_ATTEMPTS = 12;
 
 const STATUS_VARIANT = {
   en_attente: 'en_attente',
@@ -31,9 +36,22 @@ export default function QuoteDetailPage() {
   const [loading,        setLoading]        = useState(true);
   const [error,          setError]          = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('orange_money');
+  const [phoneNumber,    setPhoneNumber]    = useState('');
   const [panelOpen,      setPanelOpen]      = useState(false);
   const [accepting,      setAccepting]      = useState(false);
   const [rejecting,      setRejecting]      = useState(false);
+
+  // 'idle' | 'confirming' | 'timeout' — état du paiement après le push USSD
+  const [paymentState, setPaymentState] = useState('idle');
+  const pollIntervalRef = useRef(null);
+  const pollAttemptsRef = useRef(0);
+
+  const phoneValidation = phoneNumber.length === 9
+  ? validateCamerounPhone(`+237${phoneNumber}`)
+  : null;
+const isPhoneValid = phoneValidation?.valid && phoneValidation.operator === selectedMethod;
+
+
 
   useEffect(() => {
     getQuoteDetail(id)
@@ -42,18 +60,46 @@ export default function QuoteDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  async function handleAccept() {
-    if (!selectedMethod) return;
-    setAccepting(true);
-    setError(null);
-    try {
-      await acceptQuote(quote.demandId, selectedMethod);
-      navigate(`/client/suivi/${quote.demandId}`);
-    } catch {
-      setError("Erreur lors de l'acceptation. Veuillez réessayer.");
-      setAccepting(false);
-    }
+  useEffect(() => {
+    // Coupe le polling si l'utilisateur quitte la page en attente de confirmation
+    return () => clearInterval(pollIntervalRef.current);
+  }, []);
+
+  function startPolling() {
+    pollAttemptsRef.current = 0;
+    pollIntervalRef.current = setInterval(async () => {
+      pollAttemptsRef.current += 1;
+      try {
+        const demand = await getDemandDetail(quote.demandId);
+        if (demand?.status === 'en_cours' && demand?.missionId) {
+          clearInterval(pollIntervalRef.current);
+          navigate(`/client/missions/${demand.missionId}`);
+          return;
+        }
+      } catch {
+        // erreur ponctuelle de polling : on ignore et on retente au prochain tick
+      }
+      if (pollAttemptsRef.current >= POLL_MAX_ATTEMPTS) {
+        clearInterval(pollIntervalRef.current);
+        setPaymentState('timeout');
+      }
+    }, POLL_INTERVAL_MS);
   }
+
+  async function handleAccept() {
+  if (!selectedMethod || !isPhoneValid) return;
+  setAccepting(true);
+  setError(null);
+  try {
+    await acceptQuote(quote.demandId, quote.id, selectedMethod, `+237${phoneNumber}`);
+    setAccepting(false);
+    setPaymentState('confirming');
+    startPolling();
+  } catch {
+    setError("Erreur lors de l'acceptation. Veuillez réessayer.");
+    setAccepting(false);
+  }
+}
 
   async function handleReject() {
     if (!window.confirm('Confirmer le refus de ce devis ?')) return;
@@ -163,45 +209,81 @@ export default function QuoteDetailPage() {
           </div>
 
           {/* Mode paiement inline — visible si PAYMENT_DISPLAY_MODE === 'inline' */}
-          {PAYMENT_DISPLAY_MODE === 'inline' && (
+          {PAYMENT_DISPLAY_MODE === 'inline' && paymentState === 'idle' && (
             <div className="lg:hidden">
-              <PaymentMethodSelector value={selectedMethod} onChange={setSelectedMethod} />
+              <PaymentMethodSelector
+                value={selectedMethod}
+                onChange={setSelectedMethod}
+                phoneNumber={phoneNumber}
+                onPhoneChange={setPhoneNumber}
+              />
             </div>
           )}
 
-          {/* Boutons — toujours sur une ligne, mêmes en mobile */}
-          <div
-            className="grid grid-cols-2 gap-2 sm:gap-3 sl-animate-fade-in"
-            style={{ animationDelay: '180ms', animationFillMode: 'both' }}
-          >
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={handleReject}
-              disabled={busy}
-              className="w-full !bg-[var(--color-danger)]/10 !text-[var(--color-danger)] !border-[var(--color-danger)]/30 hover:!bg-[var(--color-danger)]/15 text-[13px] sm:text-[15px] px-3 sm:px-7"
+          {/* État : en attente de confirmation du paiement (push USSD envoyé) */}
+          {paymentState === 'confirming' && (
+            <div
+              className="rounded-[var(--radius-lg)] border border-[var(--color-sl-200)] bg-[var(--color-sl-50)] px-5 py-4 flex items-center gap-3 sl-animate-fade-in"
             >
-              <X size={14} className="shrink-0" />
-              <span className="truncate">{rejecting ? 'Refus...' : 'Refuser'}</span>
-            </Button>
+              <span className="w-5 h-5 border-2 border-[var(--color-sl-400)] border-t-transparent rounded-full animate-spin shrink-0" />
+              <p className="text-sm text-[var(--color-sl-700)]">
+                Tapez *126# ou #150# pour confirmer le paiement sur votre téléphone.
+              </p>
+            </div>
+          )}
 
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={PAYMENT_DISPLAY_MODE === 'panel' ? () => setPanelOpen(true) : handleAccept}
-              disabled={busy}
-              className="w-full group !bg-[var(--color-sl-900)] hover:!bg-[var(--color-sl-800)] text-[13px] sm:text-[15px] px-3 sm:px-7"
+          {/* État : timeout — pas de confirmation reçue après 60s */}
+          {paymentState === 'timeout' && (
+            <div className="rounded-[var(--radius-lg)] border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/5 px-5 py-4 space-y-3 sl-animate-fade-in">
+              <p className="text-sm text-[var(--color-danger)]">
+                Nous n'avons pas pu confirmer votre paiement. Vérifiez votre téléphone ou réessayez.
+              </p>
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full"
+                onClick={() => { setPaymentState('idle'); handleAccept(); }}
+              >
+                Réessayer
+              </Button>
+            </div>
+          )}
+
+          {/* Boutons — toujours sur une ligne, mêmes en mobile. Masqués pendant la confirmation/timeout du paiement. */}
+          {paymentState === 'idle' && (
+            <div
+              className="grid grid-cols-2 gap-2 sm:gap-3 sl-animate-fade-in"
+              style={{ animationDelay: '180ms', animationFillMode: 'both' }}
             >
-              <span className="truncate">
-                {accepting
-                  ? 'Traitement...'
-                  : `Payer ${formatXAF(quote.totalAmount)}`}
-              </span>
-              <span className="hidden sm:flex w-7 h-7 rounded-full bg-white/10 items-center justify-center shrink-0 ml-2 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-110 group-hover:translate-x-0.5">
-                <CheckCircle size={14} className="text-white" />
-              </span>
-            </Button>
-          </div>
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={handleReject}
+                disabled={busy}
+                className="w-full !bg-[var(--color-danger)]/10 !text-[var(--color-danger)] !border-[var(--color-danger)]/30 hover:!bg-[var(--color-danger)]/15 text-[13px] sm:text-[15px] px-3 sm:px-7"
+              >
+                <X size={14} className="shrink-0" />
+                <span className="truncate">{rejecting ? 'Refus...' : 'Refuser'}</span>
+              </Button>
+
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={PAYMENT_DISPLAY_MODE === 'panel' ? () => setPanelOpen(true) : handleAccept}
+                disabled={busy || (PAYMENT_DISPLAY_MODE === 'inline' && !isPhoneValid)}
+                className="w-full group !bg-[var(--color-sl-900)] hover:!bg-[var(--color-sl-800)] text-[13px] sm:text-[15px] px-3 sm:px-7"
+              >
+                <span className="truncate">
+                  {accepting
+                    ? 'Traitement...'
+                    : `Payer ${formatXAF(quote.totalAmount)}`}
+                </span>
+                <span className="hidden sm:flex w-7 h-7 rounded-full bg-white/10 items-center justify-center shrink-0 ml-2 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-110 group-hover:translate-x-0.5">
+                  <CheckCircle size={14} className="text-white" />
+                </span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* ── COLONNE DROITE — desktop uniquement ─────────────────── */}
@@ -210,19 +292,26 @@ export default function QuoteDetailPage() {
           style={{ animationDelay: '90ms', animationFillMode: 'both' }}
         >
           <ProviderSummaryCard provider={quote.provider} />
-          {PAYMENT_DISPLAY_MODE === 'inline' && (
-            <PaymentMethodSelector value={selectedMethod} onChange={setSelectedMethod} />
+          {PAYMENT_DISPLAY_MODE === 'inline' && paymentState === 'idle' && (
+            <PaymentMethodSelector
+              value={selectedMethod}
+              onChange={setSelectedMethod}
+              phoneNumber={phoneNumber}
+              onPhoneChange={setPhoneNumber}
+            />
           )}
         </div>
       </div>
 
       {/* Panel paiement détaché — actif si PAYMENT_DISPLAY_MODE === 'panel' */}
-      {PAYMENT_DISPLAY_MODE === 'panel' && (
+      {PAYMENT_DISPLAY_MODE === 'panel' && paymentState === 'idle' && (
         <PaymentMethodPanel
           open={panelOpen}
           value={selectedMethod}
           onChange={setSelectedMethod}
           onClose={() => setPanelOpen(false)}
+          phoneNumber={phoneNumber}
+          onPhoneChange={setPhoneNumber}
         />
       )}
     </div>

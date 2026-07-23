@@ -2,7 +2,7 @@
 import { Card } from '../../commons/Card';
 import { Button } from '../../commons/Button';
 import { Plus, X } from '../../commons/Icons';
-import { formatXAF } from './formatXAF';
+import { formatXAF } from '../../../utils/formatters';
 
 let localId = 0;
 const nextLocalId = () => `mat_local_${Date.now()}_${localId++}`;
@@ -11,27 +11,15 @@ export function createEmptyMaterial() {
   return { id: nextLocalId(), designation: '', quantity: 1, unitPrice: 0 };
 }
 
-/**
- * SectionCard · Matériaux
- * Contient QuoteMaterialsTable — une ligne par matériau, avec ajout/suppression
- * et sous-total calculé en direct (designation × quantité × prix unitaire).
- *
- * Props
- * - materials: [{ id, designation, quantity, unitPrice }]
- * - onChange(nextMaterials)git add src/components/client/clients/demandes/ \
-        src/components/provider/demandedisponible/ \
-        src/components/provider/devis/ \
-        src/pages/client/NouvelleDemande.jsx \
-        src/pages/provider/CreerDevis.jsx \
-        src/pages/provider/DemandesDisponibles.jsx \
-        src/services/clentService.js \
-        src/services/providerService.js \
-        src/styles/tokens.css \
-        src/data/provider/mock_available_demands.json
+// ── Une ligne est "remplie" si désignation non vide ET prix unitaire > 0 ──
+function isMaterialFilled(material) {
+  return Boolean(material.designation.trim()) && Number(material.unitPrice) > 0;
+}
 
-git commit -m "backup: demandes disponible, creer devis, nouvelle demande"
- */
 export function MaterialsSection({ materials, onChange }) {
+  const lastMaterial = materials[materials.length - 1];
+  const canAddRow = materials.length === 0 || isMaterialFilled(lastMaterial);
+
   const updateRow = (id, patch) => {
     onChange(materials.map((m) => (m.id === id ? { ...m, ...patch } : m)));
   };
@@ -41,7 +29,13 @@ export function MaterialsSection({ materials, onChange }) {
   };
 
   const addRow = () => {
+    if (!canAddRow) return;
     onChange([...materials, createEmptyMaterial()]);
+  };
+
+  const handleUnitPriceChange = (id, rawValue) => {
+    const digitsOnly = rawValue.replace(/[^0-9]/g, '');
+    updateRow(id, { unitPrice: digitsOnly === '' ? 0 : Number(digitsOnly) });
   };
 
   const materialsTotal = materials.reduce(
@@ -51,25 +45,37 @@ export function MaterialsSection({ materials, onChange }) {
 
   return (
     <Card className="p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-4 mb-4">
+      <div className="flex items-center justify-between gap-4 mb-1">
         <h2 className="font-display text-sm font-semibold tracking-wide text-sl-500 uppercase">
           Matériaux nécessaires
         </h2>
-        <Button variant="ghost" size="sm" onClick={addRow} className="shrink-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={addRow}
+          disabled={!canAddRow}
+          className="shrink-0"
+        >
           <Plus className="w-4 h-4" />
           <span className="hidden xs:inline">Ajouter une ligne</span>
           <span className="xs:hidden">Ajouter</span>
         </Button>
       </div>
 
+      {!canAddRow && (
+        <p className="text-xs text-sl-400 text-right mb-3">
+          Complétez la désignation et le prix unitaire avant d'ajouter une nouvelle ligne.
+        </p>
+      )}
+
       {materials.length === 0 ? (
-        <p className="text-sm text-sl-400 py-6 text-center border border-dashed border-sl-200 rounded-md">
+        <p className="text-sm text-sl-400 py-6 text-center border border-dashed border-sl-200 rounded-md mt-3">
           Aucun matériau ajouté. Cliquez sur « Ajouter une ligne » si nécessaire.
         </p>
       ) : (
         <>
           {/* ── Desktop / tablet : tableau ── */}
-          <div className="hidden sm:block overflow-x-auto">
+          <div className="hidden sm:block overflow-x-auto mt-3">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs font-semibold tracking-wide text-sl-500 uppercase border-b border-sl-200">
@@ -106,21 +112,15 @@ export function MaterialsSection({ materials, onChange }) {
                         />
                       </td>
                       <td className="py-2.5 px-3">
-                     
-                    <td className="py-2.5 px-3">
-                    <input
-                    type="text"
-                    inputMode="numeric"
-                   value={m.unitPrice === 0 ? '' : m.unitPrice}
-                   onChange={(e) => {
-                  const digitsOnly = e.target.value.replace(/[^0-9]/g, '');
-                 updateRow(m.id, { unitPrice: digitsOnly === '' ? 0 : Number(digitsOnly) });
-                 }}
-                 placeholder="0"
-                 className="w-full rounded-md border border-sl-200 bg-surface px-2.5 py-1.5 text-sm
-                focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light"
-                />
-              </td>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={m.unitPrice === 0 ? '' : m.unitPrice}
+                          onChange={(e) => handleUnitPriceChange(m.id, e.target.value)}
+                          placeholder="0"
+                          className="w-full rounded-md border border-sl-200 bg-surface px-2.5 py-1.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light"
+                        />
                       </td>
                       <td className="py-2.5 pl-3 text-right font-semibold text-sl-900 whitespace-nowrap">
                         {formatXAF(subtotal)}
@@ -143,7 +143,7 @@ export function MaterialsSection({ materials, onChange }) {
           </div>
 
           {/* ── Mobile : cartes empilées ── */}
-          <div className="sm:hidden flex flex-col gap-3">
+          <div className="sm:hidden flex flex-col gap-3 mt-3">
             {materials.map((m) => {
               const subtotal = (Number(m.quantity) || 0) * (Number(m.unitPrice) || 0);
               return (
@@ -184,11 +184,11 @@ export function MaterialsSection({ materials, onChange }) {
                     <label className="flex flex-col gap-1">
                       <span className="text-[11px] font-semibold text-sl-500 uppercase">P.U (XAF)</span>
                       <input
-                        type="number"
-                        min={0}
-                        step={100}
-                        value={m.unitPrice}
-                        onChange={(e) => updateRow(m.id, { unitPrice: Number(e.target.value) })}
+                        type="text"
+                        inputMode="numeric"
+                        value={m.unitPrice === 0 ? '' : m.unitPrice}
+                        onChange={(e) => handleUnitPriceChange(m.id, e.target.value)}
+                        placeholder="0"
                         className="rounded-md border border-sl-200 bg-surface px-2.5 py-1.5 text-sm
                           focus:outline-none focus:ring-2 focus:ring-brand-light/40 focus:border-brand-light"
                       />

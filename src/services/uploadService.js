@@ -33,7 +33,7 @@ export async function uploadPhotos(files, context) {
     buildMockUpload("photo", files[0]),
     () => apiClient
       .post(`/uploads/photos`, formData, { headers: { "Content-Type": "multipart/form-data" } })
-      .then(r => r.data.data),
+      ,
   );
 }
 
@@ -51,6 +51,6 @@ export async function uploadDocument(file, type) {
     buildMockUpload("doc", file),
     () => apiClient
       .post(`/uploads/documents`, formData, { headers: { "Content-Type": "multipart/form-data" } })
-      .then(r => r.data.data),
+      ,
   );
 }

@@ -1,7 +1,7 @@
 // src/hooks/useProviderLocation.js
 import { useState, useEffect, useCallback } from 'react';
 import { usePolling }        from './usePolling';
-import { getMissionDetails } from '../services/clientService';
+import { getMission } from '../services/clientService';
 
 const POLL_INTERVAL_MS = 10_000; // 10s — position non critique, pas besoin de plus
 
@@ -40,7 +40,7 @@ export function useProviderLocation(missionId) {
     setLoading(true);
     setError(null);
 
-    getMissionDetails(missionId)
+    getMission(missionId)
       .then(mission => {
         if (cancelled) return;
         setProviderLocation(mission.providerLocation ?? null);
@@ -62,7 +62,7 @@ export function useProviderLocation(missionId) {
   const poll = useCallback(async () => {
     if (!missionId) return;
     try {
-      const mission = await getMissionDetails(missionId);
+      const mission = await getMission(missionId);
       setProviderLocation(mission.providerLocation ?? null);
       setMissionStatus(mission.status);
     } catch {

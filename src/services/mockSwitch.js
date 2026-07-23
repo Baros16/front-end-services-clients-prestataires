@@ -1,6 +1,6 @@
 
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true";
+const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
 console.log("[mockSwitch] VITE_USE_MOCK =", import.meta.env.VITE_USE_MOCK);
 console.log("[mockSwitch] USE_MOCK =", USE_MOCK);
 

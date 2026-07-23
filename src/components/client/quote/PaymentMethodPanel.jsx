@@ -1,24 +1,38 @@
 // src/components/client/quote/PaymentMethodPanel.jsx
+import { useMemo } from 'react';
 import { Button } from '../../commons';
 import { X } from '../../commons';
+import { validateCamerounPhone } from '../../../utils/formatters';
 
 const METHODS = [
   { id: 'orange_money', label: 'Orange Money',     dot: '#FF6600' },
   { id: 'mtn_momo',     label: 'MTN Mobile Money', dot: '#FFCB00' },
 ];
 
-export default function PaymentMethodPanel({ open, value, onChange, onClose }) {
+export default function PaymentMethodPanel({ open, value, onChange, onClose, phoneNumber, onPhoneChange }) {
+  const validation = useMemo(() => {
+    if (phoneNumber.length < 9) return null;
+    return validateCamerounPhone(`+237${phoneNumber}`);
+  }, [phoneNumber]);
+
+  const operatorMismatch = validation?.valid && validation.operator !== value;
+  const hasError = (validation && !validation.valid) || operatorMismatch;
+  const isPhoneValid = validation?.valid && validation.operator === value;
+
+  function handlePhoneChange(e) {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
+    onPhoneChange(digits);
+  }
+
   if (!open) return null;
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300"
         onClick={onClose}
       />
 
-      {/* Panel — bottom sheet mobile, side panel desktop */}
       <div
         className={[
           'fixed z-50 bg-white shadow-[var(--shadow-md)]',
@@ -46,7 +60,7 @@ export default function PaymentMethodPanel({ open, value, onChange, onClose }) {
                 type="button"
                 variant={selected ? 'secondary' : 'ghost'}
                 size="lg"
-                onClick={() => { onChange(method.id); onClose(); }}
+                onClick={() => onChange(method.id)}
                 className={[
                   'w-full justify-start gap-3',
                   selected ? '!bg-[var(--color-brand-xlight)]' : '',
@@ -58,6 +72,42 @@ export default function PaymentMethodPanel({ open, value, onChange, onClose }) {
             );
           })}
         </div>
+
+        {value && (
+          <div className="mt-4">
+            <label className="text-[10px] font-semibold tracking-[0.14em] uppercase text-[var(--color-sl-400)]">
+              Numéro {value === 'orange_money' ? 'Orange Money' : 'MTN Mobile Money'}
+            </label>
+            <input
+              type="tel"
+              inputMode="numeric"
+              placeholder="6XX XXX XXX"
+              value={phoneNumber}
+              onChange={handlePhoneChange}
+              className={[
+                'mt-1 w-full rounded-[var(--radius-lg)] border px-3 py-2 text-sm',
+                hasError ? 'border-[var(--color-danger)]' : 'border-[var(--color-sl-200)]',
+              ].join(' ')}
+            />
+            {validation && !validation.valid && (
+              <p className="mt-1 text-xs text-[var(--color-danger)]">{validation.message}</p>
+            )}
+            {operatorMismatch && (
+              <p className="mt-1 text-xs text-[var(--color-danger)]">
+                Ce numéro correspond à {validation.operator === 'orange_money' ? 'Orange Money' : 'MTN Mobile Money'}, pas à {value === 'orange_money' ? 'Orange Money' : 'MTN Mobile Money'}.
+              </p>
+            )}
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full mt-3"
+              onClick={onClose}
+              disabled={!isPhoneValid}
+            >
+              Confirmer
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

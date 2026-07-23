@@ -1,7 +1,7 @@
 // src/pages/client/ChatPage.jsx
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams }                   from 'react-router-dom';
+import { useParams, useNavigate }      from 'react-router-dom';
 
 import { MessageBubble }  from '../../components/client/chat/MessageBubble';
 import { MessageSkeleton } from '../../components/client/chat/MessageSkeleton';
@@ -16,10 +16,11 @@ import {
   Toast,
   Phone,
   Info,
+  FileText,
 } from '../../components/commons';
 
 import { useChat }                from '../../hooks/useChat';
-import { getConversationContext } from '../../services/chatService';
+import { getConversationContext, getConversations } from '../../services/chatService';
 
 // ─── Header squelette ─────────────────────────────────────────────────────────
 function HeaderSkeleton() {
@@ -48,6 +49,7 @@ const MSG_ANIM = `
 
 // ─── ChatPage ─────────────────────────────────────────────────────────────────
 export default function ChatPage() {
+  const navigate = useNavigate();
   const { conversationId: paramId } = useParams();
   const activeId = paramId ?? 'conv_001';
 
@@ -68,6 +70,9 @@ export default function ChatPage() {
   const [contextLoading, setContextLoading] = useState(true);
   const [panelOpen,      setPanelOpen]      = useState(false);
 
+  // ── Détection devis sur la conversation courante ─────────────────────────
+  const [convData, setConvData] = useState(null);
+
   useEffect(() => {
     setContext(null);
     setContextLoading(true);
@@ -75,6 +80,14 @@ export default function ChatPage() {
       .then(setContext)
       .catch(console.error)
       .finally(() => setContextLoading(false));
+  }, [activeId]);
+
+  // Récupère les métadonnées de la conversation (hasQuote, quoteStatus, demandId)
+  useEffect(() => {
+    getConversations().then((list) => {
+      const found = list.find((c) => c.id === activeId);
+      if (found) setConvData(found);
+    }).catch(console.error);
   }, [activeId]);
 
   // Scroll automatique au dernier message
@@ -140,6 +153,8 @@ export default function ChatPage() {
   );
 
   // ── Actions header ───────────────────────────────────────────────────────
+  const hasQuote = convData?.hasQuote === true;
+
   const headerActions = (
     <div className="flex items-center gap-1.5 shrink-0">
       <Button variant="ghost" size="sm"
@@ -153,6 +168,18 @@ export default function ChatPage() {
         disabled={!context?.provider?.phone}>
         <Phone size={15} />
       </Button>
+
+      {hasQuote && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/client/devis/${convData.demandId}`)}
+          className="hidden sm:inline-flex items-center gap-1"
+        >
+          <FileText size={14} />
+          Voir le devis
+        </Button>
+      )}
 
       {context?.mission && (
         <div className="hidden sm:block">

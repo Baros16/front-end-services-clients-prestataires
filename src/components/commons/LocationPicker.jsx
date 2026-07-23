@@ -99,6 +99,7 @@ export function LocationPicker({
 
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
+        console.log('[GEO] coords brutes', coords.latitude, coords.longitude);
         const { latitude: lat, longitude: lng } = coords;
         const addr = await reverseGeocode(lat, lng);
         setInputText(addr);

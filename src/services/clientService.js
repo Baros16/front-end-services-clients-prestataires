@@ -5,6 +5,7 @@ import mockClientDashboard from "../data/client/mock_dashboard.json";
 import mockDemands from "../data/client/mock_demands.json";
 import mockQuote from "../data/client/mock_quote.json";
 import mockMission from "../data/client/mock_mission.json";
+import mockProvidersSearch from "../data/client/mock_providers_search.json";
 
 // ─── En-tête du fichier — ajout ────────────────────────────────────────────
 function normalizeStatus(obj) {
@@ -34,13 +35,40 @@ export async function getClientDemands(params = {}) {
     mockDemands,
     () => apiClient.get(`/client/demands`, { params }),
   );
-  return { ...result, data: result.data.map(normalizeStatus) };
+  let data = result.data.map(normalizeStatus);
+  // Appliquer le filtre par statut en mode mock
+  if (params.status) {
+    data = data.filter((d) => d.status === params.status);
+  }
+  return { ...result, data };
 }
 
 /**
- * Créer une nouvelle demande.
- * payload : { categoryId, description, location, isUrgent, estimatedBudget, photoIds }
+ * Détail complet d'une demande du client.
+ * GET /client/demands/:demandId renvoie un objet <Demand> unique (pas une liste).
  */
+export async function getDemandDetail(demandId) {
+  const result = await getMock(
+    { data: mockDemands.data.find((d) => d.id === demandId) ?? null },
+    () => apiClient.get(`/client/demands/${demandId}`),
+  );
+  return result ? normalizeStatus(result) : null;
+}
+
+/**
+ * Liste des postulants (prestataires ayant postulé) pour une demande donnée.
+ */
+export async function getDemandApplications(demandId) {
+  // Import dynamique pour éviter les imports circulaires
+  const mockApplications = await import('../data/client/mock_demand_applications.json');
+  const result = await getMock(
+    mockApplications,
+    () => apiClient.get(`/client/demands/${demandId}/applications`),
+  );
+  const list = Array.isArray(result) ? result : (result?.data ?? []);
+  return list.filter((app) => app.demandId === demandId);
+}
+
 export async function createDemand(payload) {
   return getMock(
     { data: { success: true, data: payload } },
@@ -75,9 +103,11 @@ export function getQuoteDetail(quoteId) {
 
 /**
  * Accepter un devis et déclencher le paiement.
+ * Le backend renvoie un ApiResponseVoid (data vide) : cette requête initie
+ * seulement le push USSD, elle ne confirme pas le paiement. La confirmation
+ * doit être vérifiée séparément via polling sur getDemandDetail().
  */
 export async function acceptQuote(demandId, quoteId, paymentMethod, phoneNumber) {
-  // AcceptQuoteRequest réel exige { quoteId, paymentMethod, phoneNumber } — les 3 requis.
   return getMock(
     { data: { success: true, data: { demandId, status: "en_cours", paymentMethod } } },
     () => apiClient.post(`/client/demands/${demandId}/quote/accept`, { quoteId, paymentMethod, phoneNumber }),
@@ -94,6 +124,15 @@ export async function rejectQuote(demandId) {
   );
 }
 
+
+export async function getClientMissions() {
+  const result = await getMock(
+    mockMission,
+    () => apiClient.get(`/client/missions`),
+  );
+  return Array.isArray(result) ? result.map(normalizeStatus) : [];
+}
+
 /**
  * Détail d'une mission en cours.
  */
@@ -104,16 +143,6 @@ export async function getMission(missionId) {
   );
   return normalizeStatus(result);
 }
-
-export async function getMissionDetails(missionId) {
-  const result = await getMock(
-    mockMission.data,
-    () => apiClient.get(`/client/missions/${missionId}`).then(r => r.data.data),
-  );
-  return normalizeStatus(result);
-}
-
-
 
 /**
  * Valider une mission terminée.
@@ -147,3 +176,14 @@ export async function createLitige(missionId, payload) {
   );
 }
 
+/**
+ * Rechercher des prestataires (mode urgence).
+ * ⚠️ v2.1 : endpoint temporaire en mock — route API à définir avec le backend.
+ * params : { query, category, page, limit }
+ */
+export async function searchProviders(params = {}) {
+  return getMockList(
+    mockProvidersSearch,
+    () => apiClient.get(`/client/providers/search`, { params }),
+  );
+}

@@ -1,5 +1,5 @@
 // src/components/client/demand/StepIndicator.jsx
-import { Check } from '../../../../components/commons/Icons';
+import { Check } from '../../commons';
 
 /**
  * StepIndicator — Indicateur de progression multi-étapes

@@ -1,16 +1,8 @@
 // src/components/provider/quote/MainDoeuvreSection.jsx
 import { useState } from 'react';
-import { Card } from '../../commons/Card';
-import { Input } from '../../commons/Input';
-/**
- * SectionCard · Main d'oeuvre
- * Regroupe FormField-Description et FormField-Montant.
- *
- * Props
- * - laborDescription, laborAmount : valeurs contrôlées
- * - onDescriptionChange(value), onAmountChange(value)
- * - errors: { laborDescription?: string, laborAmount?: string }
- */
+import { Card, Input } from '../../commons';
+
+
 export function MainDoeuvreSection({
   laborDescription,
   laborAmount,

@@ -1,7 +1,237 @@
-import PlaceHolderPage from "../_placeholder";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Input, AlertBanner } from "../../components/commons";
+import { PhoneInput } from "../../components/auth/PhoneInput";
+import { RoleSwitcher } from "../../components/auth/RoleSwitcher";
+import { validateCamerounPhone } from "../../utils/formatters";
+import { register } from "../../services/authService.js";
+import { Eye, EyeOff } from "../../components/commons";
 
-export default function RegisterPage(){
-    return(
-        <PlaceHolderPage/>
-    )
+export default function RegisterPage() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [role, setRole] = useState("client");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const clearError = () => {
+    setError("");
+  };
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    clearError();
+  };
+
+  const handleSubmit = async () => {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.phone ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Tous les champs sont obligatoires");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Email invalide. Format attendu nom@gmail.com");
+      return;
+    }
+
+    const phoneRegex = /^\+237[0-9]{9}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setError("Téléphone invalide. Format attendu: +237XXXXXXXXX");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères");
+      return;
+    }
+
+    if (formData.firstName.length < 4 || formData.lastName.length < 4) {
+      setError("Le prénom et le nom doivent contenir au moins 4 caractères");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    // Validation du téléphone Cameroun
+    const phoneValidation = validateCamerounPhone(formData.phone);
+    if (!phoneValidation.valid) {
+      setError(phoneValidation.message);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const payload = {
+        role,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+      };
+
+      await register(payload);
+
+      // Stockage de l'email (verifyOtp attend email maintenant)
+      sessionStorage.setItem("pendingEmail", payload.email);
+      sessionStorage.setItem("pendingPhone", formData.phone);
+
+      // Redirection vers OTP avec email en paramètre
+      navigate(`/auth/otp?email=${encodeURIComponent(payload.email)}`);
+    } catch (err) {
+      setError(err.message || "Une erreur est survenue.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md  rounded-xl shadow-lg p-8">
+        <h1 className="text-2xl font-bold mb-2">Créer un compte</h1>
+        <p className="text-gray-500 mb-6">
+          Commencez gratuitement dès aujourd'hui
+        </p>
+
+        <RoleSwitcher role={role} onChange={setRole} />
+
+        <div className="space-y-4">
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Prénom"
+              placeholder="Ex: Madeleine"
+              value={formData.firstName}
+              onChange={(value) => handleChange("firstName", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Nom"
+              placeholder="Ex: Kamdem"
+              value={formData.lastName}
+              onChange={(value) => handleChange("lastName", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <PhoneInput
+              label="Téléphone"
+              placeholder="6XXXXXXXX"
+              value={formData.phone}
+              onChange={(value) => handleChange("phone", value)}
+              required
+              error={error.phone}
+            />
+          </div>
+
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Email"
+              type="email"
+              placeholder="vous@email.com"
+              value={formData.email}
+              onChange={(value) => handleChange("email", value)}
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Mot de passe"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(value) => handleChange("password", value)}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+              required
+            />
+          </div>
+          <div onFocusCapture={clearError}>
+            <Input
+              label="Confirmation mot de passe"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(value) => handleChange("confirmPassword", value)}
+              rightIcon={
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              }
+              required
+            />
+          </div>
+        </div>
+
+        {error && (
+          <div className="mt-4">
+            <AlertBanner type="danger" message={error} />
+          </div>
+        )}
+
+        <Button
+          variant="primary"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full mt-6"
+        >
+          {isSubmitting ? "Création en cours..." : "Créer mon compte"}
+        </Button>
+
+        <div className="text-center mt-4">
+          <span className="text-gray-500">Déjà inscrit ? </span>
+          <button
+            onClick={() => navigate("/auth/login")}
+            className="text-black underline font-medium"
+          >
+            Se connecter
+          </button>
+        </div>
+
+        <div className="mt-4">
+          <AlertBanner
+            type="info"
+            message="Un code par Email vous sera envoyé pour valider votre numéro de téléphone."
+          />
+        </div>
+      </div>
+    </div>
+  );
 }

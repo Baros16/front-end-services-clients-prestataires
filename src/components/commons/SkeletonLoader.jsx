@@ -1,11 +1,4 @@
-// src/components/SkeletonLoader.jsx
 
-/**
- * SkeletonLoader
- * Placeholder animé (shimmer) pendant le chargement des données.
- * variants : card | row | metric | text
- * count    : nombre de répétitions
- */
 
 function ShimmerBlock({ height, width = "100%", rounded = false, className = "" }) {
   return (

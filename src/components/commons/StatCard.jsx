@@ -29,7 +29,7 @@ export function StatCard({
         {label}
       </span>
 
-      <span className="font-[family-name:var(--font-display)] text-[26px] font-extrabold text-sl-900 leading-none">
+      <span className="font-[family-name:var(--font-body)] text-[26px] font-extrabold text-sl-900 leading-none">
         {value}
       </span>
 

@@ -130,14 +130,10 @@ export async function envoyerRappelSMS(providerId, documents = []) {
 // ⚠️ Écran existant mais ne consomme pas encore ces fonctions — à corriger.
 
 export async function getManagedUsers(params = {}) {
-  if (USE_MOCK) {
-    return getMockList(mockManagedUsers, () => {});
-  }
-  const response = await apiClient.get(`/admin/users`, { params });
-  return {
-    data: response.data?.data?.users ?? [],
-    meta: response.data?.data?.meta ?? response.data?.meta ?? {},
-  };
+  return getMockList(
+    mockManagedUsers,
+    () => apiClient.get(`/admin/users`, { params }),
+  );
 }
 
 export async function suspendUser(userId, reason) {
@@ -175,5 +171,29 @@ export async function assignLitige(litigeId, agentId) {
   return getMock(
     { data: { success: true, litigeId, agentId, status: "assigne" } },
     () => apiClient.post(`/admin/litiges/${litigeId}/assign`, { agentId }),
+  );
+}
+
+/**
+ * Stats globales pour les pages Commissions et Paiements.
+ * Retourne les commissions et transactions mockées.
+ */
+export async function getAdminStats() {
+  return getMock(
+    {
+      data: {
+        commissions: [
+          { id: "c1", reference: "TRX-001", providerName: "Jean Kamga", amount: 50000, commissionRate: 10, commissionAmount: 5000, date: "2026-05-15" },
+          { id: "c2", reference: "TRX-002", providerName: "Marie Tagne", amount: 75000, commissionRate: 10, commissionAmount: 7500, date: "2026-05-16" },
+          { id: "c3", reference: "TRX-003", providerName: "Paul Biya", amount: 120000, commissionRate: 10, commissionAmount: 12000, date: "2026-05-17" },
+        ],
+        payments: [
+          { id: "p1", reference: "PAY-001", type: "paiement", clientName: "Alice", providerName: "Jean Kamga", amount: 50000, status: "debloque", date: "2026-05-15" },
+          { id: "p2", reference: "PAY-002", type: "sequestre", clientName: "Bob", providerName: "Marie Tagne", amount: 75000, status: "sequestre", date: "2026-05-16" },
+          { id: "p3", reference: "PAY-003", type: "remboursement", clientName: "Charlie", providerName: "Paul Biya", amount: 25000, status: "rembourse", date: "2026-05-17" },
+        ],
+      },
+    },
+    () => apiClient.get('/admin/stats'),
   );
 }

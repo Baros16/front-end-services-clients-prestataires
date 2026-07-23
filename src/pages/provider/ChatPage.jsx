@@ -1,7 +1,7 @@
 // src/pages/provider/ChatPage.jsx
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams }                   from 'react-router-dom';
+import { useParams, useNavigate }      from 'react-router-dom';
 
 import { MessageBubble }   from '../../components/client/chat/MessageBubble';
 import { MessageSkeleton } from '../../components/client/chat/MessageSkeleton';
@@ -16,10 +16,12 @@ import {
   Toast,
   Phone,
   Info,
+  FileText,
+  Plus,
 } from '../../components/commons';
 
 import { useChat }                         from '../../hooks/useChat';
-import { getProviderConversationContext }  from '../../services/chatService';
+import { getProviderConversationContext, getProviderConversations }  from '../../services/chatService';
 
 // ─── Header squelette ─────────────────────────────────────────────────────────
 function HeaderSkeleton() {
@@ -48,6 +50,7 @@ const MSG_ANIM = `
 
 // ─── ChatPage (provider) ───────────────────────────────────────────────────────
 export default function ChatPage() {
+  const navigate = useNavigate();
   const { conversationId: paramId } = useParams();
   const activeId = paramId ?? 'conv_001';
 
@@ -68,6 +71,9 @@ export default function ChatPage() {
   const [contextLoading, setContextLoading] = useState(true);
   const [panelOpen,      setPanelOpen]      = useState(false);
 
+  // ── Détection devis sur la conversation courante ─────────────────────────
+  const [convData, setConvData] = useState(null);
+
   useEffect(() => {
     setContext(null);
     setContextLoading(true);
@@ -75,6 +81,14 @@ export default function ChatPage() {
       .then(setContext)
       .catch(console.error)
       .finally(() => setContextLoading(false));
+  }, [activeId]);
+
+  // Récupère les métadonnées de la conversation (hasQuote, demandId)
+  useEffect(() => {
+    getProviderConversations().then((list) => {
+      const found = list.find((c) => c.id === activeId);
+      if (found) setConvData(found);
+    }).catch(console.error);
   }, [activeId]);
 
   // Scroll automatique au dernier message
@@ -139,6 +153,9 @@ export default function ChatPage() {
   );
 
   // ── Actions header ───────────────────────────────────────────────────────
+  const hasQuote = convData?.hasQuote === true;
+  const demandId = convData?.demandId ?? null;
+
   const headerActions = (
     <div className="flex items-center gap-1.5 shrink-0">
       <Button variant="ghost" size="sm"
@@ -152,6 +169,27 @@ export default function ChatPage() {
         disabled={!context?.client?.phone}>
         <Phone size={15} />
       </Button>
+
+      {demandId && !hasQuote && (
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => navigate(`/provider/devis/nouveau/${demandId}`)}
+          className="hidden sm:inline-flex items-center gap-1"
+        >
+          <Plus size={14} /> Proposer un devis
+        </Button>
+      )}
+      {demandId && hasQuote && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/provider/devis/${demandId}`)}
+          className="hidden sm:inline-flex items-center gap-1"
+        >
+          <FileText size={14} /> Voir le devis
+        </Button>
+      )}
 
       {context?.mission && (
         <div className="hidden sm:block">

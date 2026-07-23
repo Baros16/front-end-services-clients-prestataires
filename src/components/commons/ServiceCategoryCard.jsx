@@ -38,16 +38,16 @@ export function ServiceCategoryCard({
         className,
       ].join(' ')}
       style={{
-        // Fond complet de la card : couleur catégorie à 10% d'opacité
-        backgroundColor: selected ? `${color}18` : `${color}0D`,
-        // Bordure dynamique selon sélection
+        backgroundColor: selected
+          ? `color-mix(in srgb, ${color} 18%, transparent)`
+          : `color-mix(in srgb, ${color} 5%, transparent)`,
         borderColor: selected ? color : 'transparent',
       }}
     >
       {/* Icône — fond catégorie à 25% */}
       <div
         className={`${s.icon} flex items-center justify-center shrink-0`}
-        style={{ backgroundColor: `${color}40` }}
+        style={{ backgroundColor: `color-mix(in srgb, ${color} 25%, transparent)` }}
       >
         {category.icon}
       </div>
