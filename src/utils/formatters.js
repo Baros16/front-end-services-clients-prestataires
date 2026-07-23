@@ -70,70 +70,43 @@ export function buildMissionDisplayTitle(mission) {
 /**
  * Vérifie si un numéro est un mobile Orange Cameroun
  */
+const MTN_PREFIXES    = ['650','651','652','653','654','670','671','672','673','674','675','676','677','678','679','680','681','682','683'];
+const ORANGE_PREFIXES = ['640','655','656','657','658','659','686','687','688','689','690','691','692','693','694','695','696','697','698','699'];
+
 export function isOrangeCM(phone) {
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 5) return false;
-  const afterPrefix = digits.slice(4);
-  // Orange : 65, 66, 67, 68, 69, 650, 651, 652, etc.
-  return /^6[5-9]/.test(afterPrefix);
+  if (digits.length !== 12) return false;
+  const prefix3 = digits.slice(3, 6); // 3 chiffres après "237"
+  return ORANGE_PREFIXES.includes(prefix3);
 }
 
-/**
- * Vérifie si un numéro est un mobile MTN Cameroun
- */
 export function isMTNCM(phone) {
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 5) return false;
-  const afterPrefix = digits.slice(4);
-  // MTN : 65, 66, 67, 68, 69
-  return /^6[5-9]/.test(afterPrefix);
+  if (digits.length !== 12) return false;
+  const prefix3 = digits.slice(3, 6);
+  return MTN_PREFIXES.includes(prefix3);
 }
 
-/**
- * Valide un numéro de téléphone camerounais complet
- */
 export function validateCamerounPhone(phone) {
-  // Nettoyer le numéro
   const digits = phone.replace(/\D/g, "");
-  
-  // Vérifier le préfixe +237
-  if (!phone.startsWith("+237")) {
-    return { 
-      valid: false, 
-      message: "Le numéro doit commencer par +237",
-      operator: null 
-    };
-  }
-  
-  // Vérifier la longueur totale (12 = +237 + 9 chiffres)
-  if (digits.length !== 12) {
-    return { 
-      valid: false, 
-      message: `Le numéro doit contenir 9 chiffres (actuellement ${digits.length - 4})`,
-      operator: null 
-    };
-  }
-  
-  // Extraire les chiffres après +237
-  const number = digits.slice(4);
-  const firstDigit = number[0];
-  
-  // Vérifier le premier chiffre
-  if (!["7","5","8","9"].includes(firstDigit)) {
-    return { 
-      valid: false, 
-      message: "Entrer un numero Orange ou MTN valide",
-      operator: null 
-    };
-  }
-  
-  return { 
-    valid: true, 
-    formatted: `+237 ${number.slice(0, 3)} ${number.slice(3, 6)} ${number.slice(6, 9)}`,
-    compact: number,
-  };
-}
 
+  if (!phone.startsWith("+237")) {
+    return { valid: false, message: "Le numéro doit commencer par +237", operator: null };
+  }
+  if (digits.length !== 12) {
+    return { valid: false, message: `Le numéro doit contenir 9 chiffres (actuellement ${Math.max(digits.length - 3, 0)})`, operator: null };
+  }
+
+  const number = digits.slice(3); // 9 chiffres après "237"
+
+  if (isOrangeCM(phone)) {
+    return { valid: true, operator: 'orange_money', formatted: `+237 ${number.slice(0,3)} ${number.slice(3,6)} ${number.slice(6,9)}`, compact: number };
+  }
+  if (isMTNCM(phone)) {
+    return { valid: true, operator: 'mtn_momo', formatted: `+237 ${number.slice(0,3)} ${number.slice(3,6)} ${number.slice(6,9)}`, compact: number };
+  }
+  return { valid: false, message: "Entrer un numéro Orange ou MTN valide", operator: null };
+}
 export function shortenName(fullName) {
   if (!fullName) return '';
   const parts = fullName.trim().split(/\s+/);

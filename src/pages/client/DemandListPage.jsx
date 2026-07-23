@@ -1,4 +1,4 @@
-import { useState,  } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DemandCard }       from '../../components/client/demandes/DemandCard';
@@ -59,7 +59,7 @@ export default function DemandsListPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {demands.map(demand => (
             <DemandCard key={demand.id} demand={demand} 
-            onClick={demand.quoteId ? () => navigate(`/client/devis/${demand.quoteId}`) : undefined}
+            onClick={() => navigate(`/client/demandes/${demand.id}`)}
             />
           ))}
         </div>

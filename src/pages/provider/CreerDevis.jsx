@@ -216,14 +216,18 @@ export default function CreerDevis() {
             </div>
           </div>
 
-          {/* ── Colonne latérale : total + client (desktop uniquement) ── */}
+          {/* ── Colonne latérale : client + total (desktop uniquement) ── */}
           <aside className="hidden lg:flex lg:flex-col gap-6">
-            <QuoteTotalPreview
-              laborAmount={laborAmount}
-              materialsTotal={materialsTotal}
-              totalAmount={totalAmount}
-            />
-            <ClientSummaryCard client={client} />
+            <div className="lg:sticky lg:top-6">
+              <ClientSummaryCard client={client} />
+            </div>
+            <div className="lg:sticky lg:top-[calc(6rem + 1.5rem)]">
+              <QuoteTotalPreview
+                laborAmount={laborAmount}
+                materialsTotal={materialsTotal}
+                totalAmount={totalAmount}
+              />
+            </div>
           </aside>
         </div>
       </div>

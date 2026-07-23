@@ -9,7 +9,6 @@ import {
   RatingStars,
   Badge,
   MessageCircle,
-  Phone,
   CheckCircle,
   Loader2,
 } from '../../commons';
@@ -26,14 +25,13 @@ import { getOrCreateConversation } from '../../../services/chatService';
 export default function ApplicationCard({ application, demandId }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   const { provider, conversationId } = application;
   const alreadyHasConversation = Boolean(conversationId);
 
   async function handleContact() {
     if (alreadyHasConversation) {
-      // Conversation déjà existante → navigation directe
       navigate(`/client/chat/${conversationId}`);
       return;
     }
@@ -61,6 +59,7 @@ export default function ApplicationCard({ application, demandId }) {
   return (
     <Card className="p-4">
       <div className="flex items-start gap-3">
+
         {/* Avatar */}
         <Avatar
           initial={provider.avatarInitial}
@@ -71,8 +70,8 @@ export default function ApplicationCard({ application, demandId }) {
         {/* Infos prestataire */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-sm font-semibold truncate"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-sl-900)' }}>
+            <h4 className="text-sm font-semibold truncate
+                           text-[var(--color-sl-900)] font-[var(--font-display)]">
               {provider.fullName}
             </h4>
             {alreadyHasConversation && (
@@ -83,24 +82,20 @@ export default function ApplicationCard({ application, demandId }) {
             )}
           </div>
 
-          <p className="text-xs mt-0.5"
-            style={{ color: 'var(--color-sl-500)', fontFamily: 'var(--font-body)' }}>
+          <p className="text-xs mt-0.5
+                        text-[var(--color-sl-500)] font-[var(--font-body)]">
             {provider.specialty}
           </p>
 
-          {/* Note et nombre de missions */}
           <div className="flex items-center gap-3 mt-1.5">
-            <div className="flex items-center gap-1">
-              <RatingStars value={provider.rating} readonly size="sm" showValue />
-            </div>
-            <span className="text-[11px]"
-              style={{ color: 'var(--color-sl-400)' }}>
+            <RatingStars value={provider.rating} readonly size="sm" showValue />
+            <span className="text-[11px] text-[var(--color-sl-400)]">
               {provider.missionCount} missions
             </span>
           </div>
         </div>
 
-        {/* Bouton Contacter */}
+        {/* Bouton Contacter / Voir le chat */}
         <div className="shrink-0">
           <Button
             variant={alreadyHasConversation ? 'secondary' : 'primary'}
@@ -114,42 +109,23 @@ export default function ApplicationCard({ application, demandId }) {
                 <Loader2 size={14} className="animate-spin mr-1" />
                 Ouverture...
               </>
-            ) : alreadyHasConversation ? (
-              <>
-                <MessageCircle size={14} className="mr-1" />
-                Voir le chat
-              </>
             ) : (
               <>
                 <MessageCircle size={14} className="mr-1" />
-                Contacter
+                {alreadyHasConversation ? 'Voir le chat' : 'Contacter'}
               </>
             )}
           </Button>
         </div>
+
       </div>
 
-      {/* Erreur */}
+      {/* Erreur inline */}
       {error && (
-        <p className="text-xs mt-2"
-          style={{ color: 'var(--color-danger)', fontFamily: 'var(--font-body)' }}>
+        <p className="text-xs mt-2
+                      text-[var(--color-danger)] font-[var(--font-body)]">
           {error}
         </p>
-      )}
-
-      {/* Téléphone (affiché si déjà en contact) */}
-      {alreadyHasConversation && provider.phone && (
-        <div className="mt-2 pt-2 border-t"
-          style={{ borderColor: 'var(--color-sl-100)' }}>
-          <a
-            href={`tel:${provider.phone}`}
-            className="inline-flex items-center gap-1 text-xs"
-            style={{ color: 'var(--color-info)', fontFamily: 'var(--font-body)' }}
-          >
-            <Phone size={12} />
-            {provider.phone}
-          </a>
-        </div>
       )}
     </Card>
   );

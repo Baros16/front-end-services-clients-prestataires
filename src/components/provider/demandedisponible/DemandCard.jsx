@@ -1,23 +1,22 @@
 // src/components/provider/demandedisponible/DemandCard.jsx
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button }      from '../../commons/Button';
 import { Card }        from '../../commons/Card';
 import { StatusBadge } from '../../commons/StatusBadge';
 import { RatingStars } from '../../commons/RatingStars';
 import { AlertBanner } from '../../commons/AlertBanner';
-import { DemandDetailModal } from './DemandDetailModal';
 import { formatBudget } from './formatBudget';
 import { CATEGORY_DISPLAY } from './categoryDisplay';
 import { formatRelativeTime } from '../../../utils/formatters';
 import { MapPin, ChevronRight } from '../../commons/Icons';
 
 export function DemandCard({ demand, onViewDetails, onApply, isApplying = false, feedback = null, onDismissFeedback }) {
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const { Icon, bgVar } =
     CATEGORY_DISPLAY[demand.category?.iconKey] ?? CATEGORY_DISPLAY.default;
 
   const handleOpenDetails = () => {
-    setShowModal(true);
+    navigate(`/provider/demandes/${demand.id}`);
     onViewDetails?.(demand.id);
   };
 
@@ -108,15 +107,6 @@ export function DemandCard({ demand, onViewDetails, onApply, isApplying = false,
         </div>
       </Card>
 
-      {showModal && (
-        <DemandDetailModal
-          open={showModal}
-          demand={demand}
-          onClose={() => setShowModal(false)}
-          onApply={() => { setShowModal(false); onApply(demand.id); }}
-          isApplying={isApplying}
-        />
-      )}
     </>
   );
 }

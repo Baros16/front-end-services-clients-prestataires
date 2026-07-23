@@ -83,8 +83,7 @@ export default function DemandesDisponibles() {
   };
 
   const handleViewDetails = (demandId) => {
-    const demand = demands.find((d) => d.id === demandId);
-    navigate(`/provider/devis/nouveau/${demandId}`, { state: { demand } });
+    navigate(`/provider/demandes/${demandId}`);
   };
 
   const headerActions = (

@@ -1,6 +1,7 @@
 // src/pages/client/DemandDetailPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Tag, User, FileText, ExternalLink, FileCheck } from 'lucide-react';
 
 import {
   PageHeader,
@@ -12,28 +13,52 @@ import {
   Card,
   MapEmbed,
   AmountDisplay,
-  ArrowLeft,
   MapPin,
   Clock,
-  AlertTriangle,
 } from '../../components/commons';
 
 import ApplicationCard from '../../components/client/demandes/ApplicationCard';
 import { getDemandDetail, getDemandApplications } from '../../services/clientService';
 import { formatDate } from '../../utils/formatters';
 
+// ── Correspondance statut → variante du badge ─────────────────────────────────
+const STATUS_VARIANT = {
+  ouverte:    'ouvert',
+  en_cours:   'en_cours',
+  terminee:   'terminee',
+  annulee:    'annulee',
+};
+
+/**
+ * Statuts pour lesquels les postulants sont visibles.
+ * Une demande "en_cours" a déjà un prestataire sélectionné — on n'affiche plus la liste.
+ */
+const STATUTS_AVEC_POSTULANTS = ['ouverte', 'en_attente'];
+
+/** Label de section interne. */
+function SectionLabel({ children }) {
+  return (
+    <p className="text-xs font-semibold uppercase tracking-wider mb-1.5
+                  text-[var(--color-sl-500)] font-[var(--font-display)]">
+      {children}
+    </p>
+  );
+}
+
 /**
  * Page de détail d'une demande client.
- * Affiche les informations complètes de la demande + la liste des postulants.
+ * - Statut ouverte / en_attente → affiche la liste des postulants.
+ * - Statut en_cours              → affiche un bouton "Voir le devis".
+ * - Statut terminee / annulee    → affiche uniquement les infos de la demande.
  */
 export default function DemandDetailPage() {
   const { id: demandId } = useParams();
   const navigate = useNavigate();
 
-  const [demand, setDemand] = useState(null);
+  const [demand, setDemand]             = useState(null);
   const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState(null);
 
   useEffect(() => {
     if (!demandId) {
@@ -49,6 +74,10 @@ export default function DemandDetailPage() {
       setError(null);
 
       try {
+        // On charge les postulants uniquement si le statut peut en avoir.
+        // getDemandDetail est toujours appelé ; getDemandApplications est conditionnel
+        // mais on ne connaît pas encore le statut ici → on charge les deux,
+        // l'affichage est ensuite contrôlé côté rendu.
         const [demandData, appsData] = await Promise.all([
           getDemandDetail(demandId),
           getDemandApplications(demandId),
@@ -76,18 +105,18 @@ export default function DemandDetailPage() {
     return () => { cancelled = true; };
   }, [demandId]);
 
-  // ── États : loading ──────────────────────────────────────────────────────
+  // ── État : chargement ─────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <SkeletonLoader variant="text" className="w-48 h-6" />
-        <SkeletonLoader variant="card" count={2} />
-        <SkeletonLoader variant="card" count={3} />
+        <SkeletonLoader variant="text" className="w-40 h-5" />
+        <SkeletonLoader variant="card" />
+        <SkeletonLoader variant="list" count={3} />
       </div>
     );
   }
 
-  // ── États : error ────────────────────────────────────────────────────────
+  // ── État : erreur ─────────────────────────────────────────────────────────
   if (error) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -97,19 +126,18 @@ export default function DemandDetailPage() {
           className="mt-4"
           onClick={() => navigate('/client/demandes')}
         >
-          <ArrowLeft size={16} className="mr-1" />
           Retour à mes demandes
         </Button>
       </div>
     );
   }
 
-  // ── États : empty (ne devrait pas arriver si error géré) ─────────────────
+  // ── État : vide ───────────────────────────────────────────────────────────
   if (!demand) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         <EmptyState
-          icon="FileText"
+          icon={<FileText size={24} />}
           title="Demande introuvable"
           description="Cette demande n'existe pas ou a été supprimée."
           action={
@@ -122,167 +150,189 @@ export default function DemandDetailPage() {
     );
   }
 
-  // ── Statut ───────────────────────────────────────────────────────────────
-  const statusVariant = demand.status === 'ouverte' ? 'ouvert'
-    : demand.status === 'en_cours' ? 'en_cours'
-    : demand.status === 'terminee' ? 'terminee'
-    : demand.status === 'annulee' ? 'annulee'
-    : 'en_attente';
+  const statusVariant      = STATUS_VARIANT[demand.status] ?? 'en_attente';
+  const showApplicants     = STATUTS_AVEC_POSTULANTS.includes(demand.status);
+  const showDevisButton    = demand.status === 'en_cours';
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
-      {/* Header */}
+
+      {/* ── En-tête ──────────────────────────────────────────────────────── */}
       <PageHeader
-        title={
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/client/demandes')}
-              className="shrink-0"
-            >
-              <ArrowLeft size={18} />
-            </Button>
-            <span className="truncate">Détail de la demande</span>
-          </div>
-        }
+        title="Détail de la demande"
         subtitle={
-          <div className="flex items-center gap-2 mt-1">
+          <span className="inline-flex items-center gap-2 mt-1">
             <StatusBadge label={demand.status} variant={statusVariant} />
-            {demand.urgent && (
-              <StatusBadge label="Urgent" variant="urgent" />
-            )}
-          </div>
+            {demand.urgent && <StatusBadge label="Urgent" variant="urgent" />}
+          </span>
         }
         className="mb-6"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
-        {/* ── Colonne principale ──────────────────────────────────────────── */}
-        <div className="space-y-6 min-w-0">
+      {/* ── Carte demande ────────────────────────────────────────────────── */}
+      <Card noPadding className="mb-6">
+
+        {/* Titre de carte = catégorie */}
+        {demand.category && (
+          <div className="flex items-center gap-2 px-4 sm:px-6 py-3.5
+                          border-b border-[var(--color-sl-100)]">
+            <Tag size={14} className="shrink-0 text-[var(--color-sl-400)]" />
+            <h2 className="text-sm font-semibold
+                           text-[var(--color-sl-900)] font-[var(--font-display)]">
+              {demand.category.label}
+            </h2>
+          </div>
+        )}
+
+        <div className="p-4 sm:p-6 space-y-5">
+
           {/* Description */}
-          <Card title="Description" className="p-4">
-            <p className="text-sm leading-relaxed"
-              style={{ color: 'var(--color-sl-700)', fontFamily: 'var(--font-body)' }}>
+          <div>
+            <SectionLabel>Description</SectionLabel>
+            <p className="text-sm leading-relaxed
+                          text-[var(--color-sl-700)] font-[var(--font-body)]">
               {demand.description}
             </p>
-          </Card>
+          </div>
+
+          <hr className="border-[var(--color-sl-100)]" />
+
+          {/* Grille : budget · date */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {demand.estimatedBudget && (
+              <div>
+                <SectionLabel>Budget estimé</SectionLabel>
+                <div className="flex items-center gap-2">
+                  <AmountDisplay amount={demand.estimatedBudget.min} size="sm" />
+                  <span className="text-sm text-[var(--color-sl-400)]">—</span>
+                  <AmountDisplay amount={demand.estimatedBudget.max} size="sm" />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <SectionLabel>Créée le</SectionLabel>
+              <div className="flex items-center gap-2 text-sm
+                              text-[var(--color-sl-600)] font-[var(--font-body)]">
+                <Clock size={14} className="shrink-0" />
+                <span>{formatDate(demand.createdAt)}</span>
+              </div>
+            </div>
+
+          </div>
 
           {/* Photos */}
-          {demand.photos && demand.photos.length > 0 && (
-            <Card title="Photos" className="p-4">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {demand.photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="relative aspect-video rounded-lg overflow-hidden bg-sl-100"
-                  >
-                    <img
-                      src={photo.url}
-                      alt={photo.name || 'Photo de la demande'}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ))}
+          {demand.photos?.length > 0 && (
+            <>
+              <hr className="border-[var(--color-sl-100)]" />
+              <div>
+                <SectionLabel>Photos ({demand.photos.length})</SectionLabel>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {demand.photos.map((photo, index) => (
+                    <a
+                      key={photo.id ?? index}
+                      href={photo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group relative aspect-video rounded-lg overflow-hidden
+                                 bg-[var(--color-sl-100)] block"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.name || `Photo ${index + 1}`}
+                        className="w-full h-full object-cover
+                                   transition-opacity group-hover:opacity-80"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center
+                                      opacity-0 group-hover:opacity-100 transition-opacity
+                                      bg-black/20">
+                        <ExternalLink size={18} className="text-white drop-shadow" />
+                      </div>
+                    </a>
+                  ))}
+                </div>
               </div>
-            </Card>
+            </>
           )}
 
           {/* Localisation */}
           {demand.location && (
-            <Card title="Localisation" className="p-4">
-              <div className="flex items-start gap-2 mb-3">
-                <MapPin size={16} className="shrink-0 mt-0.5"
-                  style={{ color: 'var(--color-sl-400)' }} />
-                <p className="text-sm"
-                  style={{ color: 'var(--color-sl-700)', fontFamily: 'var(--font-body)' }}>
-                  {demand.location.address}
-                </p>
+            <>
+              <hr className="border-[var(--color-sl-100)]" />
+              <div>
+                <SectionLabel>Localisation</SectionLabel>
+                <div className="flex items-start gap-2 mb-3">
+                  <MapPin size={16} className="shrink-0 mt-0.5 text-[var(--color-sl-400)]" />
+                  <p className="text-sm text-[var(--color-sl-700)] font-[var(--font-body)]">
+                    {demand.location.address}
+                  </p>
+                </div>
+                <MapEmbed
+                  address={demand.location.address}
+                  interactive={false}
+                  className="h-44 rounded-lg"
+                />
               </div>
-              <MapEmbed
-                address={demand.location.address}
-                interactive={false}
-                height="180px"
-              />
-            </Card>
+            </>
           )}
 
-          {/* Postulants */}
-          <div>
-            <h3 className="text-base font-semibold mb-3"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--color-sl-900)' }}>
-              Prestataires intéressés ({applications.length})
-            </h3>
-
-            {applications.length === 0 ? (
-              <EmptyState
-                icon="User"
-                title="Aucun prestataire pour le moment"
-                description="Les prestataires intéressés apparaîtront ici."
-              />
-            ) : (
-              <div className="space-y-3">
-                {applications.map((app) => (
-                  <ApplicationCard
-                    key={app.id}
-                    application={app}
-                    demandId={demandId}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
         </div>
+      </Card>
 
-        {/* ── Colonne latérale ────────────────────────────────────────────── */}
-        <aside className="space-y-4">
-          {/* Budget estimé */}
-          {demand.estimatedBudget && (
-            <Card title="Budget estimé" className="p-4">
-              <div className="flex items-center gap-2">
-                <AmountDisplay
-                  amount={demand.estimatedBudget.min}
-                  size="sm"
-                />
-                <span className="text-sm"
-                  style={{ color: 'var(--color-sl-400)' }}>—</span>
-                <AmountDisplay
-                  amount={demand.estimatedBudget.max}
-                  size="sm"
-                />
-              </div>
-            </Card>
-          )}
+      {/* ── Section conditionnelle selon le statut ───────────────────────────
 
-          {/* Catégorie */}
-          {demand.category && (
-            <Card title="Catégorie" className="p-4">
-              <p className="text-sm font-medium"
-                style={{ color: 'var(--color-sl-700)', fontFamily: 'var(--font-body)' }}>
-                {demand.category.label}
-              </p>
-            </Card>
-          )}
+          ouverte / en_attente → liste des postulants
+          en_cours             → bouton vers le devis
+          terminee / annulee   → rien (les infos de la demande suffisent)
 
-          {/* Dates */}
-          <Card title="Informations" className="p-4 space-y-3">
-            <div className="flex items-center gap-2 text-sm"
-              style={{ color: 'var(--color-sl-600)', fontFamily: 'var(--font-body)' }}>
-              <Clock size={14} className="shrink-0" />
-              <span>Créée le {formatDate(demand.createdAt)}</span>
-            </div>
+      ─────────────────────────────────────────────────────────────────────── */}
 
-            {demand.urgent && (
-              <div className="flex items-center gap-2 text-sm"
-                style={{ color: 'var(--color-urgent)', fontFamily: 'var(--font-body)' }}>
-                <AlertTriangle size={14} className="shrink-0" />
-                <span>Demande urgente</span>
-              </div>
+      {showApplicants && (
+        <div>
+          <h2 className="text-base font-semibold mb-3
+                         text-[var(--color-sl-900)] font-[var(--font-display)]">
+            Prestataires intéressés
+            {applications.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-[var(--color-sl-400)]">
+                ({applications.length})
+              </span>
             )}
-          </Card>
-        </aside>
-      </div>
+          </h2>
+
+          {applications.length === 0 ? (
+            <EmptyState
+              icon={<User size={24} />}
+              title="Aucun prestataire pour le moment"
+              description="Les prestataires intéressés apparaîtront ici dès qu'ils postuleront."
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {applications.map((app) => (
+                <ApplicationCard
+                  key={app.id}
+                  application={app}
+                  demandId={demandId}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showDevisButton && (
+        <div className="flex justify-end">
+          <Button
+            variant="primary"
+            onClick={() => navigate(`/client/devis/${demandId}`)}
+          >
+            <FileCheck size={16} className="mr-2" />
+            Voir le devis
+          </Button>
+        </div>
+      )}
+
     </div>
   );
 }

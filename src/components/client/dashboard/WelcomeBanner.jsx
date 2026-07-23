@@ -34,7 +34,7 @@ Besoin d'un service rapidement ?
 <Button
  variant="ghost"
  className="mt-2 bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-white/90 transition-all w-fit"
- onClick={() => navigate("/client/nouvelle-demande")}
+  onClick={() => navigate("/client/provider/search")}
 >
     <Zap size={14} />
 Trouver un prestataire maintenant →

@@ -170,24 +170,24 @@ export default function ChatPage() {
         <Phone size={15} />
       </Button>
 
-      {demandId && (
+      {demandId && !hasQuote && (
         <Button
-          variant={hasQuote ? 'secondary' : 'primary'}
+          variant="primary"
           size="sm"
-          onClick={() => {
-            if (hasQuote) {
-              navigate(`/provider/devis/nouveau/${demandId}`);
-            } else {
-              navigate(`/provider/devis/nouveau/${demandId}`);
-            }
-          }}
+          onClick={() => navigate(`/provider/devis/nouveau/${demandId}`)}
           className="hidden sm:inline-flex items-center gap-1"
         >
-          {hasQuote ? (
-            <><FileText size={14} /> Voir le devis</>
-          ) : (
-            <><Plus size={14} /> Proposer un devis</>
-          )}
+          <Plus size={14} /> Proposer un devis
+        </Button>
+      )}
+      {demandId && hasQuote && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/provider/devis/${demandId}`)}
+          className="hidden sm:inline-flex items-center gap-1"
+        >
+          <FileText size={14} /> Voir le devis
         </Button>
       )}
 

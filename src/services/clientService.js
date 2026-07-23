@@ -44,21 +44,15 @@ export async function getClientDemands(params = {}) {
 }
 
 /**
- * Créer une nouvelle demande.
- * payload : { categoryId, description, location, isUrgent, estimatedBudget, photoIds }
- */
-/**
  * Détail complet d'une demande du client.
+ * GET /client/demands/:demandId renvoie un objet <Demand> unique (pas une liste).
  */
 export async function getDemandDetail(demandId) {
   const result = await getMock(
-    mockDemands,
+    { data: mockDemands.data.find((d) => d.id === demandId) ?? null },
     () => apiClient.get(`/client/demands/${demandId}`),
   );
-  // mockDemands est une liste → on filtre par id
-  const list = Array.isArray(result) ? result : (result?.data ?? []);
-  const found = list.find((d) => d.id === demandId) ?? null;
-  return found ? normalizeStatus(found) : null;
+  return result ? normalizeStatus(result) : null;
 }
 
 /**
@@ -109,9 +103,11 @@ export function getQuoteDetail(quoteId) {
 
 /**
  * Accepter un devis et déclencher le paiement.
+ * Le backend renvoie un ApiResponseVoid (data vide) : cette requête initie
+ * seulement le push USSD, elle ne confirme pas le paiement. La confirmation
+ * doit être vérifiée séparément via polling sur getDemandDetail().
  */
 export async function acceptQuote(demandId, quoteId, paymentMethod, phoneNumber) {
-  // AcceptQuoteRequest réel exige { quoteId, paymentMethod, phoneNumber } — les 3 requis.
   return getMock(
     { data: { success: true, data: { demandId, status: "en_cours", paymentMethod } } },
     () => apiClient.post(`/client/demands/${demandId}/quote/accept`, { quoteId, paymentMethod, phoneNumber }),

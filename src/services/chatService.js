@@ -4,6 +4,9 @@ import mockConversations from '../data/client/mock_conversations.json';
 import mockMessages      from '../data/client/mock_messages.json';
 import apiClient         from './apiClient.js';
 
+// ─── Stockage des conversations mockées créées dynamiquement ─────────────────
+const dynamicMockConversations = new Map();
+
 // ─── Mock context ─────────────────────────────────────────────────────────────
 // Données enrichies non disponibles dans l'API v2.1 (isOnline, mission).
 // En prod : getConversationContext() reconstruit depuis GET /user/:id.
@@ -199,10 +202,40 @@ export async function getOrCreateConversation(providerId, demandId) {
 }
 
 export async function openConversation(providerId, demandId = null) {
-  return getMock(
-    mockConversations.data[0] ?? null,
-    () => apiClient.post('/client/conversations', { providerId, demandId }),
-  );
+  if (USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
+    const existing = mockConversations.data.find(
+      (c) => c.provider.id === providerId && (!demandId || c.demandId === demandId)
+    );
+    if (existing) return existing;
+
+    // Créer une nouvelle conversation mockée
+    const newConv = {
+      id: `conv_mock_${Date.now()}`,
+      demandId: demandId ?? null,
+      client: {
+        id: 'usr_abc123',
+        fullName: 'Madeleine Kamdem',
+        avatarInitial: 'M',
+      },
+      provider: {
+        id: providerId,
+        fullName: providerId,
+        avatarInitial: providerId.charAt(0).toUpperCase(),
+      },
+      lastMessage: null,
+      unreadCount: 0,
+      hasQuote: false,
+      quoteStatus: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    dynamicMockConversations.set(newConv.id, newConv);
+    return newConv;
+  }
+
+  return apiClient.post('/client/conversations', { providerId, demandId })
+    .then(r => r.data?.data ?? r.data);
 }
 
 /**
@@ -213,7 +246,29 @@ export async function openConversation(providerId, demandId = null) {
 export async function getConversationContext(conversationId) {
   if (USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 400));
-    return MOCK_CONTEXT[conversationId] ?? null;
+    const known = MOCK_CONTEXT[conversationId];
+    if (known) return known;
+
+    // Pour les conversations mockées créées dynamiquement (conv_mock_...)
+    const dynamicConv = dynamicMockConversations.get(conversationId);
+    if (dynamicConv) {
+      return {
+        provider: {
+          id:            dynamicConv.provider.id,
+          fullName:      dynamicConv.provider.fullName,
+          avatarInitial: dynamicConv.provider.avatarInitial,
+          phone:         null,
+          rating:        null,
+          missionCount:  null,
+          specialty:     null,
+          isOnline:      null,
+          category:      null,
+        },
+        mission: null,
+      };
+    }
+
+    return null;
   }
 
   try {

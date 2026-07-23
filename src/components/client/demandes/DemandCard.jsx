@@ -51,7 +51,7 @@ export function DemandCard({ demand, onClick }) {
         {clickable && (
           <div className="pt-2 mt-auto border-t border-[var(--color-sl-100)]">
             <Button variant="ghost" size="md" onClick={onClick} className="w-full">
-              Voir le devis
+              Voir details
             </Button>
           </div>
         )}
