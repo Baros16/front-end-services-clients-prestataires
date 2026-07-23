@@ -6,14 +6,14 @@ import {
   PageHeader,
   StatusBadge,
   Card,
-  LocationPicker,   // BUG 1 — remplace MapEmbed (qui n'accepte pas lat/lng)
+  LocationPicker,
   UserAvatarCircle,
   Button,
   AlertBanner,
   SkeletonLoader,
-  EmptyState,       // BUG 10 — état vide localisation
-  MessageCircle,    // BUG 6 — importé depuis commons (barrel), plus depuis Icons.jsx
-  MapPin,           // BUG 10 — icône EmptyState localisation
+  EmptyState,
+  MessageCircle,
+  MapPin,
 } from '../../components/commons';
 
 import { MissionProgressHeader } from '../../components/client/missions/MissionProgressHeader';
@@ -24,6 +24,13 @@ import { LitigeAlertPanel }      from '../../components/client/missions/LitigeAl
 import { getMission }            from '../../services/clientService';
 import { useProviderLocation }   from '../../hooks/useProviderLocation';
 import { buildMissionDisplayTitle } from '../../utils/formatters';
+
+const STATUS_LABELS = {
+  en_cours:  'En cours',
+  en_attente: 'En attente',
+  terminee:  'Terminée',
+  litige:    'Litige',
+};
 
 export default function SuiviMission() {
   const navigate = useNavigate();
@@ -67,7 +74,6 @@ export default function SuiviMission() {
   }
 
   // ── État erreur ──────────────────────────────────────────
-  // BUG 2 — corrigé : variant="error" (pas type="danger")
   if (error) {
     return (
       <div className="p-6">
@@ -78,13 +84,19 @@ export default function SuiviMission() {
 
   if (!mission) return null;
 
-  // BUG 9 — corrigé : fallback en majuscule
   const providerInitial = mission.providerAvatarInitial ?? 'P';
-  const providerName    = mission.providerName ?? buildMissionDisplayTitle(mission);
+  // ⚠️ mission.providerName n'existe pas dans le mock actuel — le fallback
+  // buildMissionDisplayTitle(mission) construit vraisemblablement un TITRE
+  // de mission ("Fuite cuisine — Madeleine K."), pas un nom de prestataire.
+  // À corriger dès que le backend expose un vrai nom de prestataire
+  // (ex. via mission.providerName ou un enrichissement côté getMission).
+  const providerName = mission.providerName ?? buildMissionDisplayTitle(mission);
 
   // Position live (polling) prioritaire, repli sur celle du chargement initial
   // tant que le hook n'a pas encore répondu.
-  const location = providerLocation ?? mission.providerLocation ?? null;
+  const location = providerLocation ?? mission.location ?? null;
+
+  const isProviderOnSite = mission.status === 'en_cours' && !!location;
 
   // ── État données ─────────────────────────────────────────
   return (
@@ -95,8 +107,11 @@ export default function SuiviMission() {
         title="Suivi de mission"
         subtitle={`${mission.category} · ${providerName}`}
         actions={
-          // BUG 4 — corrigé : label obligatoire sur StatusBadge
-          <StatusBadge variant="en_cours" label="En cours" withDot />
+          <StatusBadge
+            variant={mission.status}
+            label={STATUS_LABELS[mission.status] ?? mission.status}
+            withDot
+          />
         }
       />
 
@@ -125,16 +140,14 @@ export default function SuiviMission() {
           <Card title="Localisation temps réel">
             {location ? (
               <>
-                {/*
-                  BUG 1 — corrigé : LocationPicker en readOnly remplace MapEmbed.
-                  MapEmbed accepte uniquement `address` (string), pas lat/lng.
-                  LocationPicker (react-leaflet) accepte defaultLocation { lat, lng }
-                  et readOnly désactive toute interaction.
-                */}
                 <div className="h-[200px] overflow-hidden rounded-lg">
                   <LocationPicker
-                    defaultLocation={{ lat: location.lat, lng: location.lng }}
-                    readOnly
+                    value={{
+                      lat: location.lat,
+                      lng: location.lng,
+                      address: location.sublabel ?? location.label ?? '',
+                    }}
+                    disabled
                   />
                 </div>
                 {location.sublabel && (
@@ -144,7 +157,6 @@ export default function SuiviMission() {
                 )}
               </>
             ) : (
-              // BUG 10 — corrigé : EmptyState au lieu du <p> brut
               <EmptyState
                 icon={<MapPin size={24} />}
                 title="Localisation indisponible"
@@ -162,11 +174,6 @@ export default function SuiviMission() {
           <Card title="Prestataire">
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3">
-                {/*
-                  BUG 3 — corrigé : prop color (pas bgClass).
-                  L'API de UserAvatarCircle est : initial, size, color, imageUrl.
-                  bgClass n'existe pas → couleur ignorée en silence.
-                */}
                 <UserAvatarCircle
                   initial={providerInitial}
                   size="md"
@@ -176,18 +183,15 @@ export default function SuiviMission() {
                   <span className="text-[14px] font-semibold font-[family-name:var(--font-body)] text-sl-900">
                     {providerName}
                   </span>
-                  <span className="flex items-center gap-1 text-[12px] font-[family-name:var(--font-body)] text-success">
-                    <span className="w-2 h-2 rounded-full bg-success sl-animate-pulse-dot" />
-                    Sur place
-                  </span>
+                  {isProviderOnSite && (
+                    <span className="flex items-center gap-1 text-[12px] font-[family-name:var(--font-body)] text-success">
+                      <span className="w-2 h-2 rounded-full bg-success sl-animate-pulse-dot" />
+                      Sur place
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/*
-                BUG 5 — corrigé : on passe missionId + providerId dans l'état
-                de navigation pour que ChatPage puisse pré-sélectionner
-                la bonne conversation sans ambiguïté.
-              */}
               <Button
                 variant="secondary"
                 size="sm"
@@ -210,6 +214,8 @@ export default function SuiviMission() {
           {/* Card Séquestre */}
           <SequestredAmountCard
             totalAmount={mission.totalAmount}
+            sequesteredAmount={mission.sequesteredAmount}
+            paymentStatus={mission.paymentStatus}
             steps={mission.steps}
           />
 

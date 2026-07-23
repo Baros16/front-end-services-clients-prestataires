@@ -1,6 +1,5 @@
 // src/components/client/missions/LitigeAlertPanel.jsx
 import { useNavigate } from 'react-router-dom';
-import { Card, Button } from '../../commons';
 import { AlertTriangle } from '../../commons/Icons';
 
 export function LitigeAlertPanel({ missionId }) {
@@ -10,19 +9,11 @@ export function LitigeAlertPanel({ missionId }) {
     <div className="bg-accent-light rounded-[var(--radius-lg)] p-4 flex flex-col gap-3">
       <button
         className="flex items-center gap-2 text-[13px] font-[family-name:var(--font-body)] font-semibold text-warning bg-transparent border-none cursor-pointer p-0 active:scale-95 transition-transform"
-        onClick={() => navigate(`client/litige/${missionId}`)}
+        onClick={() => navigate(`/client/litige/${missionId}`)}
       >
         <AlertTriangle size={14} />
         Signaler un problème
       </button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate(`/client/litige?missionId=${missionId}`)}
-      >
-        Ouvrir un litige
-      </Button>
     </div>
   );
 }

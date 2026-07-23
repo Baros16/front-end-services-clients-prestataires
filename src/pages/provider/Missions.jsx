@@ -10,6 +10,7 @@ import {
   AlertBanner,
   EmptyState,
   Flag,
+  ErrorState,
 } from '../../components/commons';
 
 import { getProviderMissions }        from '../../services/providerService';
@@ -60,7 +61,7 @@ export default function MissionsPage() {
       {loading ? (
         <MissionsSkeleton />
       ) : error ? (
-        <AlertBanner message={error} type ="danger" />
+        <ErrorState/>
       ) : missions.length === 0 ? (
         <EmptyState
           icon={<Flag size={40} strokeWidth={1.5} />}
@@ -73,7 +74,7 @@ export default function MissionsPage() {
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {missions.map(mission => (
+          {missions.data.map(mission => (
             <MissionCard key={mission.id} mission={mission}  basePath="/provider/missions"/>
           ))}
         </div>

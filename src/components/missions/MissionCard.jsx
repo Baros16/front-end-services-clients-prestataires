@@ -3,7 +3,7 @@ import { useNavigate }                          from 'react-router-dom';
 import { AmountDisplay, StatusBadge, Avatar, Button, Card } from '../commons';
 import { formatDateShort }                      from '../../utils/formatters';
 
-export function MissionCard({ mission }) {
+export function MissionCard({ mission , basePath}) {
   const navigate     = useNavigate();
   const dateAffichee = mission.completedAt ?? mission.startedAt;
 
@@ -51,7 +51,7 @@ export function MissionCard({ mission }) {
       <Button
         variant="secondary"
         size="sm"
-        onClick={() => navigate(`/provider/missions/${mission.id}`)}
+        onClick={() => navigate(`${basePath}/${mission.id}`)}
         className="w-full"
       >
         Voir détails

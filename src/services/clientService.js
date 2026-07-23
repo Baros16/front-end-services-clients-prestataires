@@ -1,11 +1,12 @@
 // src/services/clientService.js
-import { getMock, getMockList } from "./mockSwitch.js";
+import { getMock, getMockList, USE_MOCK } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
 import mockClientDashboard from "../data/client/mock_dashboard.json";
 import mockDemands from "../data/client/mock_demands.json";
 import mockQuote from "../data/client/mock_quote.json";
 import mockMission from "../data/client/mock_mission.json";
 import mockProvidersSearch from "../data/client/mock_providers_search.json";
+import mockApplications from "../data/client/mock_demand_applications.json";
 
 // ─── En-tête du fichier — ajout ────────────────────────────────────────────
 function normalizeStatus(obj) {
@@ -57,16 +58,18 @@ export async function getDemandDetail(demandId) {
 
 /**
  * Liste des postulants (prestataires ayant postulé) pour une demande donnée.
+ * L'endpoint réel est déjà scopé par demandId dans l'URL ; le filtre par
+ * demandId n'est appliqué qu'en mode mock, car le mock local mélange
+ * plusieurs demandes dans un seul fichier.
  */
 export async function getDemandApplications(demandId) {
-  // Import dynamique pour éviter les imports circulaires
-  const mockApplications = await import('../data/client/mock_demand_applications.json');
-  const result = await getMock(
+  const result = await getMockList(
     mockApplications,
     () => apiClient.get(`/client/demands/${demandId}/applications`),
   );
-  const list = Array.isArray(result) ? result : (result?.data ?? []);
-  return list.filter((app) => app.demandId === demandId);
+  return USE_MOCK
+    ? result.data.filter((app) => app.demandId === demandId)
+    : result.data;
 }
 
 export async function createDemand(payload) {
@@ -77,12 +80,16 @@ export async function createDemand(payload) {
 }
 
 /**
- * Détail d'un devis reçu, enrichi des infos prestataire + demande.
- * En S2 : ignore quoteId, retourne toujours le mock enrichi.
- * En S3 : GET /client/devis/:quoteId
+ * Détail d'un devis reçu.
+ * ⚠️ Le backend ne renvoie que providerId / demandId (pas d'objets imbriqués).
+ * En mode mock, on enrichit avec provider{} et demand{} pour faciliter le dev
+ * UI sans dépendre d'appels supplémentaires. En mode API réelle, provider et
+ * demand sont normalisés à null si absents — le composant consommateur doit
+ * gérer ce cas (ex : aller chercher les infos via un autre endpoint, ou
+ * afficher un fallback tant que le backend n'enrichit pas la réponse).
  */
-export function getQuoteDetail(quoteId) {
-  const enriched = {
+export async function getQuoteDetail(quoteId) {
+  const enrichedMock = {
     data: {
       ...mockQuote.data,
       provider: {
@@ -95,10 +102,17 @@ export function getQuoteDetail(quoteId) {
       demand: { category: 'Plomberie', description: 'Fuite cuisine' },
     },
   };
-  return getMock(
-    enriched,
+
+  const result = await getMock(
+    enrichedMock,
     () => apiClient.get(`/client/devis/${quoteId}`),
   );
+
+  return {
+    ...result,
+    provider: result.provider ?? null,
+    demand: result.demand ?? null,
+  };
 }
 
 /**
@@ -124,24 +138,32 @@ export async function rejectQuote(demandId) {
   );
 }
 
-
-export async function getClientMissions() {
-  const result = await getMock(
+/**
+ * Liste des missions du client.
+ * params : { page, limit, status }
+ */
+export async function getClientMissions(params = {}) {
+  const result = await getMockList(
     mockMission,
-    () => apiClient.get(`/client/missions`),
+    () => apiClient.get(`/client/missions`, { params }),
   );
-  return Array.isArray(result) ? result.map(normalizeStatus) : [];
+  let data = result.data.map(normalizeStatus);
+  if (params.status) {
+    data = data.filter((m) => m.status === params.status);
+  }
+  return { ...result, data };
 }
 
 /**
  * Détail d'une mission en cours.
+ * GET /client/missions/:missionId renvoie un objet <Mission> unique (pas une liste).
  */
 export async function getMission(missionId) {
   const result = await getMock(
-    mockMission,
+    { data: mockMission.data.find((m) => m.id === missionId) ?? null },
     () => apiClient.get(`/client/missions/${missionId}`),
   );
-  return normalizeStatus(result);
+  return result ? normalizeStatus(result) : null;
 }
 
 /**

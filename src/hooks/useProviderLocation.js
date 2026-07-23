@@ -14,6 +14,10 @@ const POLL_INTERVAL_MS = 10_000; // 10s — position non critique, pas besoin de
  * - Arrête le polling si mission.status !== 'en_cours'.
  * - Met en pause si l'onglet est masqué (Visibility API via usePolling).
  *
+ * ⚠️ Le champ renvoyé par l'API/mock est `mission.location` (pas
+ * `mission.providerLocation`) — à vérifier avec le backend si ce nom est
+ * bien la position live du prestataire et non l'adresse fixe du chantier.
+ *
  * @param {string|null} missionId
  *
  * @returns {{
@@ -43,7 +47,7 @@ export function useProviderLocation(missionId) {
     getMission(missionId)
       .then(mission => {
         if (cancelled) return;
-        setProviderLocation(mission.providerLocation ?? null);
+        setProviderLocation(mission.location ?? null);
         setMissionStatus(mission.status);
       })
       .catch(err => {
@@ -63,7 +67,7 @@ export function useProviderLocation(missionId) {
     if (!missionId) return;
     try {
       const mission = await getMission(missionId);
-      setProviderLocation(mission.providerLocation ?? null);
+      setProviderLocation(mission.location ?? null);
       setMissionStatus(mission.status);
     } catch {
       // Échec silencieux — la dernière position connue reste affichée

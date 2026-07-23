@@ -31,18 +31,25 @@ export async function getAvailableDemands(params = {}) {
   );
 }
 
+/**
+ * Liste des missions du prestataire.
+ * params : { status, page, limit }
+ * Le filtre par statut n'est appliqué explicitement qu'en mode mock (le mock
+ * n'est pas paginé côté backend simulé) ; en mode API réelle, params.status
+ * est transmis au backend qui applique son propre filtre.
+ */
 export async function getProviderMissions(params = {}) {
-  // params : { status, page, limit }
+  const normalized = mock_missions.data.map(normalizeMissionStatus);
   const filtered = params.status
-    ? mock_missions.data.filter(m => m.status === params.status)
-    : mock_missions.data;
+    ? normalized.filter(m => m.status === params.status.toLowerCase())
+    : normalized;
 
-  return getMock(
-    filtered,
-    () => apiClient
-      .get('/provider/missions', { params })
-      ,
+  const result = await getMockList(
+    { data: filtered, meta: mock_missions.meta },
+    () => apiClient.get('/provider/missions', { params }),
   );
+
+  return { ...result, data: result.data.map(normalizeMissionStatus) };
 }
 
 export async function getMissionById(missionId) {
@@ -194,7 +201,7 @@ export async function updateSchedule(schedule) {
 export async function getEarnings(params = {}) {
   // params : { page, month } — ex. month: "2026-05"
   return getMock(
-    mock_earnings.data,
+    mock_earnings,
     () => apiClient.get(`/provider/earnings`, { params }),
   );
 }
@@ -202,7 +209,10 @@ export async function getEarnings(params = {}) {
 
 /**
  * Mise à jour de la position GPS du prestataire pendant une mission.
- * Endpoint à ajouter au contrat : PATCH /provider/missions/:id/location
+ * ⚠️ Endpoint pas encore contractualisé côté backend — PATCH
+ * /provider/missions/:id/location doit être ajouté au contrat API avant
+ * toute activation du tracking GPS en prod (risque d'erreurs réseau en
+ * boucle si appelé en polling contre un endpoint inexistant).
  *
  * @param {string} missionId
  * @param {number} lat
@@ -211,10 +221,12 @@ export async function getEarnings(params = {}) {
 export async function updateMissionLocation(missionId, lat, lng) {
   return getMock(
     {
-      missionId,
-      lat,
-      lng,
-      updatedAt: new Date().toISOString(),
+      data: {
+        missionId,
+        lat,
+        lng,
+        updatedAt: new Date().toISOString(),
+      },
     },
     () => apiClient
       .patch(`/provider/missions/${missionId}/location`, { lat, lng })

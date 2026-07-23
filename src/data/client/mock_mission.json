@@ -1,61 +1,164 @@
 {
   "success": true,
-  "data": {
-    "id": "msn_001",
-    "demandId": "dem_xyz789",
-    "quoteId": "quote_001",
-    "clientId": "usr_abc123",
-    "providerId": "usr_jcm456",
-    "category": "Plomberie",
-    "status": "en_cours",
-    "totalAmount": 23000,
-    "sequesteredAmount": 23000,
-    "paymentStatus": "sequestre",
-    "startedAt": "2026-07-03T09:32:00+01:00",
-    "estimatedDurationHours": 2,
-    "completedAt": null,
-    "steps": [
-      {
-        "id": "step_001",
-        "label": "Coupure eau principale vérifiée",
-        "completed": true,
-        "order": 1
-      },
-      {
-        "id": "step_002",
-        "label": "Démontage siphon fissuré",
-        "completed": true,
-        "order": 2
-      },
-      {
-        "id": "step_003",
-        "label": "Remplacement joint silicone ×2",
-        "completed": true,
-        "order": 3
-      },
-      {
-        "id": "step_004",
-        "label": "Installation siphon PVC neuf",
-        "completed": true,
-        "order": 4
-      },
-      {
-        "id": "step_005",
-        "label": "Test d'étanchéité (5 min eau courante)",
-        "completed": false,
-        "order": 5
-      },
-      {
-        "id": "step_006",
-        "label": "Nettoyage zone d'intervention",
-        "completed": false,
-        "order": 6
+  "data": [
+    {
+      "id": "msn_001",
+      "demandId": "dem_xyz789",
+      "quoteId": "quote_001",
+      "clientId": "usr_abc123",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Fuite cuisine — Madeleine K.",
+      "status": "en_cours",
+      "totalAmount": 23000,
+      "sequesteredAmount": 23000,
+      "paymentStatus": "sequestre",
+      "startedAt": "2026-07-03T09:32:00+01:00",
+      "estimatedDurationHours": 2,
+      "completedAt": null,
+      "steps": [
+        { "id": "step_001", "label": "Coupure eau principale vérifiée", "completed": true, "order": 1 },
+        { "id": "step_002", "label": "Démontage siphon fissuré", "completed": true, "order": 2 },
+        { "id": "step_003", "label": "Remplacement joint silicone ×2", "completed": true, "order": 3 },
+        { "id": "step_004", "label": "Installation siphon PVC neuf", "completed": true, "order": 4 },
+        { "id": "step_005", "label": "Test d'étanchéité (5 min eau courante)", "completed": false, "order": 5 },
+        { "id": "step_006", "label": "Nettoyage zone d'intervention", "completed": false, "order": 6 }
+      ],
+      "location": {
+        "address": "Bafoussam, Quartier Commercial",
+        "lat": 5.4764,
+        "lng": 10.4207
       }
-    ],
-    "location": {
-      "address": "Bafoussam, Quartier Commercial",
-      "lat": 5.4764,
-      "lng": 10.4207
+    },
+    {
+      "id": "msn_002",
+      "demandId": "dem_prv002",
+      "quoteId": "quote_002",
+      "clientId": "b2adb724-8bd7-46b3-b527-b564f5c05a59",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Robinet cassé — Pierre F.",
+      "status": "en_attente",
+      "totalAmount": 15000,
+      "sequesteredAmount": 15000,
+      "paymentStatus": "sequestre",
+      "startedAt": null,
+      "estimatedDurationHours": null,
+      "completedAt": null,
+      "steps": [],
+      "location": {
+        "address": "Bafoussam, Djeleng Nord",
+        "lat": 5.4830,
+        "lng": 10.4170
+      }
+    },
+    {
+      "id": "msn_010",
+      "demandId": "dem_prv010",
+      "quoteId": "quote_010",
+      "clientId": "usr_client02",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Robinet cuisine — Pierre F.",
+      "status": "terminee",
+      "totalAmount": 18000,
+      "sequesteredAmount": 0,
+      "paymentStatus": "libere",
+      "startedAt": "2026-05-19T10:00:00+01:00",
+      "estimatedDurationHours": 1,
+      "completedAt": "2026-05-19T11:30:00+01:00",
+      "steps": [
+        { "id": "step_001", "label": "Remplacement robinet", "completed": true, "order": 1 },
+        { "id": "step_002", "label": "Test d'étanchéité", "completed": true, "order": 2 }
+      ],
+      "location": {
+        "address": "Bafoussam, Djeleng Nord",
+        "lat": 5.4830,
+        "lng": 10.4170
+      }
+    },
+    {
+      "id": "msn_009",
+      "demandId": "dem_prv009",
+      "quoteId": "quote_009",
+      "clientId": "usr_client03",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Tuyau percé — Sylvie T.",
+      "status": "terminee",
+      "totalAmount": 32000,
+      "sequesteredAmount": 0,
+      "paymentStatus": "libere",
+      "startedAt": "2026-05-17T08:30:00+01:00",
+      "estimatedDurationHours": 3,
+      "completedAt": "2026-05-17T12:00:00+01:00",
+      "steps": [
+        { "id": "step_001", "label": "Localisation fuite", "completed": true, "order": 1 },
+        { "id": "step_002", "label": "Remplacement tronçon tuyau", "completed": true, "order": 2 },
+        { "id": "step_003", "label": "Test pression", "completed": true, "order": 3 }
+      ],
+      "location": {
+        "address": "Bafoussam, Cité des Fleurs",
+        "lat": 5.4700,
+        "lng": 10.4250
+      }
+    },
+    {
+      "id": "msn_008",
+      "demandId": "dem_prv008",
+      "quoteId": "quote_008",
+      "clientId": "usr_client04",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Chauffe-eau — Brigitte N.",
+      "status": "litige",
+      "totalAmount": 45000,
+      "sequesteredAmount": 45000,
+      "paymentStatus": "litige",
+      "startedAt": "2026-05-14T08:00:00+01:00",
+      "estimatedDurationHours": 4,
+      "completedAt": null,
+      "steps": [
+        { "id": "step_001", "label": "Diagnostic chauffe-eau", "completed": true, "order": 1 },
+        { "id": "step_002", "label": "Remplacement résistance", "completed": false, "order": 2 }
+      ],
+      "location": {
+        "address": "Bafoussam, Banengo",
+        "lat": 5.4900,
+        "lng": 10.4300
+      }
+    },
+    {
+      "id": "msn_007",
+      "demandId": "dem_prv007",
+      "quoteId": "quote_007",
+      "clientId": "usr_client05",
+      "providerId": "usr_jcm456",
+      "category": "Plomberie",
+      "title": "Installation douche — Robert T.",
+      "status": "terminee",
+      "totalAmount": 38000,
+      "sequesteredAmount": 0,
+      "paymentStatus": "libere",
+      "startedAt": "2026-05-10T09:00:00+01:00",
+      "estimatedDurationHours": 3,
+      "completedAt": "2026-05-10T12:30:00+01:00",
+      "steps": [
+        { "id": "step_001", "label": "Pose receveur", "completed": true, "order": 1 },
+        { "id": "step_002", "label": "Raccordement plomberie", "completed": true, "order": 2 },
+        { "id": "step_003", "label": "Test fonctionnement", "completed": true, "order": 3 }
+      ],
+      "location": {
+        "address": "Bafoussam, Tamdja",
+        "lat": 5.4650,
+        "lng": 10.4150
+      }
     }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 6,
+    "totalPages": 1
   }
 }
