@@ -4,7 +4,7 @@ import {
   PageHeader, Card, StatCard, DataTable, AmountDisplay, SkeletonLoader, EmptyState, AlertBanner, TabBar,
 } from '../../components/commons';
 import { Wallet, TrendingUp, Receipt, Calendar } from '../../components/commons';
-import { getProviderEarnings } from '../../services/providerService';
+import { getEarnings } from '../../services/providerService';
 
 const PERIOD_TABS = [
   { id: 'month', label: 'Ce mois' },
@@ -30,7 +30,7 @@ export default function HistoriqueGains() {
   const [period, setPeriod] = useState('month');
 
   useEffect(() => {
-    getProviderEarnings()
+    getEarnings()
       .then((res) => setData(res?.data ?? res ?? []))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

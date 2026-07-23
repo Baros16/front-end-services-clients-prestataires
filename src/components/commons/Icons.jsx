@@ -16,7 +16,7 @@
 // ─── Navigation & UI ──────────────────────────────────────────
 export { ChevronRight, ChevronLeft, ChevronDown, ChevronUp, ArrowLeft, ArrowRight } from 'lucide-react';
 export { X, Menu, Search, SlidersHorizontal }                from 'lucide-react';
-export { Plus, Minus, Check, Copy }                          from 'lucide-react';
+export { Plus, Minus, Check, Copy, Save }                          from 'lucide-react';
 export { LogOut, Settings, Bell, LogIn }                            from 'lucide-react';
 export { House, Home, LayoutDashboard, ChartPie, BarChart3, BriefcaseBusiness, Gavel, MessageSquare} from 'lucide-react';
 
@@ -25,7 +25,7 @@ export { Phone, MessageCircle, Send, Mail }                  from 'lucide-react'
 export { Paperclip, Image , Inbox}                                  from 'lucide-react';
 
 // ─── Utilisateurs & identité ──────────────────────────────────
-export { User, Users, UserCheck, UserX }                     from 'lucide-react';
+export { User, Users, UserCheck, UserX, UserPlus }                     from 'lucide-react';
 export { Shield, ShieldCheck }                               from 'lucide-react';
 
 // ─── Services & missions ──────────────────────────────────────
