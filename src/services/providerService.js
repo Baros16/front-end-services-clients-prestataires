@@ -1,10 +1,11 @@
 import { getMock, getMockList } from "./mockSwitch.js";
 import apiClient from "./apiClient.js";
 import mock_dashboard from "../data/provider/mock_dashboard.json";
-import mock_avilable_demands from "../data/provider/mock_available_demands.json";
+import mock_available_demands from "../data/provider/mock_available_demands.json";
 import mock_profile     from "../data/provider/mock_profile.json"
 import mock_missions from "../data/provider/mock_mission.json"
 import mock_quote from "../data/client/mock_quote.json"
+import mock_earnings from "../data/provider/mock_earnings.json"
 
 function normalizeMissionStatus(mission) {
   if (!mission) return mission;
@@ -24,7 +25,7 @@ export async function getProviderDashboard() {
 export async function getAvailableDemands(params = {}) {
   // params : { categoryId } — l'API réelle ne supporte que categoryId, pas de pagination
   return getMockList(
-    mock_avilable_demands,
+    mock_available_demands,
     () => apiClient.get(`/provider/demands`, { params }),
   );
 }

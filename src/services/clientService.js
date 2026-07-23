@@ -5,6 +5,7 @@ import mockClientDashboard from "../data/client/mock_dashboard.json";
 import mockDemands from "../data/client/mock_demands.json";
 import mockQuote from "../data/client/mock_quote.json";
 import mockMission from "../data/client/mock_mission.json";
+import mockProvidersSearch from "../data/client/mock_providers_search.json";
 
 // ─── En-tête du fichier — ajout ────────────────────────────────────────────
 function normalizeStatus(obj) {
@@ -34,7 +35,12 @@ export async function getClientDemands(params = {}) {
     mockDemands,
     () => apiClient.get(`/client/demands`, { params }),
   );
-  return { ...result, data: result.data.map(normalizeStatus) };
+  let data = result.data.map(normalizeStatus);
+  // Appliquer le filtre par statut en mode mock
+  if (params.status) {
+    data = data.filter((d) => d.status === params.status);
+  }
+  return { ...result, data };
 }
 
 /**
@@ -142,16 +148,6 @@ export async function getMission(missionId) {
   return normalizeStatus(result);
 }
 
-export async function getMissionDetails(missionId) {
-  const result = await getMock(
-    mockMission.data,
-    () => apiClient.get(`/client/missions/${missionId}`), // laisser getMock déballer
-  );
-  return normalizeStatus(result);
-}
-
-
-
 /**
  * Valider une mission terminée.
  */
@@ -181,5 +177,17 @@ export async function createLitige(missionId, payload) {
   return getMock(
     { data: { success: true, data: { missionId, status: "ouvert" } } },
     () => apiClient.post(`/client/missions/${missionId}/litige`, payload),
+  );
+}
+
+/**
+ * Rechercher des prestataires (mode urgence).
+ * ⚠️ v2.1 : endpoint temporaire en mock — route API à définir avec le backend.
+ * params : { query, category, page, limit }
+ */
+export async function searchProviders(params = {}) {
+  return getMockList(
+    mockProvidersSearch,
+    () => apiClient.get(`/client/providers/search`, { params }),
   );
 }
