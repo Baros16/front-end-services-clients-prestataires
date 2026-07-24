@@ -91,7 +91,7 @@ const NotFoundPage       = lazy(() => import("../pages/NotFoundPage"));
 function SmartRedirect() {
   try {
     const raw = localStorage.getItem("sl_mock_user");
-    if (!raw) return <Navigate to="/auth/register" replace />;
+    if (!raw) return <Navigate to="/home" replace />;
     const { role } = JSON.parse(raw);
     if (role === "CLIENT")   return <Navigate to="/client/dashboard" replace />;
     if (role === "PROVIDER") return <Navigate to="/provider/dashboard" replace />;

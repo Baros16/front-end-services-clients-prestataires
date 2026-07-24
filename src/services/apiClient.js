@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/v1',
   timeout: 15_000,
   headers: {
     'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
         try {
           // Tentative de refresh via l'endpoint dédié
           const { data } = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'}/users/refresh`,
+            `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'}/auth/refresh`,
             { refreshToken: storedRefreshToken },
           );
 
