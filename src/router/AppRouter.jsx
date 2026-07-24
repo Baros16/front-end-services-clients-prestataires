@@ -100,7 +100,7 @@ function SmartRedirect() {
   } catch {
     // ignore
   }
-  return <Navigate to="/auth/login" replace />;
+  return <Navigate to="/home" replace />;
 }
 
 // ─── Fallback spinner centré ─────────────────────────────────────────────────
