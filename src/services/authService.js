@@ -48,7 +48,7 @@ export async function register(payload) {
         message: "Compte créé. OTP de test : 123456",
       },
     },
-    () => axios.post(`${BASE}/register`, payload)
+    () => apiClient.post(`${BASE}/register`, payload)
   );
 }
 
@@ -64,7 +64,7 @@ export async function verifyOtp(email, code) {
 export async function resendOtp(email) {
   return getMock(
     { success: true, data: { message: "OTP renvoyé. Code de test : 123456" } },
-    () => axios.post(`${BASE}/resend-otp`, { email })
+    () => apiClient.post(`${BASE}/resend-otp`, { email })
   );
 }
 
