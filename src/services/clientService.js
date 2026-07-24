@@ -66,18 +66,24 @@ export async function getDemandDetail(demandId) {
  * Liste des postulants (prestataires ayant postulé) pour une demande donnée.
  */
 export async function getDemandApplications(demandId) {
-  const result = await getMockList(
+  const response = await getMockList(
     mockApplications,
     () => apiClient.get(`/client/demands/${demandId}/applications`),
   );
 
   if (USE_MOCK) {
-    return result.data.filter((app) => app.demandId === demandId);
+    return response.data.filter((app) => app.demandId === demandId);
   }
 
-  // En API réelle, 'result' est directement la réponse de l'apiClient
-  // (ou result.data si ton interceptor Axios déballe déjà les données)
-  return result?.data ?? result ?? [];
+  // Le backend renvoie ApiResponse = { success: true, data: [...] }
+  // Si Axios ne déballe que la réponse HTTP : response.data est { success, data }
+  // Donc les données réelles sont dans response.data.data ou response.data
+  const payload = response?.data;
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+  
+  return Array.isArray(payload) ? payload : [];
 }
 export async function createDemand(payload) {
   return getMock(
