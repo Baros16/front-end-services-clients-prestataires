@@ -7,7 +7,8 @@ import {
   sendMessage,
   getProviderMessages,
   sendProviderMessage,
-  deleteMessage as deleteMessageService,   // ← ajout
+  deleteClientMessage,
+  deleteProviderMessage,
 } from '../services/chatService';
 
 function getCurrentUserId() {
@@ -23,9 +24,17 @@ function getCurrentUserId() {
 
 function getServiceFns(role) {
   if (role === 'provider') {
-    return { fetchFn: getProviderMessages, sendFn: sendProviderMessage };
+    return {
+      fetchFn:  getProviderMessages,
+      sendFn:   sendProviderMessage,
+      deleteFn: deleteProviderMessage,
+    };
   }
-  return { fetchFn: getMessages, sendFn: sendMessage };
+  return {
+    fetchFn:  getMessages,
+    sendFn:   sendMessage,
+    deleteFn: deleteClientMessage,
+  };
 }
 
 export function useChat(conversationId, role = 'client') {
@@ -33,11 +42,10 @@ export function useChat(conversationId, role = 'client') {
   const [loading,    setLoading]    = useState(true);
   const [sending,    setSending]    = useState(false);
   const [error,      setError]      = useState(null);
-  // IDs supprimés localement (optimistic) — source de vérité tant que le mock ne renvoie pas deleted:true
   const [deletedIds, setDeletedIds] = useState(() => new Set());
 
   const { toast, showToast, dismissToast } = useToast();
-  const { fetchFn, sendFn }                = getServiceFns(role);
+  const { fetchFn, sendFn, deleteFn }      = getServiceFns(role);
   const currentUserId                      = getCurrentUserId();
   const pendingIds                         = useRef(new Set());
 
@@ -65,26 +73,30 @@ export function useChat(conversationId, role = 'client') {
 
   // ── Polling ───────────────────────────────────────────────────────────────
   const poll = useCallback(async () => {
-    if (!conversationId) return;
-    try {
-      const fresh     = await fetchFn(conversationId);
-      const serverIds = new Set(fresh.map(m => m.id));
+  if (!conversationId) return;
+  try {
+    const fresh     = await fetchFn(conversationId);
+    const serverIds = new Set(fresh.map(m => m.id));
 
-      setMessages(prev => {
-        const existingNonPending = prev.filter(m => !pendingIds.current.has(m.id));
-        const existingIds        = new Set(existingNonPending.map(m => m.id));
-        const trulyNew           = fresh.filter(m => !existingIds.has(m.id));
-        const stillPending       = prev.filter(
-          m => pendingIds.current.has(m.id) && !serverIds.has(m.id),
-        );
-        return [...existingNonPending, ...trulyNew, ...stillPending]
-          .sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt));
-      });
-    } catch {
-      // Échec silencieux
-    }
-  }, [conversationId, fetchFn]);
+    setMessages(prev => {
+      const existingNonPending = prev.filter(m => !pendingIds.current.has(m.id));
+      const existingIds        = new Set(existingNonPending.map(m => m.id));
+      const trulyNew           = fresh.filter(m => !existingIds.has(m.id));
+      const stillPending       = prev.filter(
+        m => pendingIds.current.has(m.id) && !serverIds.has(m.id),
+      );
 
+      const merged = [...existingNonPending, ...trulyNew, ...stillPending];
+      // Dédoublonnage défensif par id — garde la dernière occurrence
+      const byId = new Map(merged.map(m => [m.id, m]));
+      return [...byId.values()].sort(
+        (a, b) => new Date(a.sentAt) - new Date(b.sentAt),
+      );
+    });
+  } catch {
+    // Échec silencieux
+  }
+}, [conversationId, fetchFn]);
   usePolling(poll, 3_000, {
     enabled:         !loading && !!conversationId,
     pauseWhenHidden: true,
@@ -115,7 +127,8 @@ export function useChat(conversationId, role = 'client') {
     setSending(true);
 
     try {
-      const confirmed = await sendFn(conversationId, trimmed, imageId);
+      // FIX : currentUserId transmis pour que le mock retourne le bon senderId
+      const confirmed = await sendFn(conversationId, trimmed, imageId, currentUserId);
       pendingIds.current.delete(optimisticId);
       setMessages(prev =>
         prev.map(m =>
@@ -134,18 +147,15 @@ export function useChat(conversationId, role = 'client') {
     }
   }, [conversationId, role, currentUserId, sendFn, showToast]);
 
-  // ── Suppression (soft delete, les deux côtés via polling) ────────────────
+  // ── Suppression ───────────────────────────────────────────────────────────
   const deleteMessage = useCallback(async (messageId) => {
-    // Optimistic : marquer immédiatement supprimé dans l'UI
     setDeletedIds(prev => new Set([...prev, messageId]));
 
     try {
-      await deleteMessageService(conversationId, messageId);
-      // En mode API réel, le prochain poll renverra deleted:true côté serveur.
-      // En mock, deletedIds reste la source de vérité.
+      // FIX : deleteFn résout la bonne route selon le rôle (client ou provider)
+      await deleteFn(conversationId, messageId);
     } catch (err) {
       console.error('[useChat] deleteMessage:', err);
-      // Rollback si l'API répond en erreur
       setDeletedIds(prev => {
         const next = new Set(prev);
         next.delete(messageId);
@@ -153,9 +163,9 @@ export function useChat(conversationId, role = 'client') {
       });
       showToast('error', 'Impossible de supprimer ce message. Réessayez.');
     }
-  }, [conversationId, showToast]);
+  }, [conversationId, deleteFn, showToast]);
 
-  // ── Messages enrichis — deleted fusionné (local + serveur) ───────────────
+  // ── Messages enrichis ─────────────────────────────────────────────────────
   const enrichedMessages = messages.map(m => ({
     ...m,
     deleted: deletedIds.has(m.id) || m.deleted === true,
@@ -168,7 +178,7 @@ export function useChat(conversationId, role = 'client') {
     error,
     currentUserId,
     send,
-    deleteMessage,     // ← exposé
+    deleteMessage,
     toast,
     dismissToast,
   };

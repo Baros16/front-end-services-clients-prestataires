@@ -9,9 +9,11 @@ const dynamicMockConversations = new Map();
 
 // ─── Mock context ─────────────────────────────────────────────────────────────
 // Données enrichies non disponibles dans l'API v2.1 (isOnline, mission).
-// En prod : getConversationContext() reconstruit depuis GET /user/:id.
-// isOnline → null (non contractualisé côté backend).
-// mission  → null (endpoint dédié à prévoir en v2.2).
+// En prod : getConversationContext() reconstruit depuis ConversationResponse
+//           qui embarque déjà un ProviderSummary (id, fullName, avatarInitial,
+//           rating, specialty, isOnline).
+// phone + missionCount → null (non présents dans ProviderSummary v2.1).
+// mission              → null (endpoint dédié à prévoir en v2.2).
 
 const MOCK_CONTEXT = {
   conv_001: {
@@ -125,18 +127,21 @@ function sortDesc(arr, key = 'updatedAt') {
 /**
  * Appel GET messages — mutualisé client/provider.
  * v2.1 : la réponse est { data: { messages: [], meta: {} } }
- * NB: ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
+ * NB : ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
  */
-async function apiFetchMessages(convId, role) {
+async function apiFetchMessages(role, convId) {
   return apiClient.get(`/${role}/conversations/${convId}/messages`, { params: { limit: 50 } });
 }
 
 /**
  * Appel POST message — mutualisé client/provider.
  * v2.1 : la réponse est { data: Message }
- * NB: ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
+ * NB : ne PAS extraire ici — getMock() se charge du unwrapping (response.data.data).
+ *
+ * FIX: `role` en premier — ordre cohérent avec apiFetchMessages et les
+ *      appelants qui fournissent le rôle avant les paramètres de contenu.
  */
-async function apiPostMessage(convId, content, imageId = null, role) {
+async function apiPostMessage(role, convId, content, imageId = null) {
   return apiClient.post(`/${role}/conversations/${convId}/messages`, { content, imageId });
 }
 
@@ -147,8 +152,10 @@ export async function getConversations() {
     mockConversations,
     () => apiClient.get('/client/conversations'),
   );
-  // mock -> tableau direct ; API -> { conversations: [...] }
-  const list = Array.isArray(result) ? result : (result?.conversations ?? []);
+  // Swagger ApiResponseListConversationResponse : data est ConversationResponse[]
+  // directement (tableau plat, pas { conversations: [] }).
+  // FIX: suppression du fallback result?.conversations (dead code).
+  const list = Array.isArray(result) ? result : [];
   return sortDesc(list);
 }
 
@@ -158,26 +165,38 @@ export async function getMessages(conversationId) {
   );
   const result = await getMock(
     { data: mockFiltered },
-    () => apiFetchMessages(conversationId, 'client'),
+    () => apiFetchMessages('client', conversationId),
   );
+  // API retourne MessageListResponse : { messages: [], meta: {} }
   const list = Array.isArray(result) ? result : (result?.messages ?? []);
   return sortAsc(list);
 }
 
-export async function sendMessage(conversationId, content, imageId = null) {
+/**
+ * Envoyer un message côté client.
+ *
+ * @param {string}      conversationId
+ * @param {string}      content
+ * @param {string|null} imageId
+ * @param {string|null} currentUserId — ID de l'utilisateur connecté.
+ *   Requis en mode mock pour aligner l'affichage des bulles (côté gauche/droite).
+ *   Le composant appelant le récupère depuis son store d'authentification.
+ *   FIX: remplace l'UUID hardcodé 'b2adb724-…' qui causait un rendu inversé
+ *        pour tout utilisateur autre que Yannick Ulrich.
+ */
+export async function sendMessage(conversationId, content, imageId = null, currentUserId = null) {
   return getMock(
     {
       id:             `msg_mock_${Date.now()}`,
       conversationId,
-      // v2.1 : senderId = UUID brut (mock UUID Yannick Ulrich)
-      senderId:       'b2adb724-8bd7-46b3-b527-b564f5c05a59',
+      senderId:       currentUserId,
       senderRole:     'client',
       content,
       imageId:        imageId ?? null,
       read:           false,
       sentAt:         new Date().toISOString(),
     },
-    () => apiPostMessage(conversationId, content, imageId, 'client'),
+    () => apiPostMessage('client', conversationId, content, imageId),
   );
 }
 
@@ -185,63 +204,87 @@ export async function sendMessage(conversationId, content, imageId = null) {
  * Vérifie si une conversation existe déjà entre ce client et ce prestataire
  * pour cette demande. Si oui, la retourne. Sinon, en crée une nouvelle.
  * Décision actée : pas de doublon de conversation pour un même (client, provider, demand).
+ *
+ * FIX: en mode prod (USE_MOCK = false) on ne cherche plus dans mockConversations.data —
+ *      ce lookup retournait toujours undefined (IDs mock ≠ IDs base) et forçait
+ *      la création d'une conversation à chaque appel, ignorant l'idempotence du backend.
+ *      POST /client/conversations est déclaré idempotent dans le swagger — on délègue
+ *      directement au backend qui gère le "get or create".
  */
 export async function getOrCreateConversation(providerId, demandId) {
-  // En mode mock : on filtre les conversations existantes
-  const existing = mockConversations.data.find(
-    (c) => c.provider.id === providerId && c.demandId === demandId
-  );
-
-  if (existing) {
-    await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 200));
-    return existing;
+  if (USE_MOCK) {
+    const existing = mockConversations.data.find(
+      c => c.provider.id === providerId && c.demandId === demandId,
+    );
+    if (existing) {
+      await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
+      return existing;
+    }
+    return openConversation(providerId, demandId);
   }
 
-  // Pas de conversation existante → on en crée une nouvelle
-  return openConversation(providerId, demandId);
+  // Prod : POST /client/conversations est idempotent (déclaré dans le swagger).
+  // Le backend retourne la conversation existante s'il en trouve une, sinon en crée une.
+  return apiClient
+    .post('/client/conversations', { providerId, demandId })
+    .then(r => r.data?.data ?? r.data);
 }
 
 export async function openConversation(providerId, demandId = null) {
   if (USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
     const existing = mockConversations.data.find(
-      (c) => c.provider.id === providerId && (!demandId || c.demandId === demandId)
+      c => c.provider.id === providerId && (!demandId || c.demandId === demandId),
     );
     if (existing) return existing;
 
-    // Créer une nouvelle conversation mockée
     const newConv = {
-      id: `conv_mock_${Date.now()}`,
-      demandId: demandId ?? null,
+      id:          `conv_mock_${Date.now()}`,
+      demandId:    demandId ?? null,
       client: {
-        id: 'usr_abc123',
-        fullName: 'Madeleine Kamdem',
+        id:            'usr_abc123',
+        fullName:      'Madeleine Kamdem',
         avatarInitial: 'M',
       },
       provider: {
-        id: providerId,
-        fullName: providerId,
+        id:            providerId,
+        fullName:      providerId,
         avatarInitial: providerId.charAt(0).toUpperCase(),
       },
-      lastMessage: null,
-      unreadCount: 0,
-      hasQuote: false,
-      quoteStatus: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      lastMessage:  null,
+      unreadCount:  0,
+      hasQuote:     false,
+      quoteStatus:  null,
+      createdAt:    new Date().toISOString(),
+      updatedAt:    new Date().toISOString(),
     };
     dynamicMockConversations.set(newConv.id, newConv);
     return newConv;
   }
 
-  return apiClient.post('/client/conversations', { providerId, demandId })
+  return apiClient
+    .post('/client/conversations', { providerId, demandId })
     .then(r => r.data?.data ?? r.data);
 }
 
 /**
- * Cas particulier : compose des données depuis 2 appels API (conversations + user).
- * Ne rentre pas dans le contrat générique getMock(mockData, apiFn) — on gère
- * USE_MOCK manuellement ici plutôt que de forcer ce cas dans getMock.
+ * Retourne le contexte d'une conversation côté client :
+ * informations sur le prestataire + mission associée.
+ *
+ * Cas particulier : compose des données depuis un appel API (GET /client/conversations)
+ * sans second appel réseau. Ne rentre pas dans le contrat générique getMock(mockData, apiFn)
+ * car la logique de composition reste nécessaire — on gère USE_MOCK manuellement.
+ *
+ * FIX 1 : r.data.data.conversations → r.data.data
+ *   GET /client/conversations retourne ApiResponseListConversationResponse où `data`
+ *   est ConversationResponse[] directement (tableau). Appeler .conversations dessus
+ *   retournait undefined → conv toujours null → fonction toujours null en prod.
+ *
+ * FIX 2 : suppression de l'appel GET /user/:id (endpoint inexistant dans le contrat).
+ *   ConversationResponse embarque déjà un ProviderSummary avec tous les champs
+ *   disponibles (id, fullName, avatarInitial, rating, specialty, isOnline).
+ *   phone et missionCount ne sont pas dans ProviderSummary — ils restent null
+ *   jusqu'à l'exposition d'un endpoint public dédié (v2.2 ou à contractualiser).
  */
 export async function getConversationContext(conversationId) {
   if (USE_MOCK) {
@@ -249,7 +292,6 @@ export async function getConversationContext(conversationId) {
     const known = MOCK_CONTEXT[conversationId];
     if (known) return known;
 
-    // Pour les conversations mockées créées dynamiquement (conv_mock_...)
     const dynamicConv = dynamicMockConversations.get(conversationId);
     if (dynamicConv) {
       return {
@@ -272,35 +314,33 @@ export async function getConversationContext(conversationId) {
   }
 
   try {
-    // Étape 1 : retrouver la conversation dans la liste
+    // FIX 1 : .data.data est ConversationResponse[] — pas besoin de .conversations
     const convs = await apiClient
       .get('/client/conversations')
-      .then(r => r.data.data.conversations);
-
-    const conv = convs.find(c => c.id === conversationId);
-    if (!conv) return null;
-
-    // Étape 2 : profil complet du prestataire
-    const provider = await apiClient
-      .get(`/user/${conv.provider.id}`)
       .then(r => r.data.data);
 
+    const conv = Array.isArray(convs) ? convs.find(c => c.id === conversationId) : null;
+    if (!conv) return null;
+
+    // FIX 2 : ProviderSummary déjà embarqué dans ConversationResponse.
+    // Champs disponibles : id, fullName, avatarInitial, rating, specialty, isOnline.
+    const p = conv.provider;
     return {
       provider: {
-        id:            provider.id,
-        fullName:      provider.fullName,
-        avatarInitial: provider.avatarInitial,
-        phone:         provider.phone  ?? null,
-        rating:        provider.rating ?? null,
-        missionCount:  provider.completedMissions ?? null,
-        specialty:     provider.specialty ?? null,
-        isOnline:      null, // Non disponible API v2.1
-        category:      provider.specialty ?? null,
+        id:            p.id,
+        fullName:      p.fullName,
+        avatarInitial: p.avatarInitial,
+        phone:         null,                // non exposé dans ProviderSummary v2.1
+        rating:        p.rating    ?? null,
+        missionCount:  null,                // non exposé dans ProviderSummary v2.1
+        specialty:     p.specialty ?? null,
+        isOnline:      p.isOnline  ?? null,
+        category:      p.specialty ?? null,
       },
-      mission: null, // Endpoint dédié à prévoir — v2.2
+      mission: null, // endpoint dédié à prévoir — v2.2
     };
   } catch (error) {
-    console.error("[ServiLoc API Error]", error);
+    console.error('[ServiLoc API Error] getConversationContext:', error);
     throw error;
   }
 }
@@ -312,7 +352,8 @@ export async function getProviderConversations() {
     mockConversations,
     () => apiClient.get('/provider/conversations'),
   );
-  const list = Array.isArray(result) ? result : (result?.conversations ?? []);
+  // FIX: même correction que getConversations — data est ConversationResponse[] direct.
+  const list = Array.isArray(result) ? result : [];
   return sortDesc(list);
 }
 
@@ -322,7 +363,7 @@ export async function getProviderMessages(conversationId) {
   );
   const result = await getMock(
     { data: mockFiltered },
-    () => apiFetchMessages(conversationId, 'provider'),
+    () => apiFetchMessages('provider', conversationId),
   );
   const list = Array.isArray(result) ? result : (result?.messages ?? []);
   return sortAsc(list);
@@ -330,27 +371,37 @@ export async function getProviderMessages(conversationId) {
 
 /**
  * Envoyer un message côté prestataire.
+ *
+ * @param {string}      conversationId
+ * @param {string}      content
+ * @param {string|null} imageId
+ * @param {string|null} currentUserId — ID du prestataire connecté.
+ *   FIX: remplace l'UUID hardcodé '2f19902b-…' (Jean-Claude Mbarga).
  */
-export async function sendProviderMessage(conversationId, content, imageId = null) {
+export async function sendProviderMessage(conversationId, content, imageId = null, currentUserId = null) {
   return getMock(
     {
       id:             `msg_mock_${Date.now()}`,
       conversationId,
-      // v2.1 : UUID brut Jean-Claude Mbarga
-      senderId:       '2f19902b-0770-49b9-9974-a92dbb44a77c',
+      senderId:       currentUserId,
       senderRole:     'provider',
       content,
       imageId:        imageId ?? null,
       read:           false,
       sentAt:         new Date().toISOString(),
     },
-    () => apiPostMessage(conversationId, content, imageId, 'provider'),
+    () => apiPostMessage('provider', conversationId, content, imageId),
   );
 }
 
 /**
- * Cas particulier : compose des données depuis 2 appels API (conversations + user).
- * Même raison que getConversationContext — on sort du contrat générique getMock.
+ * Retourne le contexte d'une conversation côté prestataire :
+ * informations sur le client + mission associée.
+ *
+ * FIX 1 : r.data.data.conversations → r.data.data (même correction que client).
+ * FIX 2 : suppression de GET /user/:id — ClientSummary déjà dans ConversationResponse.
+ *   Champs disponibles : id, fullName, avatarInitial, isOnline.
+ *   phone et completedMissions ne sont pas dans ClientSummary — restent null.
  */
 export async function getProviderConversationContext(conversationId) {
   if (USE_MOCK) {
@@ -359,39 +410,69 @@ export async function getProviderConversationContext(conversationId) {
   }
 
   try {
+    // FIX 1 : .data.data est ConversationResponse[] directement
     const convs = await apiClient
       .get('/provider/conversations')
-      .then(r => r.data.data.conversations);
-
-    const conv = convs.find(c => c.id === conversationId);
-    if (!conv) return null;
-
-    const client = await apiClient
-      .get(`/user/${conv.client.id}`)
       .then(r => r.data.data);
 
+    const conv = Array.isArray(convs) ? convs.find(c => c.id === conversationId) : null;
+    if (!conv) return null;
+
+    // FIX 2 : ClientSummary déjà embarqué dans ConversationResponse.
+    // Champs disponibles : id, fullName, avatarInitial, isOnline.
+    const c = conv.client;
     return {
       client: {
-        id:                client.id,
-        fullName:          client.fullName,
-        avatarInitial:     client.avatarInitial,
-        phone:             client.phone ?? null,
-        completedMissions: client.completedMissions ?? null,
-        isOnline:          null, // Non disponible API v2.1
+        id:                c.id,
+        fullName:          c.fullName,
+        avatarInitial:     c.avatarInitial,
+        phone:             null,            // non exposé dans ClientSummary v2.1
+        completedMissions: null,            // non exposé dans ClientSummary v2.1
+        isOnline:          c.isOnline ?? null,
       },
-      mission: null, // Endpoint dédié à prévoir — v2.2
+      mission: null, // endpoint dédié à prévoir — v2.2
     };
   } catch (error) {
-    console.error("[ServiLoc API Error]", error);
+    console.error('[ServiLoc API Error] getProviderConversationContext:', error);
     throw error;
   }
 }
 
-export async function deleteMessage(conversationId, messageId) {
+// ─── SUPPRESSION DE MESSAGES ──────────────────────────────────────────────────
+
+/**
+ * Suppression (soft-delete) d'un message côté client.
+ * DELETE /client/conversations/{id}/messages/{messageId}
+ */
+export async function deleteClientMessage(conversationId, messageId) {
   return getMock(
-    { success: true },
+    { messageId, deleted: true },
     () => apiClient
       .delete(`/client/conversations/${conversationId}/messages/${messageId}`)
-      .then(r => r.data),
+      .then(r => r.data?.data ?? r.data),
   );
+}
+
+/**
+ * Suppression (soft-delete) d'un message côté prestataire.
+ * DELETE /provider/conversations/{id}/messages/{messageId}
+ *
+ * FIX: fonction manquante — l'endpoint est déclaré dans le swagger 8083
+ *      mais n'était pas exposé côté service.
+ */
+export async function deleteProviderMessage(conversationId, messageId) {
+  return getMock(
+    { messageId, deleted: true },
+    () => apiClient
+      .delete(`/provider/conversations/${conversationId}/messages/${messageId}`)
+      .then(r => r.data?.data ?? r.data),
+  );
+}
+
+/**
+ * @deprecated Utiliser deleteClientMessage() ou deleteProviderMessage() selon le rôle.
+ * Conservé pour rétrocompatibilité — pointe sur deleteClientMessage.
+ */
+export async function deleteMessage(conversationId, messageId) {
+  return deleteClientMessage(conversationId, messageId);
 }

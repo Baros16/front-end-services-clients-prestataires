@@ -48,16 +48,21 @@ export async function getMockList(mockData, apiFn) {
 
   try {
     const response = await apiFn();
+    const body = response.data; // PagedResponse<T> brut, pas d'enveloppe success/data
     return {
-      data: response.data?.data ?? [],
-      meta: response.data?.meta ?? {},
+      data: body?.content ?? [],
+      meta: {
+        page: body?.page ?? 1,
+        limit: body?.limit ?? 20,
+        total: body?.totalElements ?? 0,
+        totalPages: body?.totalPages ?? 1,
+      },
     };
   } catch (error) {
     console.error("[ServiLoc API Error]", error);
     throw error;
   }
 }
-
 // Helper interne
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
