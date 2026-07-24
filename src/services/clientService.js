@@ -62,16 +62,23 @@ export async function getDemandDetail(demandId) {
  * demandId n'est appliqué qu'en mode mock, car le mock local mélange
  * plusieurs demandes dans un seul fichier.
  */
+/**
+ * Liste des postulants (prestataires ayant postulé) pour une demande donnée.
+ */
 export async function getDemandApplications(demandId) {
   const result = await getMockList(
     mockApplications,
     () => apiClient.get(`/client/demands/${demandId}/applications`),
   );
-  return USE_MOCK
-    ? result.data.filter((app) => app.demandId === demandId)
-    : result.data;
-}
 
+  if (USE_MOCK) {
+    return result.data.filter((app) => app.demandId === demandId);
+  }
+
+  // En API réelle, 'result' est directement la réponse de l'apiClient
+  // (ou result.data si ton interceptor Axios déballe déjà les données)
+  return result?.data ?? result ?? [];
+}
 export async function createDemand(payload) {
   return getMock(
     { data: { success: true, data: payload } },

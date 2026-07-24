@@ -40,7 +40,7 @@ export default function CreerDevis() {
   const [laborAmount, setLaborAmount] = useState(0);
   const [materials, setMaterials] = useState([createEmptyMaterial()]);
   const [estimatedDurationHours, setEstimatedDurationHours] = useState(1);
-  const [validityDays, setValidityDays] = useState(14); // 👈 Correctif : Durée de validité du devis (en jours)
+  const [validityDays, setValidityDays] = useState(5); // 👈 Correctif : Durée de validité du devis (en jours)
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
