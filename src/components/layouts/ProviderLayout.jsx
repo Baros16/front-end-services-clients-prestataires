@@ -1,7 +1,7 @@
 // src/components/layouts/ProviderLayout.jsx
 
 import { Outlet, useNavigate } from 'react-router-dom';
-import { AppShell } from '../commons';
+import { AppShell, MessageCircle } from '../commons';
 import { Sidebar }  from '../commons';
 import {
   Home,
@@ -17,9 +17,9 @@ import { logout } from '../../services/authService';
 const PROVIDER_NAV = [
   { id: 'dashboard', label: 'Tableau de bord',      icon: <Home        size={16} />, href: '/provider/dashboard' },
   { id: 'demandes',  label: 'Demandes disponibles', icon: <Search      size={16} />, href: '/provider/demandes'  },
-  { id: 'devis',     label: 'Mes devis',            icon: <FileText    size={16} />, href: '/provider/devis'     },
   { id: 'missions',  label: 'Mes missions',          icon: <CheckCircle size={16} />, href: '/provider/missions'  },
   { id: 'gains',     label: 'Gains',                icon: <Wallet      size={16} />, href: '/provider/gains'     },
+  { id: 'messages',  label: 'Messages',             icon: <MessageCircle size={16} />, href: '/provider/chat'},
   { id: 'profil',    label: 'Mon profil',           icon: <User        size={16} />, href: '/provider/profil'    },
 ];
 
