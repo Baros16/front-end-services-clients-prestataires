@@ -120,9 +120,9 @@ export default function OTPVerificationPage() {
         </div>
         {/* Titre et sous-titre centrés */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Vérification du téléphone</h1>
+          <h1 className="text-2xl font-bold mb-2">Vérification de l'email</h1>
           <p className="text-gray-500">
-            Code envoyé au {formatPhone(sessionStorage.getItem("pendingPhone"))}
+            Code envoyé au { email}
           </p>
         </div>
 
