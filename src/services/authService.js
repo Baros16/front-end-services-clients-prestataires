@@ -57,7 +57,7 @@ export async function verifyOtp(email, code) {
   // L'écran OTP doit rediriger vers /auth/login après succès (pas d'auto-login).
   return getMock(
     { success: true, data: { message: "Compte activé avec succès" } },
-    () => axios.post(`${BASE}/verify-otp`, { email, code })
+    () => apiClient.post(`${BASE}/verify-otp`, { email, code })
   );
 }
 
