@@ -20,7 +20,6 @@ const CLIENT_NAV = [
   { id: 'nouvelle-demande', label: 'Nouvelle demande',  icon: <Plus          size={16} />, href: '/client/nouvelle-demande' },
   { id: 'missions',         label: 'Mes missions',      icon: <MapPin        size={16} />, href: '/client/missions'         },
   { id: 'messages',         label: 'Messages',          icon: <MessageCircle size={16} />, href: '/client/chat',            },
-  { id: 'notation',         label: 'Notation',          icon: <Star          size={16} />, href: '/client/notation'         },
 ];
 
 export function ClientLayout() {

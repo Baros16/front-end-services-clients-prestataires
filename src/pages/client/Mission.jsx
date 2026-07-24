@@ -27,24 +27,25 @@ export default function MissionsPage() {
   const [activeTab, setActiveTab] = useState('');
 
   // Un seul chargement — l'API réelle ne filtre pas côté serveur (cf. 1.6),
-  // le filtrage par onglet se fait en mémoire ci-dessous.
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    getClientMissions()
-      .then(setMissions)
-      .catch(err => {
-        console.error('[MissionsPage - client]', err);
-        setError('Impossible de charger les missions. Vérifiez votre connexion.');
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  setLoading(true);
+  setError(null);
+  getClientMissions()
+    .then((res) => {
+      // ✅ On s'assure d'extraire le tableau de 'data'
+      setMissions(Array.isArray(res?.data) ? res.data : []);
+    })
+    .catch((err) => {
+      console.error('[MissionsPage - client]', err);
+      setError('Impossible de charger les missions. Vérifiez votre connexion.');
+    })
+    .finally(() => setLoading(false));
+}, []);
 
   const filteredMissions = useMemo(() => {
-    if (!activeTab) return missions;
-    return missions.filter(m => m.status === activeTab);
-  }, [missions, activeTab]);
-
+  if (!activeTab) return missions;
+  return missions.filter((m) => m.status === activeTab); // ✅ Désormais 'missions' est toujours un Array
+}, [missions, activeTab]);
   return (
     <div className="p-4 md:p-6 flex flex-col gap-5">
 
@@ -75,7 +76,7 @@ export default function MissionsPage() {
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredMissions.data.map(mission => (
+          {filteredMissions.map(mission => (
             <MissionCard key={mission.id} mission={mission} basePath="/client/missions" />
           ))}
         </div>
