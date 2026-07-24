@@ -1,7 +1,6 @@
-// src/services/apiClient.js
 import axios from 'axios';
 
-const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/v1';
+const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://serviloc.store/v1';
 
 const apiClient = axios.create({
   baseURL: DEFAULT_BASE_URL,
@@ -15,17 +14,15 @@ const apiClient = axios.create({
 // ── Intercepteur requête : injection JWT conditionnelle ─────────────────────
 apiClient.interceptors.request.use(
   (config) => {
-    // Ne JAMAIS envoyer de header Authorization sur les endpoints d'authentification
-    // (login, register, otp, refresh, etc.)
-    const isAuthRoute = config.url?.includes('auth/');
+    // Exclure uniquement les routes publiques qui n'ont pas besoin de token
+    const isPublicAuthRoute = config.url?.includes('auth/login') || config.url?.includes('auth/register');
 
-    if (!isAuthRoute) {
+    if (!isPublicAuthRoute) {
       const token = localStorage.getItem('serviloc_access');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     } else {
-      // Supprime le header s'il a été hérité ou mis par erreur
       delete config.headers.Authorization;
     }
 
@@ -40,34 +37,58 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Éviter les boucles infinies sur les requêtes 401
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Ne pas tenter de refresh si la requête d'origine était DÉJÀ un login ou un refresh
+    const isAuthEndpoint = originalRequest.url?.includes('auth/login') || originalRequest.url?.includes('auth/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       const storedRefreshToken = localStorage.getItem('serviloc_refresh');
-      if (storedRefreshToken) {
+      
+      if (!storedRefreshToken) {
+        console.warn('[apiClient] Aucun refresh token trouvé dans le localStorage.');
+      } else {
         try {
-          // Utilisation d'axios brut pour le refresh sans passer par l'intercepteur apiClient
-          const refreshUrl = DEFAULT_BASE_URL.endsWith('/') 
-            ? `${DEFAULT_BASE_URL}auth/refresh` 
-            : `${DEFAULT_BASE_URL}/auth/refresh`;
+          // Résolution propre de l'URL absolue pour Axios brut
+          const baseUrl = apiClient.defaults.baseURL.endsWith('/')
+            ? apiClient.defaults.baseURL.slice(0, -1)
+            : apiClient.defaults.baseURL;
 
-          const { data } = await axios.post(refreshUrl, {
-            refreshToken: storedRefreshToken,
-          });
+          const refreshUrl = `${baseUrl}/auth/refresh`;
 
-          const newToken = data?.data?.accessToken ?? data?.accessToken;
+          console.log('[apiClient] Tentative de Refresh Token sur :', refreshUrl);
+
+          // Appel HTTP sans passer par les intercepteurs pour éviter toute boucle
+          const { data } = await axios.post(
+            refreshUrl,
+            { refreshToken: storedRefreshToken },
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+
+          // Extraction selon le format de ton DTO (ajuster si nécessaire)
+          const newToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token;
+
           if (newToken) {
+            console.log('[apiClient] ✅ Refresh réussi ! Nouveau token injecté.');
             localStorage.setItem('serviloc_access', newToken);
+
+            // Si le backend renvoie aussi un nouveau refresh token (Refresh Token Rotation)
+            const newRefreshToken = data?.data?.refreshToken ?? data?.refreshToken;
+            if (newRefreshToken) {
+              localStorage.setItem('serviloc_refresh', newRefreshToken);
+            }
+
+            // Met à jour la requête originale et la relance
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return apiClient(originalRequest); // Rejouer la requête originale
+            return apiClient(originalRequest);
           }
         } catch (refreshError) {
-          console.error('[apiClient] Refresh token échoué:', refreshError);
+          console.error('[apiClient] ❌ Erreur lors de la tentative de refresh :', refreshError?.response?.data || refreshError.message);
         }
       }
 
-      // Échec du refresh → nettoyage et redirection vers le login
+      // Échec du refresh ou pas de refresh token → Nettoyage et redirection
+      console.warn('[apiClient] Redirection vers /auth/login...');
       localStorage.removeItem('serviloc_access');
       localStorage.removeItem('serviloc_refresh');
       localStorage.removeItem('serviloc_user');
