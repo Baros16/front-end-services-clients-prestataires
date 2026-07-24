@@ -10,8 +10,8 @@ export function buildClientFallback(demand) {
   if (!demand) return null;
   return {
     id: demand.clientId,
-    fullName: demand.clientName || demand.clientId || 'Client',
-    avatarInitial: (demand.clientName || demand.clientId)?.replace(/^usr_/, '').charAt(0).toUpperCase() || '?',
+    fullName: demand.clientName  || 'Client',
+    avatarInitial: demand.clientName?.charAt(0).toUpperCase() || '?',
     rating: demand.clientRating ?? null,
     completedMissions: demand.clientCompletedMissions ?? null,
   };
