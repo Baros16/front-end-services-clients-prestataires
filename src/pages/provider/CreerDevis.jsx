@@ -229,7 +229,7 @@ export default function CreerDevis() {
             <div className="lg:sticky lg:top-6">
               <ClientSummaryCard client={client} />
             </div>
-            <div className="lg:sticky lg:top-[calc(6rem + 1.5rem)]">
+            <div className="lg:sticky lg:top-[7.5rem]">
               <QuoteTotalPreview
                 laborAmount={laborAmount}
                 materialsTotal={materialsTotal}
