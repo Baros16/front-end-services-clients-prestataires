@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://serviloc.store/v1';
+// Si ton API backend utilise un préfixe global, garde /v1, sinon retire-le.
+const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://serviloc.store';
 
 const apiClient = axios.create({
   baseURL: DEFAULT_BASE_URL,
@@ -11,19 +12,35 @@ const apiClient = axios.create({
   },
 });
 
-// ── Intercepteur requête : injection JWT conditionnelle ─────────────────────
+// ── Intercepteur requête : injection JWT et X-User-Id ────────────────────────
 apiClient.interceptors.request.use(
   (config) => {
-    // Exclure uniquement les routes publiques qui n'ont pas besoin de token
-    const isPublicAuthRoute = config.url?.includes('auth/login') || config.url?.includes('auth/register');
+    const isPublicAuthRoute = 
+      config.url?.includes('auth/login') || 
+      config.url?.includes('auth/register');
 
     if (!isPublicAuthRoute) {
       const token = localStorage.getItem('serviloc_access');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
+      // Injection automatique de X-User-Id si l'utilisateur est stocké
+      const storedUser = localStorage.getItem('serviloc_user');
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          const userId = user?.id || user?.userId;
+          if (userId) {
+            config.headers['X-User-Id'] = userId;
+          }
+        } catch {
+          // Ignorer en cas de JSON malformé
+        }
+      }
     } else {
       delete config.headers.Authorization;
+      delete config.headers['X-User-Id'];
     }
 
     return config;
@@ -33,66 +50,72 @@ apiClient.interceptors.request.use(
 
 // ── Intercepteur réponse : gestion 401 avec refresh token ──────────────────
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Si le backend entoure tout dans { success: true, data: [...] }
+    // On retourne directement response.data pour simplifier les services
+    return response.data;
+  },
   async (error) => {
     const originalRequest = error.config;
 
-    // Ne pas tenter de refresh si la requête d'origine était DÉJÀ un login ou un refresh
-    const isAuthEndpoint = originalRequest.url?.includes('auth/login') || originalRequest.url?.includes('auth/refresh');
+    // Ne pas tenter de refresh si la requête n'a pas de config ou était sur l'auth
+    if (!originalRequest) return Promise.reject(error);
+
+    const isAuthEndpoint = 
+      originalRequest.url?.includes('auth/login') || 
+      originalRequest.url?.includes('auth/refresh');
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       const storedRefreshToken = localStorage.getItem('serviloc_refresh');
-      
-      if (!storedRefreshToken) {
-        console.warn('[apiClient] Aucun refresh token trouvé dans le localStorage.');
-      } else {
+
+      if (storedRefreshToken) {
         try {
-          // Résolution propre de l'URL absolue pour Axios brut
           const baseUrl = apiClient.defaults.baseURL.endsWith('/')
             ? apiClient.defaults.baseURL.slice(0, -1)
             : apiClient.defaults.baseURL;
 
           const refreshUrl = `${baseUrl}/auth/refresh`;
 
-          console.log('[apiClient] Tentative de Refresh Token sur :', refreshUrl);
-
-          // Appel HTTP sans passer par les intercepteurs pour éviter toute boucle
+          // Appel HTTP isolé sans passer par les intercepteurs du client principal
           const { data } = await axios.post(
             refreshUrl,
             { refreshToken: storedRefreshToken },
             { headers: { 'Content-Type': 'application/json' } }
           );
 
-          // Extraction selon le format de ton DTO (ajuster si nécessaire)
           const newToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token;
 
           if (newToken) {
-            console.log('[apiClient] ✅ Refresh réussi ! Nouveau token injecté.');
             localStorage.setItem('serviloc_access', newToken);
 
-            // Si le backend renvoie aussi un nouveau refresh token (Refresh Token Rotation)
             const newRefreshToken = data?.data?.refreshToken ?? data?.refreshToken;
             if (newRefreshToken) {
               localStorage.setItem('serviloc_refresh', newRefreshToken);
             }
 
-            // Met à jour la requête originale et la relance
+            // Rejouer la requête d'origine avec le nouveau token
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return apiClient(originalRequest);
           }
         } catch (refreshError) {
-          console.error('[apiClient] ❌ Erreur lors de la tentative de refresh :', refreshError?.response?.data || refreshError.message);
+          console.error(
+            '[apiClient] ❌ Échec du refresh token :',
+            refreshError?.response?.data || refreshError.message
+          );
         }
       }
 
-      // Échec du refresh ou pas de refresh token → Nettoyage et redirection
-      console.warn('[apiClient] Redirection vers /auth/login...');
+      // Nettoyage de la session
       localStorage.removeItem('serviloc_access');
       localStorage.removeItem('serviloc_refresh');
       localStorage.removeItem('serviloc_user');
-      window.location.replace('/auth/login');
+      
+      // Éviter la boucle si on est déjà sur la page de login
+      if (!window.location.pathname.startsWith('/auth/')) {
+        window.location.replace('/auth/login');
+      }
     }
 
     return Promise.reject(error);
