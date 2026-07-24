@@ -40,6 +40,7 @@ export default function CreerDevis() {
   const [laborAmount, setLaborAmount] = useState(0);
   const [materials, setMaterials] = useState([createEmptyMaterial()]);
   const [estimatedDurationHours, setEstimatedDurationHours] = useState(1);
+  const [validityDays, setValidityDays] = useState(14); // 👈 Correctif : Durée de validité du devis (en jours)
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,6 +102,10 @@ export default function CreerDevis() {
     if (!estimatedDurationHours || estimatedDurationHours <= 0) {
       next.estimatedDurationHours = 'La durée estimée doit être supérieure à 0.';
     }
+    // 👈 Correctif : Validation validityDays
+    if (!validityDays || validityDays <= 0) {
+      next.validityDays = 'La durée de validité doit être supérieure à 0.';
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -118,6 +123,7 @@ export default function CreerDevis() {
           .filter((m) => m.designation.trim())
           .map(({ designation, quantity, unitPrice }) => ({ designation, quantity, unitPrice })),
         estimatedDurationHours,
+        validityDays: Number(validityDays), // 👈 Correctif : transmis dans le DTO
       });
       navigate('/provider/demandes', {
         state: { successMessage: 'Devis envoyé au client avec succès.' },
@@ -186,7 +192,9 @@ export default function CreerDevis() {
             <DelaiSection
               estimatedDurationHours={estimatedDurationHours}
               onChange={setEstimatedDurationHours}
-              error={errors.estimatedDurationHours}
+              validityDays={validityDays}
+              onValidityChange={setValidityDays}
+              error={errors.estimatedDurationHours || errors.validityDays}
             />
 
             {/* Récap total visible avant les boutons sur mobile */}
@@ -243,7 +251,6 @@ export default function CreerDevis() {
             {formatXAF(totalAmount)}
           </p>
         </div>
-        {/* FIX #4 (2e occurrence) — variant="primary" */}
         <Button
           variant="primary"
           className="flex-1 justify-center"
